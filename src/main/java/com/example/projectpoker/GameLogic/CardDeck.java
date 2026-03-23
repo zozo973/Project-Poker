@@ -8,7 +8,6 @@ public class CardDeck {
 
     private ArrayList<Card> cardDeck;
     private ArrayList<Card> drawnCards;
-    private Random order;
 
     public enum Suit {
         SPADES,
@@ -34,7 +33,6 @@ public class CardDeck {
     }
 
     public CardDeck() {
-        order = new Random();
         drawnCards = new ArrayList<>();
         cardDeck = new ArrayList<Card>(Suit.values().length * Rank.values().length);
         reset();
@@ -99,21 +97,5 @@ public class CardDeck {
         drawnCards.add(c);
         return c;
     }
-
-    /**
-     * Returns a pseudo-random number between min and max, inclusive.
-     * The difference between min and max can be at most
-     * <code>Integer.MAX_VALUE - 1</code>.
-     *
-     * @param min Minimum value
-     * @param max Maximum value.  Must be greater than min.
-     * @return Integer between min and max, inclusive.
-     * @see java.util.Random#nextInt(int)
-     */
-    public int randInt (int min, int max) {
-        int randomNum = order.nextInt((max - min) + 1) + min;
-        return randomNum;
-    }
-
 }
 

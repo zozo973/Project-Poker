@@ -1,4 +1,4 @@
-package com.example.projectpoker.GameLogic;
+package com.example.projectpoker.model;
 
 public enum PokerHand {
     // ENUM constants

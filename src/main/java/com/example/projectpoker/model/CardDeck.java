@@ -1,8 +1,7 @@
-package com.example.projectpoker.GameLogic;
+package com.example.projectpoker.model;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Random;
 
 public class CardDeck {
 
@@ -54,36 +53,7 @@ public class CardDeck {
         shuffle();
     }
 
-    public static class Card {
 
-        private Suit suit;
-        private Rank rank;
-
-        // Constructor
-        public Card(Suit suit, Rank rank) {
-            this.suit = suit;
-            this.rank = rank;
-        }
-
-        public Suit getSuit() {
-            return suit;
-        }
-
-        public Rank getRank() {
-            return rank;
-        }
-
-        public int getValue() {
-            return rank.ordinal() + 2;
-        }
-
-        // Possibly recode or remove method as it may not be necessary
-        // as there should never be the exact same card
-        @Override
-        public boolean equals(Object o) {
-            return (o instanceof Card && ((Card) o).rank == rank && ((Card) o).suit == suit);
-        }
-    }
 
     /**
      * Get a random card from the deck, removing it from the deck

@@ -1,0 +1,14 @@
+As a player, I want to start a quick poker game against the AI so that I can practice anytime.
+As a player, I want to choose the poker variant (Texas Hold’em) so that I can play my preferred style.
+As a player, I want to see my cards and community cards clearly so that I can make informed decisions.
+As a player, I want to take actions (fold, call, raise) easily so that gameplay feels smooth.
+As a player, I want the AI to make realistic decisions so that the game feels like playing against real opponents.
+As a player, I want to select different AI difficulty levels so that I can match my skill level.
+As a player, I want the AI to adapt slightly to my playstyle so that I’m challenged over time.
+As a player, I want feedback after each hand so that I understand whether I played well.
+As a player, I want to see the probability of winning (hand strength) so that I can learn better decision-making.
+As a player, I want tips or suggestions during or after the game so that I can improve my strategy.
+As a player, I want to review my hands after a game so that I can learn from mistakes.
+As a player, I want to enable or disable hints so that I can control the learning experience.
+As a user, I want to create an account so that my progress is saved.
+As a user, I want to resume previous sessions so that I can continue where I left off.

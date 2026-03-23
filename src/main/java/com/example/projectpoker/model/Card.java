@@ -3,20 +3,20 @@ package com.example.projectpoker.model;
 
     public class Card {
 
-    private CardDeck.Suit suit;
-    private CardDeck.Rank rank;
+    private Suit suit;
+    private Rank rank;
 
     // Constructor
-    public Card(CardDeck.Suit suit, CardDeck.Rank rank) {
+    public Card(Suit suit, Rank rank) {
         this.suit = suit;
         this.rank = rank;
     }
 
-    public CardDeck.Suit getSuit() {
+    public Suit getSuit() {
         return suit;
     }
 
-    public CardDeck.Rank getRank() {
+    public Rank getRank() {
         return rank;
     }
 

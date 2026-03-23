@@ -8,28 +8,9 @@ public class CardDeck {
     private ArrayList<Card> cardDeck;
     private ArrayList<Card> drawnCards;
 
-    public enum Suit {
-        SPADES,
-        CLUBS,
-        HEARTS,
-        DIAMONDS;
-    }
 
-    public enum Rank {
-        TWO,
-        THREE,
-        FOUR,
-        FIVE,
-        SIX,
-        SEVEN,
-        EIGHT,
-        NINE,
-        TEN,
-        JACK,
-        QUEEN,
-        KING,
-        ACE;
-    }
+
+
 
     public CardDeck() {
         drawnCards = new ArrayList<>();

@@ -1,4 +1,4 @@
-package com.example.projectpoker.Controllers;
+package com.example.projectpoker.controller;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;

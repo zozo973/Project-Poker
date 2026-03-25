@@ -13,6 +13,6 @@ module com.example.projectpoker {
 
     opens com.example.projectpoker to javafx.fxml;
     exports com.example.projectpoker;
-    exports com.example.projectpoker.Controllers;
-    opens com.example.projectpoker.Controllers to javafx.fxml;
+    exports com.example.projectpoker.controller;
+    opens com.example.projectpoker.controller to javafx.fxml;
 }

@@ -1,3 +1,7 @@
+As a user, I want to create an account so I can save my progress.
+As a user, I want to log in to my account so I can see my progress.
+As a user, I want to resume previous sessions so that I can continue where I left off.
+As a user, I want to view my profile page, so that I can see my stats to track my improvement
 As a player, I want to start a quick poker game against the AI so that I can practice anytime.
 As a player, I want to choose the poker variant (Texas Hold’em) so that I can play my preferred style.
 As a player, I want to see my cards and community cards clearly so that I can make informed decisions.
@@ -10,5 +14,3 @@ As a player, I want to see the probability of winning (hand strength) so that I 
 As a player, I want tips or suggestions during or after the game so that I can improve my strategy.
 As a player, I want to review my hands after a game so that I can learn from mistakes.
 As a player, I want to enable or disable hints so that I can control the learning experience.
-As a user, I want to create an account so that my progress is saved.
-As a user, I want to resume previous sessions so that I can continue where I left off.

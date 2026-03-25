@@ -1,31 +1,93 @@
 package com.example.projectpoker.model;
 
-import com.example.projectpoker.Player;
-
 import java.util.ArrayList;
-import java.util.Dictionary;
-import java.util.Hashtable;
 
 public class PokerRound {
 
     private Stage stage;
     private int numPlayers;
     private int pot;
+    private int toPlay;
     private CardDeck deck;
-    private Dictionary<Player,Integer> betLog;
+    private ArrayList<GameLogEntry> roundLog;
+    private ArrayList<Player> turnOrder;
 
 
-    public PokerRound(ArrayList<Player> players, ArrayList<Roles> roles, int blindSize) {
+    public PokerRound(ArrayList<Player> players, int blindSize, int[] roleIndices) {
         this.stage = Stage.PREFLOP;
         this.numPlayers = players.size();
         this.deck = new CardDeck();
-        Dictionary<Player,Integer> betLog = new Hashtable<>();
-        for (int i = 0; i < players.size();i++) {
-            int bet = (int) (roles.get(i).getBlindMultiplier()*blindSize);
-            betLog.put(players.get(i),bet);
+        this.toPlay = blindSize;
+        createTurnOrder(players,roleIndices);
+    }
+
+    private void createTurnOrder(ArrayList<Player> players, int[] roleIndices) {
+        ArrayList<Player> turnOrder = new ArrayList<>();
+        turnOrder.add(players.get(roleIndices[1]));
+        for (int i = roleIndices[2]; i < numPlayers; i++){
+            turnOrder.add(players.get(i));
         }
-        this.betLog = betLog;
+        for (int i = 0 ; i <= roleIndices[0]; i++){
+            turnOrder.add(players.get(i));
+        }
+        this.turnOrder = turnOrder;
+    }
+  //  public Dictionary getBetLog() { return betLog; }
+
+    // TODO Attach to the game controller
+    // On click method depending on player choice
+    public void playerAction(Player player, int betSize, Action action) {
+        if (action.isBet(action)) {
+            this.roundLog.add(new GameLogEntry(player,toPlay-player.getRoundInvestment(),betSize,action));
+        } else {
+            this.roundLog.add(new GameLogEntry(player,betSize));
+        }
+    }
+
+    private void dealCards() {
+        for (int repeat = 0; repeat < 2; repeat++) {
+            for (int i = 0; i < turnOrder.size(); i++) {
+                turnOrder.get(i).addCardToHand(deck.draw());
+            }
+        }
+        this.pot = turnOrder.get(0).payBlind(toPlay) + turnOrder.get(1).payBlind(toPlay);
+    }
+
+    private void playPreFlop() {
+
+        for (int i = 0; i < turnOrder.size(); i++) {
+            turnOrder.get(i).setIsTurn(true);
+            while (turnOrder.get(i).getIsTurn()) {
+                // Wait for input on bet or check or fold
+                // call method to asked user for input
+                // turnOrder.get(i).setAction(actionButtonInput());
+                int betSize = turnOrder.get(i).chooseBetSize();
+                this.pot += turnOrder.get(i).placeBet(betSize);
+                playerAction(turnOrder.get(i),betSize,turnOrder.get(i).getAction());
+                if (turnOrder.get(i).getAction() == Action.RAISE) this.toPlay = turnOrder.get(i).getRoundInvestment();
+
+            }
+        }
+    }
+
+    private boolean endBettingCondition() {
+        boolean[] endBetting = new boolean[]{};
+        for (int i = 0; i < turnOrder.size(); i++) {
+            if (turnOrder.get(i).getAction().endBettingActions(turnOrder.get(i).getAction())) {
+                endBetting[i] = true;
+            } else {
+                endBetting[i] = false;
+            }
+        }
+
+        return endBetting;
     }
 
 
+    public void playRound() {
+        dealCards();
+
+
+
+    }
 }

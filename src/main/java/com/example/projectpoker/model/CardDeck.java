@@ -42,11 +42,16 @@ public class CardDeck {
      */
     public Card draw() {
         if (cardDeck.isEmpty()) { return null; }
-        // int drawnIndex = randInt(0,cardDeck.size()-1);
         Card c = cardDeck.getFirst();
         cardDeck.removeFirst();
         drawnCards.add(c);
         return c;
+    }
+
+    public void burnCard() {
+        Card c = cardDeck.getFirst();
+        cardDeck.removeFirst();
+        drawnCards.add(c);
     }
 }
 

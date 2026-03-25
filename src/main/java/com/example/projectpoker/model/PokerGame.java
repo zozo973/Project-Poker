@@ -1,14 +1,13 @@
 package com.example.projectpoker.model;
 
-import com.example.projectpoker.Player;
-
 import java.util.*;
 
 public class PokerGame {
 
     private ArrayList<Player> players;
-    private int numRounds;
-    private int initialBlind;
+    private int numRoundsLeft;
+    private int gameLength;
+    private int blindSize;
     private int whenInceaseBlinds;
 
 
@@ -21,13 +20,16 @@ public class PokerGame {
     //      gameLength: maximum number of rounds the poker game goes for.
     //      difficulty: affects the intelligence, risk taking and starting cash of the AI players
     //
+
     public PokerGame(Player user, int numPlayers, int initBlind, int whenInceaseBlinds, int gameLength, Difficulty difficulty) {
-        this.players = new ArrayList<Player>();
+        this.players = new ArrayList<>();
         players.add(user);
-        this.players = initAiPlayers(players,user.getBalance(),numPlayers,difficulty);
-        this.initialBlind = initBlind;
+        this.players = delegateRoles(initAiPlayers(players,user.getBalance(),numPlayers,difficulty), new int[] {0,1,2});
+        this.blindSize = initBlind;
         this.whenInceaseBlinds = whenInceaseBlinds;
-        this.numRounds = gameLength;
+        this.gameLength = gameLength;
+        this.numRoundsLeft = gameLength;
+        // Method for loading visual game features
     }
 
     private ArrayList<Player> initAiPlayers(ArrayList<Player> players, int userBalance, int numPlayers, Difficulty difficulty) {
@@ -38,18 +40,59 @@ public class PokerGame {
         return players;
     }
 
-    private ArrayList<Player> delegateRoles(ArrayList<Player> players, int dealerIndex) {
+    private ArrayList<Player> delegateRoles(ArrayList<Player> players, int[] roleIndices) {
+        players.get(roleIndices[0]).setRole(Roles.DEALER);
+        players.get(roleIndices[1]).setRole(Roles.SMALLBLIND);
+        players.get(roleIndices[2]).setRole(Roles.BIGBLIND);
+        return players;
+    }
+
+    private int[] findRoleIndices() {
+        int[] roleIndices = {0, 0, 0};
         for (int i = 0; i < players.size(); i++) {
-            if (i == dealerIndex) {
-                players.get(i).setRole(Roles.DEALER);
-            } else if (i == dealerIndex+1) {
-                players.get(i).setRole(Roles.SMALLBLIND);
-            } else if (i == dealerIndex+2) {
-                players.get(i).setRole(Roles.BIGBLIND);
-            } else {
-                players.get(i).setRole(Roles.PLAYER);
+            if (players.get(i).getRole() == Roles.DEALER) {
+                roleIndices[0] = i;
+            } else if (players.get(i).getRole() == Roles.SMALLBLIND) {
+                roleIndices[1] = i;
+            } else if (players.get(i).getRole() == Roles.BIGBLIND) {
+                roleIndices[2] = i;
             }
         }
-        return players;
+        return roleIndices;
+    }
+
+    private int[] stepRoleIndices() {
+        int[] roleIndices = findRoleIndices();
+        if (roleIndices[0] == players.size() - 3) {
+            roleIndices[0] += 1;
+            roleIndices[1] += 1;
+            roleIndices[2] = 0;
+        } else if (roleIndices[0] == players.size() - 2) {
+            roleIndices[0] += 1;
+            roleIndices[1] = 0;
+            roleIndices[2] = 1;
+        } else if (roleIndices[0] == players.size() - 1) { roleIndices = new int[] {0,1,2}; }
+        else {
+            roleIndices[0] += 1;
+            roleIndices[1] += 1;
+            roleIndices[2] += 1;
+        }
+        return roleIndices;
+    }
+
+
+    private void tryIncreaseBlind() {
+        if ((gameLength - numRoundsLeft) == whenInceaseBlinds) {
+            this.blindSize = blindSize * 2;
+        }
+    }
+
+    public void newRound(ArrayList<Player> players) {
+        tryIncreaseBlind();
+
+        PokerRound round = new PokerRound(players,blindSize,findRoleIndices());
+
+
+        delegateRoles(players,stepRoleIndices());
     }
 }

@@ -1,0 +1,65 @@
+AI Poker Trainer App – Core Requirements
+1. User Account System
+•	Users can sign up, log in, and log out
+•	Store user profiles and progress
+•	Optional: guest mode
+•	 Needed for tracking learning progress and personalization
+2. Poker Game Engine
+•	Implement core poker logic (e.g., Texas Hold’em):
+o	Deck generation & shuffling
+o	Dealing cards
+o	Betting rounds
+o	Hand evaluation (win/loss)
+o	This is the foundation of the entire app
+3. AI Opponent / Trainer
+•	AI that plays poker against the user
+•	Adjustable difficulty levels (beginner → advanced)
+•	AI makes decisions based on:
+o	Hand strength
+o	Position
+o	Betting patterns
+-	Core “trainer” functionality
+4. Decision Feedback System
+•	After each hand, provide feedback:
+o	“Correct play” vs “suboptimal play”
+o	Suggested action (fold/call/raise)
+•	Show reasoning (basic → advanced explanations)
+5. Hand Analysis & Replay
+•	Users can:
+o	Review previous hands
+o	Replay decisions step-by-step
+o	See alternative outcomes
+o	Critical for learning and improvement
+6. Training Modes
+•	Multiple modes such as:
+o	Practice mode (no pressure)
+o	Scenario-based training (e.g., “short stack”)
+o	Quiz mode (what should you do here?)
+o	Adds structured learning
+7. Statistics & Progress Tracking
+•	Track:
+o	Win rate
+o	Decision accuracy
+o	Common mistakes
+•	Display dashboards/graphs
+•	Keeps users engaged + measurable improvement
+8. UI/UX Interface (Maybe JavaFX or Swing)
+•	Interactive poker table UI
+•	Clear display of:
+o	Cards
+o	Chips
+o	Actions
+•	Responsive and intuitive design
+9. Data Persistence
+•	Store:
+o	User accounts
+o	Game history
+o	Statistics
+•	Use a database (e.g., SQLite similar to address book project)
+10. System Architecture & Modularity
+•	Clean separation:
+o	Game logic
+o	AI logic
+o	UI
+o	Data layer
+•	Use interfaces (e.g., DAO pattern)

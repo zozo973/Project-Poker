@@ -13,4 +13,6 @@ public enum Roles {
         this.blindMultiplier = blindMultiplier;
         this.description = description;
     }
+
+    public double getBlindMultiplier() { return this.blindMultiplier; }
 }

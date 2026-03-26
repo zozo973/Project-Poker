@@ -2,12 +2,14 @@ package com.example.projectpoker;
 
 import com.example.projectpoker.model.Action;
 import com.example.projectpoker.model.Card;
+import com.example.projectpoker.model.Roles;
 
 public class Player {
     private Card[] playerHand;
     private boolean isTurn;
     private int balance;
     private Action action;
+    private Roles role;
 
     // No args constructor, minimum balance a player starts a
     // game with if they do not choose to use money they have won before.
@@ -15,6 +17,7 @@ public class Player {
         this.playerHand = new Card[5];
         this.isTurn = false;
         this.action = null;
+        this.role = Roles.PLAYER;
     }
 
     public Player(int balance) {
@@ -22,6 +25,7 @@ public class Player {
         this.isTurn = false;
         this.balance = balance;
         this.action = null;
+        this.role = Roles.PLAYER;
     }
 
     public Card[] getPlayerHand() { return playerHand; }
@@ -37,6 +41,10 @@ public class Player {
     public boolean getIsTurn() { return isTurn; }
 
     public void setIsTurn(boolean isTurn) { this.isTurn = isTurn; }
+
+    public Roles getRole() { return role; }
+
+    public void setRole(Roles role) { this.role = role; }
 
     public void placeBet(int betSize) {
         if (betSize == balance) {

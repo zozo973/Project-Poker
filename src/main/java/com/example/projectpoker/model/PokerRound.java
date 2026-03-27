@@ -22,6 +22,8 @@ public class PokerRound {
         createTurnOrder(players,roleIndices);
     }
 
+    public ArrayList<GameLogEntry> getRoundLog() { return roundLog; }
+
     private void createTurnOrder(ArrayList<Player> players, int[] roleIndices) {
         ArrayList<Player> turnOrder = new ArrayList<>();
         turnOrder.add(players.get(roleIndices[1]));
@@ -33,7 +35,6 @@ public class PokerRound {
         }
         this.turnOrder = turnOrder;
     }
-  //  public Dictionary getBetLog() { return betLog; }
 
     // TODO Attach to the game controller
     // On click method depending on player choice
@@ -55,7 +56,6 @@ public class PokerRound {
     }
 
     private void playPreFlop() {
-
         for (int i = 0; i < turnOrder.size(); i++) {
             turnOrder.get(i).setIsTurn(true);
             while (turnOrder.get(i).getIsTurn()) {

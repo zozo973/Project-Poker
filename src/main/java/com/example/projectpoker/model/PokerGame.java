@@ -41,6 +41,9 @@ public class PokerGame {
     }
 
     private ArrayList<Player> delegateRoles(ArrayList<Player> players, int[] roleIndices) {
+        for (Player p : players) {
+            p.setRole(Roles.PLAYER);
+        }
         players.get(roleIndices[0]).setRole(Roles.DEALER);
         players.get(roleIndices[1]).setRole(Roles.SMALLBLIND);
         players.get(roleIndices[2]).setRole(Roles.BIGBLIND);
@@ -89,10 +92,15 @@ public class PokerGame {
 
     public void newRound(ArrayList<Player> players) {
         tryIncreaseBlind();
+        PokerRound round = new PokerRound(delegateRoles(players,stepRoleIndices()),blindSize,findRoleIndices());
+        // methods to play round
 
-        PokerRound round = new PokerRound(players,blindSize,findRoleIndices());
+        // once round ends
+        ArrayList<GameLogEntry> roundLog = round.getRoundLog();
+        // method for sending log to database
 
 
-        delegateRoles(players,stepRoleIndices());
+
+
     }
 }

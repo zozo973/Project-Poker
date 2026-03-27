@@ -6,7 +6,7 @@ public class PokerRound {
 
     private Stage stage;
     private int numPlayers;
-    private int pot;
+    private Pot pot;
     private int toPlay;
     private CardDeck deck;
     private ArrayList<GameLogEntry> roundLog;
@@ -18,6 +18,7 @@ public class PokerRound {
         this.numPlayers = players.size();
         this.deck = new CardDeck();
         this.toPlay = blindSize;
+        this.pot = new Pot(players);
         createTurnOrder(players,roleIndices);
     }
 
@@ -50,7 +51,7 @@ public class PokerRound {
                 turnOrder.get(i).addCardToHand(deck.draw());
             }
         }
-        this.pot = turnOrder.get(0).payBlind(toPlay) + turnOrder.get(1).payBlind(toPlay);
+        this.pot.addToPot(turnOrder.get(0).payBlind(toPlay) + turnOrder.get(1).payBlind(toPlay));
     }
 
     private void playPreFlop() {
@@ -62,27 +63,13 @@ public class PokerRound {
                 // call method to asked user for input
                 // turnOrder.get(i).setAction(actionButtonInput());
                 int betSize = turnOrder.get(i).chooseBetSize();
-                this.pot += turnOrder.get(i).placeBet(betSize);
+                this.pot.addToPot(turnOrder.get(i).placeBet(betSize));
                 playerAction(turnOrder.get(i),betSize,turnOrder.get(i).getAction());
                 if (turnOrder.get(i).getAction() == Action.RAISE) this.toPlay = turnOrder.get(i).getRoundInvestment();
 
             }
         }
     }
-
-    private boolean endBettingCondition() {
-        boolean[] endBetting = new boolean[]{};
-        for (int i = 0; i < turnOrder.size(); i++) {
-            if (turnOrder.get(i).getAction().endBettingActions(turnOrder.get(i).getAction())) {
-                endBetting[i] = true;
-            } else {
-                endBetting[i] = false;
-            }
-        }
-
-        return endBetting;
-    }
-
 
     public void playRound() {
         dealCards();

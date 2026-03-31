@@ -52,7 +52,10 @@ public class HandResult {
                 return "IT'S A ROYAL FLUSH!!";
             //Straight Flush
             case 8:
-                return "It's a Straight Flush: " + Rank.values()[value-7] + "through to " + Rank.values()[value-2] + ".";
+                if (Rank.values()[value - 2] == Rank.Five) {
+                    return "It's a Straight Flush: Ace through to 5.";
+                }
+                return "It's a Straight Flush: " + Rank.values()[value-6] + " through to " + Rank.values()[value-2] + ".";
             // Four of a kind
             case 7:
                 return "Four of a kind: "+ Rank.values()[value-2] + "s.";
@@ -64,7 +67,11 @@ public class HandResult {
                 return "Its a flush";
             // Straight
             case 4:
-                return "It's a Straight: " + Rank.values()[value-7] + "through to " + Rank.values()[value-2] + ".";
+                if (Rank.values()[value - 2] == Rank.Five) {
+                    return "It's a Straight: Ace through to 5.";
+                }
+
+                return "It's a Straight: " + Rank.values()[value-6] + " through to " + Rank.values()[value-2] + ".";
             // Three of a kind
             case 3:
                 return "Three of a kind: "+ Rank.values()[value-2] + "s.";
@@ -73,7 +80,7 @@ public class HandResult {
                 return "Two pairs: "+ Rank.values()[value-2] + "s and "+ Rank.values()[kicker1-2] + "s." ;
             // Pair
             case 1:
-                return "Pair of" + Rank.values()[value-2] + "s.";
+                return "Pair of " + Rank.values()[value-2] + "s.";
             //
             case 0:
                 return "High Card: " + Rank.values()[value-2] + ".";

@@ -63,7 +63,7 @@ public class HandEvaluation {
         int kicker3 = values.size() > 3 ? values.get(3) : 0;
         int kicker4 = values.size() > 4 ? values.get(4) : 0;
 
-        return new HandResult(1, value, kicker1, kicker2, kicker3, kicker4);
+        return new HandResult(PokerHand.HIGHCARD.getValue()-1, value, kicker1, kicker2, kicker3, kicker4);
     }
 
     private static HandResult isPair(List<Card> cards) {

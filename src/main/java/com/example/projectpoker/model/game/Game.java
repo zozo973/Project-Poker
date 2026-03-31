@@ -1,12 +1,15 @@
 package com.example.projectpoker.model.game;
 
+import com.example.projectpoker.model.game.RoleUtil;
 import com.example.projectpoker.model.game.oberserver.AbsSubject;
 
 import java.util.ArrayList;
 import java.util.Collections;
 
+
 public class Game extends AbsSubject {
 
+    private GameStatus state;
     private ArrayList<Player> players;
     private int numRoundsLeft;
     private int gameLength;
@@ -42,17 +45,33 @@ public class Game extends AbsSubject {
     }
 
     public void init(int numPlayers) {
-        this.players = delegateRoles(initAiPlayers(players, userBalance, numPlayers, difficulty), new int[]{0, 1, 2});
+        this.players = RoleUtil.delegateRoles(initAiPlayers(players, userBalance, numPlayers, difficulty), new int[]{0, 1, 2});
+        this.state = GameStatus.INITIALISED;
+        notifyObservers(state);
     }
 
     public void start() {
-
+        // Valid game before starting
+        this.state = GameStatus.RUNNING;
+        notifyObservers(state);
+        while (state == GameStatus.RUNNING) {
+            Round round = new Round(players,blindSize);
+            round.Init();
+            round.Start();
+            // Loss Condition
+            if (players.getFirst().getBalance() == 0) { end(); break; }
+            else if (numRoundsLeft == 0) { end(); break; }
+            else if (players.size() == 1 && !(players.getFirst() instanceof AiPlayer)) {end(); break; }
+            tryIncreaseBlind();
+        }
     }
 
     public void end() {
-
+        this.state = GameStatus.ENDED;
+        notifyObservers(state); // notify UI
+        // save to database
+        //      update player balance & records
     }
-
 
     private ArrayList<Player> initAiPlayers(ArrayList<Player> players, int userBalance, int numPlayers, Difficulty difficulty) {
         for (int i = numPlayers - 1; i > 0; i--) {
@@ -62,66 +81,9 @@ public class Game extends AbsSubject {
         return players;
     }
 
-    private ArrayList<Player> delegateRoles(ArrayList<Player> players, int[] roleIndices) {
-        for (Player p : players) {
-            p.setRole(Roles.PLAYER);
-        }
-        players.get(roleIndices[0]).setRole(Roles.DEALER);
-        players.get(roleIndices[1]).setRole(Roles.SMALLBLIND);
-        players.get(roleIndices[2]).setRole(Roles.BIGBLIND);
-        return players;
-    }
-
     private void tryIncreaseBlind() {
-        if ((gameLength - numRoundsLeft) == whenInceaseBlinds) {
+        if ((gameLength - numRoundsLeft) % whenInceaseBlinds == 0) {
             this.blindSize = blindSize * 2;
         }
-    }
-
-    private int[] findRoleIndices() {
-        int[] roleIndices = {0, 0, 0};
-        for (int i = 0; i < players.size(); i++) {
-            if (players.get(i).getRole() == Roles.DEALER) {
-                roleIndices[0] = i;
-            } else if (players.get(i).getRole() == Roles.SMALLBLIND) {
-                roleIndices[1] = i;
-            } else if (players.get(i).getRole() == Roles.BIGBLIND) {
-                roleIndices[2] = i;
-            }
-        }
-        return roleIndices;
-    }
-
-    private int[] stepRoleIndices() {
-        int[] roleIndices = findRoleIndices();
-        if (roleIndices[0] == players.size() - 3) {
-            roleIndices[0] += 1;
-            roleIndices[1] += 1;
-            roleIndices[2] = 0;
-        } else if (roleIndices[0] == players.size() - 2) {
-            roleIndices[0] += 1;
-            roleIndices[1] = 0;
-            roleIndices[2] = 1;
-        } else if (roleIndices[0] == players.size() - 1) {
-            roleIndices = new int[]{0, 1, 2};
-        } else {
-            roleIndices[0] += 1;
-            roleIndices[1] += 1;
-            roleIndices[2] += 1;
-        }
-        return roleIndices;
-    }
-
-    public void newRound(ArrayList<Player> players) {
-        tryIncreaseBlind();
-        Round round = new Round(delegateRoles(players, stepRoleIndices()), blindSize, findRoleIndices());
-
-        // methods to play round
-
-        // once round ends
-        // ArrayList<GameLogEntry> roundLog = round.getRoundLog();
-        // method for sending log to database
-
-
     }
 }

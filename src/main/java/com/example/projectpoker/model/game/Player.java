@@ -1,10 +1,12 @@
 package com.example.projectpoker.model.game;
 
+import com.example.projectpoker.model.game.oberserver.Observer;
+
 import java.util.ArrayList;
 
 import static com.example.projectpoker.model.statistics.SkewNormalSampler.safeRoundToInt;
 
-public class Player {
+public class Player implements Observer {
     private ArrayList<Card> playerHand;
     private String name;
     private boolean isTurn;
@@ -51,6 +53,7 @@ public class Player {
 
     public ArrayList<Card> getPlayerHand() { return playerHand; }
 
+    // TODO implement validation for UI input
     public int getBalance() { return balance; }
 
     protected void setBalance(int balance) { this.balance = balance; }
@@ -70,6 +73,11 @@ public class Player {
     public Roles getRole() { return role; }
 
     public void setRole(Roles role) { this.role = role; }
+
+    @Override
+    public void update() {
+
+    }
 
     public int placeBet(int betSize) {
         if (betSize >= balance) {
@@ -94,7 +102,7 @@ public class Player {
         } else {
             setBalance((balance - betSize));
         }
-        roundInvestment += betSize;
+        this.roundInvestment += betSize;
         return betSize;
     }
 
@@ -107,4 +115,6 @@ public class Player {
         // return rounded slider value from the view
         return 0;
     }
+
+
 }

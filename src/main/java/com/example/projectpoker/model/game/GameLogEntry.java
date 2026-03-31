@@ -1,4 +1,4 @@
-package com.example.projectpoker.model;
+package com.example.projectpoker.model.game;
 
 public class GameLogEntry {
     private Player player;

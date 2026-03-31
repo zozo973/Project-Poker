@@ -1,14 +1,20 @@
-package com.example.projectpoker.model;
+package com.example.projectpoker.model.game;
 
-import java.util.*;
+import com.example.projectpoker.model.game.oberserver.AbsSubject;
 
-public class PokerGame {
+import java.util.ArrayList;
+import java.util.Collections;
+
+public class Game extends AbsSubject {
 
     private ArrayList<Player> players;
     private int numRoundsLeft;
     private int gameLength;
     private int blindSize;
     private int whenInceaseBlinds;
+    private Difficulty difficulty;
+    private int numPlayers;
+    private int userBalance;
 
 
     // Constructor called when starting a new game of poker
@@ -21,20 +27,36 @@ public class PokerGame {
     //      difficulty: affects the intelligence, risk taking and starting cash of the AI players
     //
 
-    public PokerGame(Player user, int numPlayers, int initBlind, int whenInceaseBlinds, int gameLength, Difficulty difficulty) {
+    public Game(Player user, int userBalance, int numPlayers, int initBlind, int whenInceaseBlinds, int gameLength, Difficulty difficulty) {
         this.players = new ArrayList<>();
         players.add(user);
-        this.players = delegateRoles(initAiPlayers(players,user.getBalance(),numPlayers,difficulty), new int[] {0,1,2});
+        this.numPlayers = numPlayers;
+        this.userBalance = userBalance;
+        this.difficulty = difficulty;
         this.blindSize = initBlind;
         this.whenInceaseBlinds = whenInceaseBlinds;
         this.gameLength = gameLength;
         this.numRoundsLeft = gameLength;
+        //GameContext gameContext = new GameContext();
         // Method for loading visual game features
     }
 
+    public void init(int numPlayers) {
+        this.players = delegateRoles(initAiPlayers(players, userBalance, numPlayers, difficulty), new int[]{0, 1, 2});
+    }
+
+    public void start() {
+
+    }
+
+    public void end() {
+
+    }
+
+
     private ArrayList<Player> initAiPlayers(ArrayList<Player> players, int userBalance, int numPlayers, Difficulty difficulty) {
-        for (int i = numPlayers-1; i > 0 ; i--) {
-            players.add(new AiPlayer(difficulty,userBalance));
+        for (int i = numPlayers - 1; i > 0; i--) {
+            players.add(new AiPlayer(difficulty, userBalance));
         }
         Collections.reverse(players);
         return players;
@@ -48,6 +70,12 @@ public class PokerGame {
         players.get(roleIndices[1]).setRole(Roles.SMALLBLIND);
         players.get(roleIndices[2]).setRole(Roles.BIGBLIND);
         return players;
+    }
+
+    private void tryIncreaseBlind() {
+        if ((gameLength - numRoundsLeft) == whenInceaseBlinds) {
+            this.blindSize = blindSize * 2;
+        }
     }
 
     private int[] findRoleIndices() {
@@ -74,8 +102,9 @@ public class PokerGame {
             roleIndices[0] += 1;
             roleIndices[1] = 0;
             roleIndices[2] = 1;
-        } else if (roleIndices[0] == players.size() - 1) { roleIndices = new int[] {0,1,2}; }
-        else {
+        } else if (roleIndices[0] == players.size() - 1) {
+            roleIndices = new int[]{0, 1, 2};
+        } else {
             roleIndices[0] += 1;
             roleIndices[1] += 1;
             roleIndices[2] += 1;
@@ -83,23 +112,15 @@ public class PokerGame {
         return roleIndices;
     }
 
-
-    private void tryIncreaseBlind() {
-        if ((gameLength - numRoundsLeft) == whenInceaseBlinds) {
-            this.blindSize = blindSize * 2;
-        }
-    }
-
     public void newRound(ArrayList<Player> players) {
         tryIncreaseBlind();
-        PokerRound round = new PokerRound(delegateRoles(players,stepRoleIndices()),blindSize,findRoleIndices());
+        Round round = new Round(delegateRoles(players, stepRoleIndices()), blindSize, findRoleIndices());
+
         // methods to play round
 
         // once round ends
-        ArrayList<GameLogEntry> roundLog = round.getRoundLog();
+        // ArrayList<GameLogEntry> roundLog = round.getRoundLog();
         // method for sending log to database
-
-
 
 
     }

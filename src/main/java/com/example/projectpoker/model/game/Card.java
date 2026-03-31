@@ -1,7 +1,10 @@
-package com.example.projectpoker.model;
+package com.example.projectpoker.model.game;
 
 
-    public class Card {
+import java.util.ArrayList;
+import java.util.Collections;
+
+public class Card {
 
     private Suit suit;
     private Rank rank;

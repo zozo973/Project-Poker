@@ -17,4 +17,10 @@ module com.example.projectpoker {
     opens com.example.projectpoker.controller to javafx.fxml;
     exports com.example.projectpoker.model;
     opens com.example.projectpoker.model to javafx.fxml;
+    exports com.example.projectpoker.model.game;
+    opens com.example.projectpoker.model.game to javafx.fxml;
+    exports com.example.projectpoker.model.game.statemachine;
+    opens com.example.projectpoker.model.game.statemachine to javafx.fxml;
+    exports com.example.projectpoker.model.game.oberserver;
+    opens com.example.projectpoker.model.game.oberserver to javafx.fxml;
 }

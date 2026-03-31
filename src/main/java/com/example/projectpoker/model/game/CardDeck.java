@@ -1,4 +1,4 @@
-package com.example.projectpoker.model;
+package com.example.projectpoker.model.game;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -7,10 +7,6 @@ public class CardDeck {
 
     private ArrayList<Card> cardDeck;
     private ArrayList<Card> drawnCards;
-
-
-
-
 
     public CardDeck() {
         drawnCards = new ArrayList<>();
@@ -33,8 +29,6 @@ public class CardDeck {
         }
         shuffle();
     }
-
-
 
     /**
      * Get a random card from the deck, removing it from the deck

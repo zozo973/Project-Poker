@@ -1,4 +1,4 @@
-package com.example.projectpoker.model;
+package com.example.projectpoker.model.game;
 
 import java.util.ArrayList;
 

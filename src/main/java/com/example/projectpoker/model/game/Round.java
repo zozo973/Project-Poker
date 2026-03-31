@@ -1,10 +1,12 @@
-package com.example.projectpoker.model;
+package com.example.projectpoker.model.game;
+
+import com.example.projectpoker.model.game.oberserver.AbsSubject;
 
 import java.util.ArrayList;
 
-public class PokerRound {
+public class Round extends AbsSubject {
 
-    private Stage stage;
+    private RoundStatus stage;
     private int numPlayers;
     private Pot pot;
     private int toPlay;
@@ -13,8 +15,8 @@ public class PokerRound {
     private ArrayList<Player> turnOrder;
 
 
-    public PokerRound(ArrayList<Player> players, int blindSize, int[] roleIndices) {
-        this.stage = Stage.PREFLOP;
+    public Round(ArrayList<Player> players, int blindSize, int[] roleIndices) {
+        this.stage = RoundStatus.BLINDS;
         this.numPlayers = players.size();
         this.deck = new CardDeck();
         this.toPlay = blindSize;

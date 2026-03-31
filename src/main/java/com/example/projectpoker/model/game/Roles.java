@@ -1,4 +1,4 @@
-package com.example.projectpoker.model;
+package com.example.projectpoker.model.game;
 
 public enum Roles {
     PLAYER(0,"Player"),

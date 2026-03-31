@@ -5,146 +5,375 @@ import java.util.List;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.EnumMap;
+
 
 public class HandEvaluation {
 
+    public static HandResult evaluateHand(List<Card> cards) {
+        HandResult testEvaluation;
 
-    private static PokerHand evaluateHand(List<Card> cards) {
+        testEvaluation = isStraightFlush(cards);
+        if (testEvaluation !=null) return testEvaluation;
 
-        if (isRoyalFlush(cards)) return (PokerHand.ROYALFLUSH);
-        if (isStraightFlush(cards)) return PokerHand.STRAIGHTFLUSH;
-        if (isFourOfAKind(cards)) return PokerHand.QUAD;
-        if (isFullHouse(cards)) return PokerHand.FULLHOUSE;
-        if (isFlush(cards)) return PokerHand.FLUSH;
-        if (isStraight(cards)) return PokerHand.STRAIGHT;
-        if (isThreeOfAKind(cards)) return PokerHand.TRIPLE;
-        if (isTwoPair(cards)) return PokerHand.TWOPAIR;
-        if (isPair(cards)) return PokerHand.ONEPAIR;
-        return PokerHand.HIGHCARD;
+        testEvaluation = isFourOfAKind(cards);
+        if (testEvaluation !=null) return testEvaluation;
+
+        testEvaluation = isFullHouse(cards);
+        if (testEvaluation !=null) return testEvaluation;
+
+        testEvaluation = isFlush(cards);
+        if (testEvaluation !=null) return testEvaluation;
+
+        testEvaluation = isStraight(cards);
+        if (testEvaluation !=null) return testEvaluation;
+
+        testEvaluation = isThreeOfAKind(cards);
+        if (testEvaluation !=null) return testEvaluation;
+
+        testEvaluation = isTwoPair(cards);
+        if (testEvaluation !=null) return testEvaluation;
+
+        testEvaluation = isPair(cards);
+        if (testEvaluation !=null) return testEvaluation;
+
+        testEvaluation = isHighCard(cards);
+        return testEvaluation;
+
+
     }
 
-    private static boolean isPair(List<Card> cards) {
+    private static HandResult isHighCard(List<Card> cards) {
+        if (cards == null || cards.isEmpty()) return null;
+
+        // Extract values
+        List<Integer> values = new ArrayList<>();
+        for (Card card : cards) {
+            values.add(card.getValue());
+        }
+
+        // Sort descending
+        values.sort(Collections.reverseOrder());
+
+        int value = values.get(0);
+        int kicker1 = values.size() > 1 ? values.get(1) : 0;
+        int kicker2 = values.size() > 2 ? values.get(2) : 0;
+        int kicker3 = values.size() > 3 ? values.get(3) : 0;
+        int kicker4 = values.size() > 4 ? values.get(4) : 0;
+
+        return new HandResult(1, value, kicker1, kicker2, kicker3, kicker4);
+    }
+
+    private static HandResult isPair(List<Card> cards) {
         for (int i = 0; i < cards.size(); i++) {
             int count = 1;
+            int rank = cards.get(i).getValue();
 
             for (int j = i + 1; j < cards.size(); j++) {
-                if (cards.get(i).getRank() == cards.get(j).getRank()) {
+                if (rank == cards.get(j).getValue()) {
                     count++;
                 }
             }
 
-            if (count >= 2) return true;
+            if (count == 2) {
+                int kicker1 = -1;
+                int kicker2 = -1;
+                int kicker3 = -1;
+
+                // find the Highest kicker card
+                for (Card card : cards) {
+                    if (card.getValue() != rank) {
+                        kicker1 = Math.max(kicker1, card.getValue());
+                    }
+                }
+                // find the 2nd kicker card
+                for (Card card : cards) {
+                    if (card.getValue() != rank && card.getValue() != kicker1) {
+                        kicker2 = Math.max(kicker2, card.getValue());
+                    }
+                }
+                // find the 3rd kicker card
+                for (Card card : cards) {
+                    if (card.getValue() != rank&& card.getValue() != kicker1 && card.getValue() != kicker2) {
+                        kicker3 = Math.max(kicker3, card.getValue());
+                    }
+                }
+
+
+                return new HandResult(PokerHand.ONEPAIR.getValue()-1, rank, kicker1, kicker2, kicker3);
+            }
         }
-        return false;
+
+        return null; // no pairs
     }
 
-    private static boolean isThreeOfAKind(List<Card> cards) {
+    private static HandResult isThreeOfAKind(List<Card> cards) {
         for (int i = 0; i < cards.size(); i++) {
             int count = 1;
+            int rank = cards.get(i).getValue();
 
             for (int j = i + 1; j < cards.size(); j++) {
-                if (cards.get(i).getRank() == cards.get(j).getRank()) {
+                if (rank == cards.get(j).getValue()) {
                     count++;
                 }
             }
 
-            if (count >= 3) return true;
+            if (count >= 3) {
+                int kicker1 = -1;
+                int kicker2 = -1;
+
+                // find the Highest kicker card
+                for (Card card : cards) {
+                    if (card.getValue() != rank) {
+                        kicker1 = Math.max(kicker1, card.getValue());
+                    }
+                }
+                // find the 2nd kicker card
+                for (Card card : cards) {
+                    if (card.getValue() != rank && card.getValue() != kicker1) {
+                        kicker2 = Math.max(kicker2, card.getValue());
+                    }
+                }
+                return new HandResult(PokerHand.TRIPLE.getValue()-1, rank, kicker1, kicker2);
+            }
         }
-        return false;
+
+        return null; // no triple
     }
 
-    private static boolean isFourOfAKind(List<Card> cards) {
+    private static HandResult isFourOfAKind(List<Card> cards) {
         for (int i = 0; i < cards.size(); i++) {
             int count = 1;
+            int rank = cards.get(i).getValue();
 
             for (int j = i + 1; j < cards.size(); j++) {
-                if (cards.get(i).getRank() == cards.get(j).getRank()) {
+                if (rank == cards.get(j).getValue()) {
                     count++;
                 }
             }
 
-            if (count >= 4) return true;
-        }
-        return false;
-    }
+            if (count >= 4) {
+                int kicker = -1;
 
-    private static boolean isTwoPair(List<Card> cards) {
-        int pairs = 0;
-
-        for (int i = 0; i < cards.size(); i++) {
-            int count = 1;
-
-            for (int j = i + 1; j < cards.size(); j++) {
-                if (cards.get(i).getRank() == cards.get(j).getRank()) {
-                    count++;
+                // find the Highest kicker card
+                for (Card card : cards) {
+                    if (card.getValue() != rank) {
+                        kicker = Math.max(kicker, card.getValue());
+                    }
                 }
-            }
 
-            if (count >= 2) {
-                pairs++;
-                i++;
+                return new HandResult(PokerHand.QUAD.getValue()-1, rank, kicker);
             }
         }
 
-        return pairs >= 2;
+        return null; // no four of a kind
     }
 
-    private static boolean isFlush(List<Card> cards){
-        for (int i = 0; i < cards.size(); i++) {
-            int count = 1;
+    private static HandResult isTwoPair(List<Card> cards) {
+        Map<Integer, Integer> counts = new HashMap<>();
 
-            for (int j = i + 1; j < cards.size(); j++) {
-                if (cards.get(i).getSuit() == cards.get(j).getSuit()) {
-                    count++;
-                }
-            }
-
-            if (count >= 5) return true;
+        // Count occurrences of each value
+        for (Card card : cards) {
+            int value = card.getValue();
+            counts.put(value, counts.getOrDefault(value, 0) + 1);
         }
-        return false;
+
+        // Collect all pairs
+        List<Integer> pairs = new ArrayList<>();
+        for (Map.Entry<Integer, Integer> entry : counts.entrySet()) {
+            if (entry.getValue() >= 2) {
+                pairs.add(entry.getKey());
+            }
+        }
+
+        // Need at least 2 pairs
+        if (pairs.size() < 2) return null;
+
+        // Sort pairs descending
+        pairs.sort(Collections.reverseOrder());
+
+        int highPair = pairs.get(0);
+        int secondPair = pairs.get(1);
+
+        // Find highest kicker not part of the pairs
+        int kicker = -1;
+        for (Card card : cards) {
+            int value = card.getValue();
+            if (value != highPair && value != secondPair) {
+                kicker = Math.max(kicker, value);
+            }
+        }
+
+        return new HandResult(PokerHand.TWOPAIR.getValue()-1, highPair, secondPair, kicker);
     }
 
-    private static boolean isStraight(List<Card> cards){
-        if (cards.size() < 5) return false;
+    private static HandResult isFlush(List<Card> cards) {
+        Map<Suit, List<Integer>> suitMap = new HashMap<>();
 
-        // collect unique values
+        // Group card values by suit
+        for (Card card : cards) {
+            Suit suit = card.getSuit();
+            suitMap.putIfAbsent(suit, new ArrayList<>());
+            suitMap.get(suit).add(card.getValue());
+        }
+
+        // Check each suit
+        for (List<Integer> values : suitMap.values()) {
+            if (values.size() >= 5) {
+
+                // Sort descending
+                values.sort(Collections.reverseOrder());
+
+                int value = values.get(0);
+                int kicker1 = values.size() > 1 ? values.get(1) : 0;
+                int kicker2 = values.size() > 2 ? values.get(2) : 0;
+                int kicker3 = values.size() > 3 ? values.get(3) : 0;
+                int kicker4 = values.size() > 4 ? values.get(4) : 0;
+
+                return new HandResult(PokerHand.FLUSH.getValue()-1, value, kicker1, kicker2, kicker3, kicker4);
+            }
+        }
+
+        return null;
+    }
+
+    private static HandResult isStraight(List<Card> cards) {
+        if (cards.size() < 5) return null;
+
         Set<Integer> uniqueValues = new HashSet<>();
         for (Card card : cards) {
             uniqueValues.add(card.getValue());
         }
-        // edge case where ace is 1
-        if (uniqueValues.contains(14) && uniqueValues.contains(2) && uniqueValues.contains(3) && uniqueValues.contains(4) && uniqueValues.contains(5)) {
-            return true;
+
+        // Treat Ace as low (1) as well
+        if (uniqueValues.contains(14)) {
+            uniqueValues.add(1);
         }
 
-        // sort values
         List<Integer> sorted = new ArrayList<>(uniqueValues);
         Collections.sort(sorted);
 
-        // look for streak of 5
         int streak = 1;
+        int bestHighCard = 0;
 
         for (int i = 1; i < sorted.size(); i++) {
             if (sorted.get(i) == sorted.get(i - 1) + 1) {
                 streak++;
-                if (streak >= 5) return true;
+
+                if (streak >= 5) {
+                    bestHighCard = sorted.get(i); // keep updating!
+                }
             } else {
                 streak = 1;
             }
         }
 
-        return false;
+        if (bestHighCard > 0) {
+            return new HandResult(PokerHand.STRAIGHT.getValue()-1, bestHighCard);
+        }
+
+        return null;
     }
 
-    //Implement these methods
-    private static boolean isFullHouse(List<Card> cards){
-        return false;
+    private static HandResult isFullHouse(List<Card> cards) {
+        Map<Integer, Integer> counts = new HashMap<>();
+
+        // Count occurrences
+        for (Card card : cards) {
+            int value = card.getValue();
+            counts.put(value, counts.getOrDefault(value, 0) + 1);
+        }
+
+        List<Integer> triples = new ArrayList<>();
+        List<Integer> pairs = new ArrayList<>();
+
+        // Separate triples and pairs
+        for (Map.Entry<Integer, Integer> entry : counts.entrySet()) {
+            int value = entry.getKey();
+            int count = entry.getValue();
+
+            if (count >= 3) {
+                triples.add(value);
+            } else if (count >= 2) {
+                pairs.add(value);
+            }
+        }
+
+        if (triples.isEmpty()) return null;
+
+        // Sort descending
+        triples.sort(Collections.reverseOrder());
+        pairs.sort(Collections.reverseOrder());
+
+        int tripleValue = triples.get(0);
+
+        int pairValue = 0;
+
+        // Case 1: another pair exists
+        if (!pairs.isEmpty()) {
+            pairValue = pairs.get(0);
+        }
+        // Case 2: second triple becomes the pair
+        else if (triples.size() > 1) {
+            pairValue = triples.get(1);
+        } else {
+            return null;
+        }
+
+        return new HandResult(PokerHand.FULLHOUSE.getValue() - 1, tripleValue, pairValue);
     }
-    private static boolean isStraightFlush(List<Card> cards){
-        return false;
-    }
-    private static boolean isRoyalFlush(List<Card> cards){
-        return false;
+
+    private static HandResult isStraightFlush(List<Card> cards) {
+        Map<Suit, List<Integer>> suitMap = new EnumMap<>(Suit.class);
+
+        // Group values by suit
+        for (Card card : cards) {
+            suitMap.putIfAbsent(card.getSuit(), new ArrayList<>());
+            suitMap.get(card.getSuit()).add(card.getValue());
+        }
+
+        int bestHighCard = 0;
+
+        // Check each suit separately
+        for (List<Integer> values : suitMap.values()) {
+            if (values.size() < 5) continue;
+
+            // Remove duplicates
+            Set<Integer> uniqueValues = new HashSet<>(values);
+
+            // Ace can be low
+            if (uniqueValues.contains(14)) {
+                uniqueValues.add(1);
+            }
+
+            List<Integer> sorted = new ArrayList<>(uniqueValues);
+            Collections.sort(sorted);
+
+            int streak = 1;
+
+            for (int i = 1; i < sorted.size(); i++) {
+                if (sorted.get(i) == sorted.get(i - 1) + 1) {
+                    streak++;
+
+                    if (streak >= 5) {
+                        bestHighCard = Math.max(bestHighCard, sorted.get(i));
+                    }
+                } else {
+                    streak = 1;
+                }
+            }
+        }
+
+        if (bestHighCard == 0) return null;
+
+        // Royal Flush check
+        if (bestHighCard == 14) {
+            return new HandResult(PokerHand.ROYALFLUSH.getValue()-1, 14); // Royal Flush
+        }
+
+        return new HandResult(PokerHand.STRAIGHTFLUSH.getValue()-1, bestHighCard); // Straight Flush
     }
 
 

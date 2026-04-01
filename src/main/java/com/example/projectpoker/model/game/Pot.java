@@ -5,23 +5,46 @@ import java.util.Dictionary;
 import java.util.Hashtable;
 
 public class Pot {
-    // private ArrayList<Player> players;
+    private ArrayList<Player> players;
     private Dictionary<Player,Integer> betTable;
     private int potSize;
+    private boolean isOpen;
 
-    public Pot(ArrayList<Player> players) {
+    public Pot() {
+        this.players = new ArrayList<>();
         this.betTable = new Hashtable<>();
         this.potSize = 0;
+        this.isOpen = true;
+    }
+
+    public Pot(ArrayList<Player> players) {
+        this.players = players;
+        this.potSize = 0;
+        this.isOpen = true;
+        initBetTable();
     }
 
     public int getPotSize() { return potSize; }
 
     public void setPotSize(int potSize) { this.potSize = potSize; }
 
-    private void initBetTable(ArrayList<Player> players) {
+    public boolean getIsOpen() { return isOpen; }
+
+    public void closePot() { this.isOpen = false; }
+
+    private void initBetTable() {
+        this.betTable = new Hashtable<>();
         for (Player p : players) {
             this.betTable.put(p,0);
         }
+    }
+
+    public void addPlayer2Table(Player player) {
+        this.betTable.put(player,0);
+    }
+
+    public void addPlayer2Table(Player player, int bet) {
+        this.betTable.put(player,bet);
     }
 
     private void addBet2Table(Player player, int bet) {
@@ -45,5 +68,25 @@ public class Pot {
         addBet2Table(players.get(turnOrder.get(0)),smallBlind);
         addBet2Table(players.get(turnOrder.get(1)),bigBlind);
         this.potSize = smallBlind + bigBlind;
+    }
+
+    public RoundStatus removeFolded(RoundStatus status) {
+        players.removeIf(p -> p.getAction() == Action.FOLD);
+        if (players.size() == 1) {
+            players.getFirst().win(potSize);
+            return RoundStatus.END;
+        }
+        return RoundStatus.stepRoundStatus(status);
+    }
+
+    public void showDown() {
+        // TODO add hand evaluation methods
+        Player winner = new Player(); // replace new instance with hand eval methods
+        winner.win(potSize);
+    }
+
+    public void payOut() {
+        if (players.size() > 1) System.err.println("Payout method shouldn't be called if there is more then one player left.");
+        players.getFirst().win(potSize);
     }
 }

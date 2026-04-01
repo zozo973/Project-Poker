@@ -40,7 +40,7 @@ public class Player implements Observer {
         this.playerHand = new ArrayList<>();
         this.isTurn = false;
         this.balance = balance;
-        this.action = null;
+        this.action = Action.UNDECIDED;
         this.role = Roles.PLAYER;
         this.roundInvestment = 0;
     }
@@ -77,6 +77,11 @@ public class Player implements Observer {
     @Override
     public void update() {
 
+    }
+
+    public void win(int potSize) {
+        this.balance += potSize;
+        //
     }
 
     public int placeBet(int betSize) {

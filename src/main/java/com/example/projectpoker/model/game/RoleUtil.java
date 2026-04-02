@@ -1,5 +1,7 @@
 package com.example.projectpoker.model.game;
 
+import com.example.projectpoker.model.game.enums.Roles;
+
 import java.util.ArrayList;
 
 public final class RoleUtil {

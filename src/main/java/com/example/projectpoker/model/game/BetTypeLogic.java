@@ -1,5 +1,7 @@
 package com.example.projectpoker.model.game;
 
+import com.example.projectpoker.model.game.enums.BetType;
+
 public class BetTypeLogic {
 
     private static BetType selectBetType() {

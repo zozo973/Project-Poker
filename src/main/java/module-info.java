@@ -23,4 +23,6 @@ module com.example.projectpoker {
     opens com.example.projectpoker.model.game.statemachine to javafx.fxml;
     exports com.example.projectpoker.model.game.oberserver;
     opens com.example.projectpoker.model.game.oberserver to javafx.fxml;
+    exports com.example.projectpoker.model.game.enums;
+    opens com.example.projectpoker.model.game.enums to javafx.fxml;
 }

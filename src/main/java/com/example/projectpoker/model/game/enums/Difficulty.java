@@ -1,4 +1,4 @@
-package com.example.projectpoker.model.game;
+package com.example.projectpoker.model.game.enums;
 
 public enum Difficulty {
     BABY("Like playing with a bunch of infant children"),

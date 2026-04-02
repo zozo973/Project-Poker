@@ -1,8 +1,8 @@
 package com.example.projectpoker.model.game;
 
 
-import java.util.ArrayList;
-import java.util.Collections;
+import com.example.projectpoker.model.game.enums.Rank;
+import com.example.projectpoker.model.game.enums.Suit;
 
 public class Card {
 

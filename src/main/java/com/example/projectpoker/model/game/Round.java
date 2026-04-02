@@ -1,6 +1,8 @@
 package com.example.projectpoker.model.game;
 
-import com.example.projectpoker.model.game.BetTypeLogic;
+import com.example.projectpoker.model.game.enums.Action;
+import com.example.projectpoker.model.game.enums.BetType;
+import com.example.projectpoker.model.game.enums.RoundStatus;
 import com.example.projectpoker.model.game.oberserver.AbsSubject;
 
 import java.util.ArrayList;

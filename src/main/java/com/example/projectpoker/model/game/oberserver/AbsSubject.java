@@ -1,7 +1,7 @@
 package com.example.projectpoker.model.game.oberserver;
 
-import com.example.projectpoker.model.game.GameStatus;
-import com.example.projectpoker.model.game.RoundStatus;
+import com.example.projectpoker.model.game.enums.GameStatus;
+import com.example.projectpoker.model.game.enums.RoundStatus;
 
 import java.util.ArrayList;
 

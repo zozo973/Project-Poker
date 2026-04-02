@@ -1,6 +1,7 @@
 package com.example.projectpoker.model.game;
 
-import com.example.projectpoker.model.game.RoleUtil;
+import com.example.projectpoker.model.game.enums.Difficulty;
+import com.example.projectpoker.model.game.enums.GameStatus;
 import com.example.projectpoker.model.game.oberserver.AbsSubject;
 
 import java.util.ArrayList;

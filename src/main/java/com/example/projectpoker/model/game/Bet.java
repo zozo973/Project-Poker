@@ -1,5 +1,7 @@
 package com.example.projectpoker.model.game;
 
+import com.example.projectpoker.model.game.enums.Action;
+
 import java.util.ArrayList;
 
 public class Bet {

@@ -1,5 +1,7 @@
 package com.example.projectpoker.model.game;
 
+import com.example.projectpoker.model.game.enums.Action;
+import com.example.projectpoker.model.game.enums.Roles;
 import com.example.projectpoker.model.game.oberserver.Observer;
 
 import java.util.ArrayList;

@@ -1,5 +1,6 @@
 package com.example.projectpoker.model.game;
 
+import com.example.projectpoker.model.game.enums.Difficulty;
 import com.example.projectpoker.model.statistics.SkewNormalSampler;
 import static java.lang.Math.abs;
 

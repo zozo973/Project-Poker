@@ -1,5 +1,8 @@
 package com.example.projectpoker.model.game;
 
+import com.example.projectpoker.model.game.enums.Action;
+import com.example.projectpoker.model.game.enums.RoundStatus;
+
 import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Hashtable;

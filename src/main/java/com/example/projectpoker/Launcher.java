@@ -1,24 +1,18 @@
 package com.example.projectpoker;
 import com.example.projectpoker.model.*;
+import com.example.projectpoker.model.statistics.HandStats;
 import javafx.application.Application;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Launcher {
     public static void main(String[] args) {
         //Application.launch(HelloApplication.class, args);
 
-        //CardDeck deck = new CardDeck();
-        //deck.shuffle();
-        //Player player = new Player(1000);
-        //Player ai = new Player(1000);
-        //System.out.println(PokerHand.values()[0].getDescription());
 
 
-        /*for (int i = 0; i < 52; i++) {
-            Card test = deck.draw();
-            System.out.println(test.getValue());
-        }*/
         Card C2 = new Card(Suit.Clubs,Rank.Two);
         Card C3 = new Card(Suit.Clubs,Rank.Three);
         Card C4 = new Card(Suit.Clubs,Rank.Four);
@@ -75,9 +69,11 @@ public class Launcher {
         Card SK = new Card(Suit.Spades, Rank.King);
         Card SA = new Card(Suit.Spades, Rank.Ace);
 
-        List<Card> Cards = List.of(S2, SA, DA, CA, HA, S5);
 
-        System.out.println(HandEvaluation.evaluateHand(Cards).toString());
+        List<Card> Board = List.of(DK, DA, H2, S3, CQ);
+        List<Card> P1Hand = List.of(HA, D5);
+        List<Card> P2Hand = List.of(CJ, H4);
+        System.out.println(HandEvaluation.whoWins(Board,List.of(P1Hand,P2Hand)));
 
     }
 }

@@ -12,4 +12,9 @@ public class PlayerResult {
 
     public List<Card> getHand() { return hand; }
     public HandResult getResult() { return result; }
+
+    //Finish this later
+    public String ToString(){
+        return result.toString();
+    }
 }

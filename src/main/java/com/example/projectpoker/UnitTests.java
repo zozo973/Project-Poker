@@ -1,8 +1,8 @@
 package com.example.projectpoker;
 
-import com.example.projectpoker.model.Card;
-import com.example.projectpoker.model.Rank;
-import com.example.projectpoker.model.Suit;
+
+import com.example.projectpoker.model.game.Card;
+import com.example.projectpoker.model.game.enums.*;
 
 public class UnitTests {
 

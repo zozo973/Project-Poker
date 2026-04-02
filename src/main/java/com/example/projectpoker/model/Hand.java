@@ -1,5 +1,5 @@
 package com.example.projectpoker.model;
-
+import com.example.projectpoker.model.game.Card;
 
 import java.util.*;
 

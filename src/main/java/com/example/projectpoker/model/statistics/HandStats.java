@@ -5,10 +5,10 @@ package com.example.projectpoker.model.statistics;
 
 
 
-import com.example.projectpoker.model.Card;
-import com.example.projectpoker.model.CardDeck;
+import com.example.projectpoker.model.game.Card;
+import com.example.projectpoker.model.game.CardDeck;
 import com.example.projectpoker.model.HandEvaluation;
-import com.example.projectpoker.model.PokerHand;
+import com.example.projectpoker.model.game.enums.PokerHand;
 
 import java.util.ArrayList;
 import java.util.HashMap;

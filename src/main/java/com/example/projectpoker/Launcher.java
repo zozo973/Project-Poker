@@ -1,5 +1,7 @@
 package com.example.projectpoker;
 import com.example.projectpoker.model.*;
+import com.example.projectpoker.model.game.Card;
+import com.example.projectpoker.model.game.enums.*;
 import com.example.projectpoker.model.statistics.HandStats;
 import javafx.application.Application;
 import java.util.List;
@@ -13,7 +15,7 @@ public class Launcher {
 
 
 
-        Card C2 = new Card(Suit.Clubs,Rank.Two);
+        Card C2 = new Card(Suit.Clubs, Rank.Two);
         Card C3 = new Card(Suit.Clubs,Rank.Three);
         Card C4 = new Card(Suit.Clubs,Rank.Four);
         Card C5 = new Card(Suit.Clubs,Rank.Five);

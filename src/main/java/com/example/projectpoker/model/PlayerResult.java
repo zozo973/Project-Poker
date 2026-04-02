@@ -1,4 +1,6 @@
 package com.example.projectpoker.model;
+import com.example.projectpoker.model.game.Card;
+
 import java.util.List;
 
 public class PlayerResult {
@@ -14,7 +16,7 @@ public class PlayerResult {
     public HandResult getResult() { return result; }
 
     //Finish this later
-    public String ToString(){
-        return result.toString();
+    public @Override String toString(){
+        return "Player wins with " + result.toString();
     }
 }

@@ -1,5 +1,7 @@
 package com.example.projectpoker.model;
 
+import com.example.projectpoker.model.game.enums.*;
+
 public class HandResult {
     private final int handType;
     private final int value;
@@ -45,7 +47,7 @@ public class HandResult {
     public int getKicker4() { return kicker4; }
 
     // Call for description of hand
-    public String toString()
+    public @Override String toString()
     {
         switch (handType) {
             //Royal Flush

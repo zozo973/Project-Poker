@@ -30,14 +30,14 @@ public class HandEvaluation {
             } else {
                 int cmp = compareHands(currentResult, bestResult);
 
-                if (cmp > 0) {
-                    // New best → clear old winners
+                if (cmp == 1) {
+                    // New best, clear old winners
                     winners.clear();
                     winners.add(new PlayerResult(playerHands.get(i), currentResult));
                     bestResult = currentResult;
 
                 } else if (cmp == 0) {
-                    // Tie → add to winners
+                    // Tie, add to winners
                     winners.add(new PlayerResult(playerHands.get(i), currentResult));
                 }
             }

@@ -44,45 +44,46 @@ public class HandResult {
     public int getKicker3() { return kicker3; }
     public int getKicker4() { return kicker4; }
 
+    // Call for description of hand
     public String toString()
     {
         switch (handType) {
             //Royal Flush
-            case 9:
+            case 10:
                 return "IT'S A ROYAL FLUSH!!";
             //Straight Flush
-            case 8:
+            case 9:
                 if (Rank.values()[value - 2] == Rank.Five) {
                     return "It's a Straight Flush: Ace through to 5.";
                 }
                 return "It's a Straight Flush: " + Rank.values()[value-6] + " through to " + Rank.values()[value-2] + ".";
             // Four of a kind
-            case 7:
+            case 8:
                 return "Four of a kind: "+ Rank.values()[value-2] + "s.";
             // Full house
-            case 6:
+            case 7:
                 return "Full house: " + Rank.values()[value-2] +"s full of "+ Rank.values()[kicker1-2] + "s.";
             // Flush
-            case 5:
+            case 6:
                 return "Its a flush";
             // Straight
-            case 4:
+            case 5:
                 if (Rank.values()[value - 2] == Rank.Five) {
                     return "It's a Straight: Ace through to 5.";
                 }
 
                 return "It's a Straight: " + Rank.values()[value-6] + " through to " + Rank.values()[value-2] + ".";
             // Three of a kind
-            case 3:
+            case 4:
                 return "Three of a kind: "+ Rank.values()[value-2] + "s.";
             // Two Pair
-            case 2:
+            case 3:
                 return "Two pairs: "+ Rank.values()[value-2] + "s and "+ Rank.values()[kicker1-2] + "s." ;
             // Pair
-            case 1:
+            case 2:
                 return "Pair of " + Rank.values()[value-2] + "s.";
             //
-            case 0:
+            case 1:
                 return "High Card: " + Rank.values()[value-2] + ".";
 
 

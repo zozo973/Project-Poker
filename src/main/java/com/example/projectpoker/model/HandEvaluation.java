@@ -12,6 +12,68 @@ import java.util.EnumMap;
 
 public class HandEvaluation {
 
+    public static List<PlayerResult> whoWins(List<Card> board, List<List<Card>> playerHands) {
+
+        List<PlayerResult> winners = new ArrayList<>();
+        HandResult bestResult = null;
+
+        for (int i = 0; i < playerHands.size(); i++) {
+
+            List<Card> combined = new ArrayList<>(board);
+            combined.addAll(playerHands.get(i));
+
+            HandResult currentResult = HandEvaluation.evaluateHand(combined);
+
+            if (bestResult == null) {
+                bestResult = currentResult;
+                winners.add(new PlayerResult(playerHands.get(i), currentResult));
+            } else {
+                int cmp = compareHands(currentResult, bestResult);
+
+                if (cmp > 0) {
+                    // New best → clear old winners
+                    winners.clear();
+                    winners.add(new PlayerResult(playerHands.get(i), currentResult));
+                    bestResult = currentResult;
+
+                } else if (cmp == 0) {
+                    // Tie → add to winners
+                    winners.add(new PlayerResult(playerHands.get(i), currentResult));
+                }
+            }
+        }
+
+        return winners;
+    }
+
+    private static int compareHands(HandResult a, HandResult b) {
+
+        int[] aVals = {
+                a.getHandName(),
+                a.getValue(),
+                a.getKicker1(),
+                a.getKicker2(),
+                a.getKicker3(),
+                a.getKicker4()
+        };
+
+        int[] bVals = {
+                b.getHandName(),
+                b.getValue(),
+                b.getKicker1(),
+                b.getKicker2(),
+                b.getKicker3(),
+                b.getKicker4()
+        };
+
+        for (int i = 0; i < aVals.length; i++) {
+            if (aVals[i] > bVals[i]) return 1;
+            if (aVals[i] < bVals[i]) return -1;
+        }
+
+        return 0; // tie
+    }
+
     public static HandResult evaluateHand(List<Card> cards) {
         HandResult testEvaluation;
 
@@ -63,7 +125,7 @@ public class HandEvaluation {
         int kicker3 = values.size() > 3 ? values.get(3) : 0;
         int kicker4 = values.size() > 4 ? values.get(4) : 0;
 
-        return new HandResult(PokerHand.HIGHCARD.getValue()-1, value, kicker1, kicker2, kicker3, kicker4);
+        return new HandResult(PokerHand.HIGHCARD.getValue(), value, kicker1, kicker2, kicker3, kicker4);
     }
 
     private static HandResult isPair(List<Card> cards) {
@@ -102,7 +164,7 @@ public class HandEvaluation {
                 }
 
 
-                return new HandResult(PokerHand.ONEPAIR.getValue()-1, rank, kicker1, kicker2, kicker3);
+                return new HandResult(PokerHand.ONEPAIR.getValue(), rank, kicker1, kicker2, kicker3);
             }
         }
 
@@ -136,7 +198,7 @@ public class HandEvaluation {
                         kicker2 = Math.max(kicker2, card.getValue());
                     }
                 }
-                return new HandResult(PokerHand.TRIPLE.getValue()-1, rank, kicker1, kicker2);
+                return new HandResult(PokerHand.TRIPLE.getValue(), rank, kicker1, kicker2);
             }
         }
 
@@ -164,7 +226,7 @@ public class HandEvaluation {
                     }
                 }
 
-                return new HandResult(PokerHand.QUAD.getValue()-1, rank, kicker);
+                return new HandResult(PokerHand.QUAD.getValue(), rank, kicker);
             }
         }
 
@@ -206,7 +268,7 @@ public class HandEvaluation {
             }
         }
 
-        return new HandResult(PokerHand.TWOPAIR.getValue()-1, highPair, secondPair, kicker);
+        return new HandResult(PokerHand.TWOPAIR.getValue(), highPair, secondPair, kicker);
     }
 
     private static HandResult isFlush(List<Card> cards) {
@@ -232,7 +294,7 @@ public class HandEvaluation {
                 int kicker3 = values.size() > 3 ? values.get(3) : 0;
                 int kicker4 = values.size() > 4 ? values.get(4) : 0;
 
-                return new HandResult(PokerHand.FLUSH.getValue()-1, value, kicker1, kicker2, kicker3, kicker4);
+                return new HandResult(PokerHand.FLUSH.getValue(), value, kicker1, kicker2, kicker3, kicker4);
             }
         }
 
@@ -271,7 +333,7 @@ public class HandEvaluation {
         }
 
         if (bestHighCard > 0) {
-            return new HandResult(PokerHand.STRAIGHT.getValue()-1, bestHighCard);
+            return new HandResult(PokerHand.STRAIGHT.getValue(), bestHighCard);
         }
 
         return null;
@@ -322,7 +384,7 @@ public class HandEvaluation {
             return null;
         }
 
-        return new HandResult(PokerHand.FULLHOUSE.getValue() - 1, tripleValue, pairValue);
+        return new HandResult(PokerHand.FULLHOUSE.getValue(), tripleValue, pairValue);
     }
 
     private static HandResult isStraightFlush(List<Card> cards) {
@@ -370,12 +432,11 @@ public class HandEvaluation {
 
         // Royal Flush check
         if (bestHighCard == 14) {
-            return new HandResult(PokerHand.ROYALFLUSH.getValue()-1, 14); // Royal Flush
+            return new HandResult(PokerHand.ROYALFLUSH.getValue(), 14); // Royal Flush
         }
 
-        return new HandResult(PokerHand.STRAIGHTFLUSH.getValue()-1, bestHighCard); // Straight Flush
+        return new HandResult(PokerHand.STRAIGHTFLUSH.getValue(), bestHighCard); // Straight Flush
     }
-
 
     private static List<Integer> getRanks(List<Card> cards) {
         List<Integer> returnList = new ArrayList<>();

@@ -20,8 +20,6 @@ public class Bet {
         this.player = player;
     }
 
-
-
     public int getBetSize() { return betSize; }
 
     public void setBetSize(int betSize) { this.betSize = betSize; }

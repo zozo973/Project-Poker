@@ -45,8 +45,6 @@ public class Round extends AbsSubject {
         dealCards();
         notifyObservers(state);
 
-        // wait
-
         this.state = RoundStatus.BETTING1;
         notifyObservers(state);
         checkBetType();

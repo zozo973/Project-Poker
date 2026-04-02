@@ -63,6 +63,7 @@ public class Game extends AbsSubject {
             else if (numRoundsLeft == 0) { end(); break; }
             else if (players.size() == 1 && !(players.getFirst() instanceof AiPlayer)) {end(); break; }
             tryIncreaseBlind();
+            this.numRoundsLeft--;
         }
     }
 

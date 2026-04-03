@@ -10,6 +10,8 @@ module com.example.projectpoker {
     requires org.kordamp.bootstrapfx.core;
     requires eu.hansolo.tilesfx;
     requires com.almasb.fxgl.all;
+    requires java.net.http;
+    requires com.google.gson;
 
     opens com.example.projectpoker to javafx.fxml;
     exports com.example.projectpoker;

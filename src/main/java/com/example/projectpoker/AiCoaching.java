@@ -1,9 +1,54 @@
 package com.example.projectpoker;
-import com.example.projectpoker.model.*;
 
+import com.example.projectpoker.model.*;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.time.Duration;
 
 
 public class AiCoaching {
+
+    //API Key in here
+    private static final String GEMINI_API_KEY = "IWILLAPPLYTHEKEYLATER";
+    private static final String API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:" + GEMINI_API_KEY;
+
+    public static class AiAdvice{
+        public Action action;
+        public int confidence;
+        public String reason;
+        public String errormsg;
+    }
+
+    public AiAdvice getAdvice(Card[] handCards, Card[] boardCards, Stage stage, AiAdviceMode mode) {
+        AiAdvice result = new AiAdvice();
+
+        try {
+            //prompt contact
+            String systemPrompt = getSystemPrompt();
+            String userPrompt = getUserPrompt(handCards, boardCards, stage, mode);
+
+            Gson gson = new Gson();
+            String GsonSystemPrompt = gson.toJson(systemPrompt);
+            String GsonUserPrompt = gson.toJson(userPrompt);
+
+            //Json for input
+            String requestBody = String.format("""
+                {
+                  "system_instruction": { "parts": [ { "text": %s } ] },
+                  "contents": [ { "parts": [ { "text": %s } ] } ],
+                  "generationConfig": { "response_mime_type": "application/json" }
+                }
+                """, GsonSystemPrompt, GsonUserPrompt);
+        } catch (Exception e) {
+        e.printStackTrace();
+        result.errormsg = "AI suggestion - verify with your own understanding";
+    }
+    }
 
     public String getSystemPrompt(){
         return """

@@ -44,10 +44,40 @@ public class AiCoaching {
                   "generationConfig": { "response_mime_type": "application/json" }
                 }
                 """, GsonSystemPrompt, GsonUserPrompt);
+
+            // HttpClient & HttpRequest
+            HttpClient client = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(10)).build();
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(API_URL))
+                    .header("Content-Type", "application/json")
+                    .POST(HttpRequest.BodyPublishers.ofString(requestBody))
+                    .build();
+
+            // Send the data out
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            // Recived Json
+            JsonObject jsonResponse = gson.fromJson(response.body(), JsonObject.class);
+
+
+            // {"action": "CALL", "confidence": 80, "reasoning": "XXXXXXXX"}
+            String generatedText = jsonResponse.getAsJsonArray("candidates")
+                    .get(0).getAsJsonObject()
+                    .getAsJsonObject("content")
+                    .getAsJsonArray("parts")
+                    .get(0).getAsJsonObject()
+                    .get("text").getAsString();
+
+            //
+            JsonObject adviceJson = gson.fromJson(generatedText, JsonObject.class);
+            result.action = Action.valueOf(adviceJson.get("action").getAsString());
+            result.confidence = adviceJson.get("confidence").getAsInt();
+            result.reason = adviceJson.get("reasoning").getAsString();
+
         } catch (Exception e) {
         e.printStackTrace();
         result.errormsg = "AI suggestion - verify with your own understanding";
     }
+        return result;
     }
 
     public String getSystemPrompt(){

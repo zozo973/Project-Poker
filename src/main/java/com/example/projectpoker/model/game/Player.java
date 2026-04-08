@@ -2,9 +2,6 @@ package com.example.projectpoker.model.game;
 
 import com.example.projectpoker.model.game.enums.Action;
 import com.example.projectpoker.model.game.enums.Roles;
-import com.example.projectpoker.model.oberserver.Observer;
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.SimpleIntegerProperty;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;

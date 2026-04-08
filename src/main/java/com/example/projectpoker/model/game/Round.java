@@ -52,6 +52,10 @@ public class Round {
         pcs.firePropertyChange("state",oldVal,this.roundStatus);
     }
 
+    public Pot getMainPot() { return this.pots.getFirst(); }
+
+    public Pot getOpenPot() { return pots.get(getOpenPotIndex()); }
+
     public int getToPlay() { return toPlay; }
 
     public void setToPlay(int toPlay) { this.toPlay = toPlay; }

@@ -1,8 +1,8 @@
 package com.example.projectpoker.model.game;
 
+import com.example.projectpoker.handler.RoundStatusChangeHandler;
 import com.example.projectpoker.model.game.enums.Difficulty;
 import com.example.projectpoker.model.game.enums.GameStatus;
-import com.example.projectpoker.model.oberserver.AbsSubject;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
@@ -16,12 +16,14 @@ public class Game {
     private GameStatus gameStatus;
     private ArrayList<Player> players;
     private int numRoundsLeft;
-    private int gameLength;
+    private final int gameLength;
     private int blindSize;
-    private int whenInceaseBlinds;
-    private Difficulty difficulty;
+    private final int whenIncreaseBlinds;
+    private final Difficulty difficulty;
     private int numPlayers;
     private int userBalance;
+    private Round round;
+    private RoundStatusChangeHandler roundHandler;
 
 
     // Constructor called when starting a new game of poker
@@ -29,19 +31,19 @@ public class Game {
     //      user: The user player data
     //      numPlayer: number of total players,
     //      initBlind: the starting size of the blinds
-    //      whenInceaseBlinds: How many rounds need to be played before the blinds increase
+    //      whenIncreaseBlinds: How many rounds need to be played before the blinds increase
     //      gameLength: maximum number of rounds the poker game goes for.
     //      difficulty: affects the intelligence, risk taking and starting cash of the AI players
     //
 
-    public Game(Player user, int userBalance, int numPlayers, int initBlind, int whenInceaseBlinds, int gameLength, Difficulty difficulty) {
+    public Game(Player user, int userBalance, int numPlayers, int initBlind, int whenIncreaseBlinds, int gameLength, Difficulty difficulty) {
         this.players = new ArrayList<>();
         players.add(user);
         this.numPlayers = numPlayers;
         this.userBalance = userBalance;
         this.difficulty = difficulty;
         this.blindSize = initBlind;
-        this.whenInceaseBlinds = whenInceaseBlinds;
+        this.whenIncreaseBlinds = whenIncreaseBlinds;
         this.gameLength = gameLength;
         this.numRoundsLeft = gameLength;
         //GameContext gameContext = new GameContext();
@@ -76,6 +78,31 @@ public class Game {
         pcs.firePropertyChange("players",oldVal,this.players);
     }
 
+    public void createNextRound() {
+        Round round = new Round(players,blindSize);
+        pcs.firePropertyChange("round",this.round,round);
+        round.addPropertyChangeListener(roundHandler);
+        setRound(round);
+    }
+
+    public Round getRound() { return this.round; }
+
+    private void setRound(Round round) { this.round = round; }
+
+    public Player getUser() { return players.getFirst(); }
+
+    public ArrayList<AiPlayer> getAiPlayers() {
+        ArrayList<AiPlayer> AiPlayers = new ArrayList<>();
+        for (Player p : players) {
+            if (p instanceof AiPlayer) AiPlayers.add((AiPlayer) p);
+        }
+        return AiPlayers;
+    }
+
+    public void setRoundHandler(RoundStatusChangeHandler roundHandler) { this.roundHandler = roundHandler; }
+
+    public RoundStatusChangeHandler getRoundHandler() { return this.roundHandler; }
+
     public void init() {
         setPlayers(
           RoleUtil.delegateRoles(
@@ -87,6 +114,7 @@ public class Game {
             ), new int[]{0, 1, 2}
           )
         );
+        createNextRound();
         setGameStatus(GameStatus.INITIALISED);
     }
 
@@ -94,9 +122,8 @@ public class Game {
         // Valid game before starting
         setGameStatus(GameStatus.RUNNING);
         while (gameStatus == GameStatus.RUNNING) {
-            Round round = new Round(players,blindSize);
-            round.init();
-            round.start();
+            this.round.init();
+            this.round.start();
             // Loss Condition
             if (players.getFirst().getBalance() == 0) { end(); break; }
             else if (numRoundsLeft == 0) { end(); break; }
@@ -121,7 +148,7 @@ public class Game {
     }
 
     private void tryIncreaseBlind() {
-        if ((gameLength - numRoundsLeft) % whenInceaseBlinds == 0) {
+        if ((gameLength - numRoundsLeft) % whenIncreaseBlinds == 0) {
             this.blindSize = blindSize * 2;
         }
     }

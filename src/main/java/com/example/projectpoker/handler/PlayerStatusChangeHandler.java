@@ -1,38 +1,44 @@
 package com.example.projectpoker.handler;
 
+import com.example.projectpoker.controller.RoundViewUpdater;
 import com.example.projectpoker.model.game.AiPlayer;
-
+import com.example.projectpoker.model.game.Player;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 public class PlayerStatusChangeHandler implements PropertyChangeListener {
+    private final RoundViewUpdater viewUpdater;
+
+    public PlayerStatusChangeHandler(RoundViewUpdater viewUpdater) {
+        this.viewUpdater = viewUpdater;
+    }
+
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        if (evt.getPropertyName().equals("isTurn") ) {
-            if (evt.getSource()instanceof AiPlayer) {
-                aiPlayerIsTurn(evt);
-            } else {
-                userIsTurn(evt);
-            }
-
-        } else if (evt.getPropertyName().equals("balance")) {
-            int newVal = (int) evt.getNewValue();
-            int oldVal = (int) evt.getOldValue();
-            if (newVal > oldVal) {
-                int winnings = newVal - oldVal;
-                System.out.println("You just won the round congratulations you won "+ winnings + " from that round");
-            }
-            // Update users balance display and slider
-
+        switch (evt.getPropertyName()) {
+            case "isTurn" -> handleTurnChange(evt);
+            case "balance" -> handleBalanceChange(evt);
         }
     }
 
-    private void aiPlayerIsTurn(PropertyChangeEvent evt) {
-        // let Ai player make there bet
+    private void handleTurnChange(PropertyChangeEvent evt) {
+        boolean isTurn = (boolean) evt.getNewValue();
+        if (!isTurn) return;
+
+        if (evt.getSource() instanceof AiPlayer) {
+            viewUpdater.onAiTurnStarted();
+        } else if (evt.getSource() instanceof Player player) {
+            viewUpdater.onUserTurnStarted();
+        }
     }
 
+    private void handleBalanceChange(PropertyChangeEvent evt) {
+        if (!(evt.getSource() instanceof Player player)) return;
+        if ((evt.getSource() instanceof AiPlayer)) return;
 
-    private void userIsTurn(PropertyChangeEvent evt) {
-        // Make users buttons userable.
+        int oldVal = (int) evt.getOldValue();
+        int newVal = (int) evt.getNewValue();
+
+        viewUpdater.onBalanceChanged(player, oldVal, newVal);
     }
 }

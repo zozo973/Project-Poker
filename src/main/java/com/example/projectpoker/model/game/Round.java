@@ -3,13 +3,15 @@ package com.example.projectpoker.model.game;
 import com.example.projectpoker.model.game.enums.Action;
 import com.example.projectpoker.model.game.enums.BetType;
 import com.example.projectpoker.model.game.enums.RoundStatus;
-import com.example.projectpoker.model.game.oberserver.AbsSubject;
 
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 
-public class Round extends AbsSubject {
+public class Round {
 
-    private RoundStatus state;
+    private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
+    private RoundStatus roundStatus;
     private int numPlayers;
     private int toPlay;
     private BetType betType;
@@ -20,67 +22,86 @@ public class Round extends AbsSubject {
     private ArrayList<Player> players;
     private ArrayList<Integer> turnOrder;
 
-
     public Round(ArrayList<Player> players, int blindSize) {
         this.players = players;
         this.toPlay = blindSize;
         this.numPlayers = players.size();
         this.communityCards = new ArrayList<>();
         this.deck = new CardDeck();
+        this.pots = new ArrayList<>();
         this.pots.add(new Pot(players));
         this.turnOrder = new ArrayList<>();
         this.betType = BetType.NORMAL;
     }
 
-    public ArrayList<GameLogEntry> getRoundLog() { return roundLog; }
-
-    public void Init() {
-        createTurnOrder(RoleUtil.findRoleIndices(players));
-        for (Player p : players) addObserver(p);
-        this.state = RoundStatus.BLINDS;
-        this.pots.getFirst().initBlinds(players,turnOrder,toPlay);
-        notifyObservers(state);
+    public void addPropertyChangeListener(PropertyChangeListener listener) {
+        pcs.addPropertyChangeListener(listener);
     }
 
-    public void Start() {
-        this.state = RoundStatus.DEAL;
+    public void removePropertyChangeListener(PropertyChangeListener listener) {
+        pcs.removePropertyChangeListener(listener);
+    }
+
+    public RoundStatus getRoundStatus() {
+        return roundStatus;
+    }
+
+    public void setRoundStatus(RoundStatus roundStatus) {
+        var oldVal = this.roundStatus;
+        this.roundStatus = roundStatus;
+        pcs.firePropertyChange("state",oldVal,this.roundStatus);
+    }
+
+    public Pot getMainPot() { return this.pots.getFirst(); }
+
+    public Pot getOpenPot() { return pots.get(getOpenPotIndex()); }
+
+    public int getToPlay() { return toPlay; }
+
+    public void setToPlay(int toPlay) { this.toPlay = toPlay; }
+
+    public ArrayList<GameLogEntry> removeRoundLog() { return roundLog; }
+
+    public void init() {
+        createTurnOrder(RoleUtil.findRoleIndices(players));
+
+        // add observer to relay state changes to ui addObserver();
+
+        this.pots.getFirst().initBlinds(players,turnOrder,toPlay);
+        setRoundStatus(RoundStatus.BLINDS);
+    }
+
+    public void start() {
         dealCards();
-        notifyObservers(state);
+        setRoundStatus(RoundStatus.DEAL);
 
-        this.state = RoundStatus.BETTING1;
-        notifyObservers(state);
+        setRoundStatus(RoundStatus.BETTING1);
         checkBetType();
 
-        this.state = RoundStatus.FLOP;
+        setRoundStatus(RoundStatus.FLOP);
         deal2Table();
-        notifyObservers(state);
 
-        this.state = RoundStatus.BETTING2;
-        notifyObservers(state);
+        setRoundStatus(RoundStatus.BETTING2);
         checkBetType();
 
-        this.state = RoundStatus.TURN;
+        setRoundStatus(RoundStatus.TURN);
         deal2Table();
-        notifyObservers(state);
 
-        this.state = RoundStatus.BETTING3;
-        notifyObservers(state);
+        setRoundStatus(RoundStatus.BETTING3);
         checkBetType();
 
-        this.state = RoundStatus.RIVER;
-        deal2Table();
-        notifyObservers(state);
 
-        this.state = RoundStatus.SHOWDOWN;
-        notifyObservers(state);
+        setRoundStatus(RoundStatus.RIVER);
+        deal2Table();
+
+        setRoundStatus(RoundStatus.SHOWDOWN);
         checkBetType();
     }
 
     public void End() {
         // TODO send RoundLog to database exit round
-        this.state = RoundStatus.END;
-        notifyObservers(state);
-        // DAO.add(roundLog);
+        setRoundStatus(RoundStatus.END);
+        // DAO.add(getRoundLog());
 
     }
 
@@ -115,7 +136,7 @@ public class Round extends AbsSubject {
 
     private void deal2Table() {
         deck.burnCard();
-        if(state == RoundStatus.FLOP) {
+        if(roundStatus == RoundStatus.FLOP) {
             this.communityCards.add(deck.draw());
             this.communityCards.add(deck.draw());
             this.communityCards.add(deck.draw());
@@ -127,20 +148,28 @@ public class Round extends AbsSubject {
     private void betting() {
         while (!endBetting()) {
             for (int i = 0; i < turnOrder.size(); i++) {
-                players.get(turnOrder.get(i)).setIsTurn(true);
-                while (players.get(turnOrder.get(i)).getIsTurn()) {
-                    // Wait for input on bet or check or fold
-                    // call method to asked user for input
-                    // turnOrder.get(i).setAction(actionButtonInput());
-                    int betSize = players.get(turnOrder.get(i)).chooseBetSize();
-                    int activePotIndex = getOpenPotIndex();
-                    if (activePotIndex == -1) System.err.println("No active Pot"); // Replace with exeception.
-                    this.pots.get(activePotIndex).addBet(players.get(turnOrder.get(i)), betSize);
-                    playerAction(players.get(turnOrder.get(i)), betSize);
-                    if (players.get(turnOrder.get(i)).getAction() == Action.RAISE) {
-                        this.toPlay = players.get(turnOrder.get(i)).getRoundInvestment();
+                Player activePlayer = players.get(turnOrder.get(i));
+                if (activePlayer.getAction() != Action.FOLD) {
+                    activePlayer.setIsTurn(true);
+//                    if (! (activePlayer instanceof AiPlayer)) {
+//                        pcs.firePropertyChange("isTurn",false,true);
+//                    }
+                    while (activePlayer.getIsTurn()) {
+                        // Wait for input on bet or check or fold
+                        // call method to asked user for input
+                        // turnOrder.get(i).setAction(actionButtonInput());
+                        int betSize = activePlayer.chooseBetSize();
+                        int activePotIndex = getOpenPotIndex();
+                        if (activePotIndex == -1) System.err.println("No active Pot"); // Replace with exeception.
+
+                        this.pots.get(activePotIndex).addBet(activePlayer, betSize);
+                        playerAction(activePlayer, betSize);
+                        if (activePlayer.getAction() == Action.RAISE) {
+                            this.toPlay = activePlayer.getRoundInvestment();
+                        }
                     }
                 }
+
                 if (endBetting()) break;
             }
         }
@@ -216,7 +245,7 @@ public class Round extends AbsSubject {
     }
 
     public void checkBetType() {
-        if (state == RoundStatus.BETTING1) {
+        if (roundStatus == RoundStatus.BETTING1) {
             BetTypeLogic.executeBets(BetType.NORMAL);
             betting();
         }
@@ -224,11 +253,11 @@ public class Round extends AbsSubject {
             case BetType.NORMAL:
                 betting();
             case BetType.ENDROUND:
-                pots.getFirst().removeFolded(state);
+                pots.getFirst().removeFolded(roundStatus);
                 pots.getFirst().payOut();
                 End();
             case BetType.SKIP2SHOWDOWN:
-                if (state == RoundStatus.SHOWDOWN) {
+                if (roundStatus == RoundStatus.SHOWDOWN) {
                     betting();
                     for (Pot p : pots) {
                         p.showDown();

@@ -53,7 +53,7 @@ public class Pot {
     private void addBet2Table(Player player, int bet) {
         int currentBets = betTable.get(player);
         this.betTable.put(player,currentBets+bet);
-        if (betTable.get(player) == player.getRoundInvestment()) {
+        if (betTable.get(player) != player.getRoundInvestment()) {
             System.err.println(player.getName() + "'s bets does not match their round investments");
         }
     }

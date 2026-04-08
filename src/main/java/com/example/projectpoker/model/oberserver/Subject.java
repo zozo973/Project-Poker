@@ -1,4 +1,4 @@
-package com.example.projectpoker.model.game.oberserver;
+package com.example.projectpoker.model.oberserver;
 
 public interface Subject {
     void addObserver(Observer observer);

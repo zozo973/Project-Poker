@@ -2,13 +2,16 @@ package com.example.projectpoker.model.game;
 
 import com.example.projectpoker.model.game.enums.Action;
 import com.example.projectpoker.model.game.enums.Roles;
-import com.example.projectpoker.model.game.oberserver.Observer;
 
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 
 import static com.example.projectpoker.model.statistics.SkewNormalSampler.safeRoundToInt;
 
-public class Player implements Observer {
+public class Player {
+
+    private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
     private ArrayList<Card> playerHand;
     private String name;
     private boolean isTurn;
@@ -24,6 +27,7 @@ public class Player implements Observer {
         this.playerHand = new ArrayList<>();
         this.isTurn = false;
         this.action = null;
+        this.balance = 1000;
         this.role = Roles.PLAYER;
         this.roundInvestment = 0;
     }
@@ -33,7 +37,18 @@ public class Player implements Observer {
         this.playerHand = new ArrayList<>();
         this.isTurn = false;
         this.action = null;
+        this.balance = 1000;
         this.role = Roles.PLAYER;
+        this.roundInvestment = 0;
+    }
+
+    public Player(String name, Roles role) {
+        this.name = name;
+        this.playerHand = new ArrayList<>();
+        this.isTurn = false;
+        this.balance = 1000;
+        this.action = Action.UNDECIDED;
+        this.role = role;
         this.roundInvestment = 0;
     }
 
@@ -47,6 +62,22 @@ public class Player implements Observer {
         this.roundInvestment = 0;
     }
 
+    public void addPropertyChangeListener(PropertyChangeListener listener) {
+        pcs.addPropertyChangeListener(listener);
+    }
+
+    public void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
+        pcs.addPropertyChangeListener(propertyName, listener);
+    }
+
+        public void removePropertyChangeListener(PropertyChangeListener listener) {
+        pcs.removePropertyChangeListener(listener);
+    }
+
+    public void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
+        pcs.removePropertyChangeListener(propertyName, listener);
+    }
+
     public String getName() { return name; }
 
     public void setName(String name) { this.name = name; }
@@ -58,7 +89,13 @@ public class Player implements Observer {
     // TODO implement validation for UI input
     public int getBalance() { return balance; }
 
-    protected void setBalance(int balance) { this.balance = balance; }
+    public void subtractBalance(int amount) { setBalance(this.balance - amount); }
+
+    protected void setBalance(int balance) {
+        var oldVal = this.balance;
+        this.balance = balance;
+        pcs.firePropertyChange("balance",oldVal,this.balance);
+    }
 
     public int getRoundInvestment() { return roundInvestment; }
 
@@ -70,16 +107,15 @@ public class Player implements Observer {
 
     public boolean getIsTurn() { return isTurn; }
 
-    public void setIsTurn(boolean isTurn) { this.isTurn = isTurn; }
+    public void setIsTurn(boolean isTurn) {
+        var oldVal = this.isTurn;
+        this.isTurn = isTurn;
+        pcs.firePropertyChange("isTurn",oldVal,this.isTurn);
+    }
 
     public Roles getRole() { return role; }
 
     public void setRole(Roles role) { this.role = role; }
-
-    @Override
-    public void update() {
-
-    }
 
     public void win(int potSize) {
         this.balance += potSize;
@@ -87,19 +123,29 @@ public class Player implements Observer {
     }
 
     public int placeBet(int betSize) {
-        if (betSize >= balance) {
-            // TODO add method that queries if player wants to go all in
-            // If player accepts to all in then
-            setBalance(0);
+        int b = getBalance();
+
+        if (betSize <= 0) {
+            throw new IllegalArgumentException("Bet must be positive.");
+        }
+        if (betSize > b) {
+
             // TODO implement method that lets user know they don't have that much
             // If a slider is used to get user input for betting size this should be redundant
-            System.err.println("User betting more then there balance");
 
+            throw new IllegalArgumentException("Bet exceeds player balance.");
+
+        } else if (betSize == b) {
+            // TODO add method that queries if player wants to go all in
+            // If player accepts to all in then
+            // throw new IllegalArgumentException("Bet exceeds player balance.");
             System.out.println("Would you like to go all in?");
             // wait for user response
             boolean response = false; // allIn();
+            setBalance(0);
             if (response) {
-                betSize = balance;
+                betSize = b;
+                allIn();
                 // calculate the main pot this player can win
             } else {
                 // if responds is to fold
@@ -107,19 +153,28 @@ public class Player implements Observer {
                 betSize = -1;
             }
         } else {
-            setBalance((balance - betSize));
+            setBalance((b - betSize));
         }
         this.roundInvestment += betSize;
         return betSize;
     }
 
     public int payBlind(int blindSize) {
+        if (this.role == Roles.PLAYER || this.role == Roles.DEALER) return 0;
         int blind = safeRoundToInt(role.getBlindMultiplier() * blindSize);
         return placeBet(blind);
     }
 
+    public void allIn() {
+        int betAmount = this.balance;
+        if (betAmount > 0) {
+            subtractBalance(betAmount);
+        }
+    }
+
     public int chooseBetSize() {
         // return rounded slider value from the view
+
         return 0;
     }
 

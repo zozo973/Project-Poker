@@ -1,4 +1,4 @@
-package com.example.projectpoker.model.game.oberserver;
+package com.example.projectpoker.model.oberserver;
 
 import com.example.projectpoker.model.game.enums.GameStatus;
 import com.example.projectpoker.model.game.enums.RoundStatus;

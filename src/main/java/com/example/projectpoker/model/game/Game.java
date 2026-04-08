@@ -2,15 +2,18 @@ package com.example.projectpoker.model.game;
 
 import com.example.projectpoker.model.game.enums.Difficulty;
 import com.example.projectpoker.model.game.enums.GameStatus;
-import com.example.projectpoker.model.game.oberserver.AbsSubject;
+import com.example.projectpoker.model.oberserver.AbsSubject;
 
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.Collections;
 
 
-public class Game extends AbsSubject {
+public class Game {
 
-    private GameStatus state;
+    private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
+    private GameStatus gameStatus;
     private ArrayList<Player> players;
     private int numRoundsLeft;
     private int gameLength;
@@ -45,20 +48,55 @@ public class Game extends AbsSubject {
         // Method for loading visual game features
     }
 
-    public void init(int numPlayers) {
-        this.players = RoleUtil.delegateRoles(initAiPlayers(players, userBalance, numPlayers, difficulty), new int[]{0, 1, 2});
-        this.state = GameStatus.INITIALISED;
-        notifyObservers(state);
+    public void addPropertyChangeListener(PropertyChangeListener listener) {
+        pcs.addPropertyChangeListener(listener);
+    }
+
+    public void removePropertyChangeListener(PropertyChangeListener listener) {
+        pcs.removePropertyChangeListener(listener);
+    }
+
+    public GameStatus getGameStatus() {
+        return gameStatus;
+    }
+
+    public void setGameStatus (GameStatus gameStatus) {
+        var oldVal = this.gameStatus;
+        this.gameStatus = gameStatus;
+        pcs.firePropertyChange("state",oldVal,this.gameStatus);
+    }
+
+    public ArrayList<Player> getPlayers() {
+        return players;
+    }
+
+    public void setPlayers(ArrayList<Player> players) {
+        var oldVal = this.players;
+        this.players = players;
+        pcs.firePropertyChange("players",oldVal,this.players);
+    }
+
+    public void init() {
+        setPlayers(
+          RoleUtil.delegateRoles(
+            initAiPlayers(
+                    players,
+                    userBalance,
+                    numPlayers,
+                    difficulty
+            ), new int[]{0, 1, 2}
+          )
+        );
+        setGameStatus(GameStatus.INITIALISED);
     }
 
     public void start() {
         // Valid game before starting
-        this.state = GameStatus.RUNNING;
-        notifyObservers(state);
-        while (state == GameStatus.RUNNING) {
+        setGameStatus(GameStatus.RUNNING);
+        while (gameStatus == GameStatus.RUNNING) {
             Round round = new Round(players,blindSize);
-            round.Init();
-            round.Start();
+            round.init();
+            round.start();
             // Loss Condition
             if (players.getFirst().getBalance() == 0) { end(); break; }
             else if (numRoundsLeft == 0) { end(); break; }
@@ -69,8 +107,7 @@ public class Game extends AbsSubject {
     }
 
     public void end() {
-        this.state = GameStatus.ENDED;
-        notifyObservers(state); // notify UI
+        setGameStatus(GameStatus.ENDED); // notify UI
         // save to database
         //      update player balance & records
     }

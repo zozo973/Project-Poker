@@ -7,17 +7,20 @@ public class SessionManager {
     // set as boolean cause either logged in or logged out
         // true = logged in
         // false = logged out
-    private static Boolean CurrentUser;
+    private static Boolean CurrentUser = false;
 
     // no constructor needed static variables belong to classes not objects with constructors initialising objects
 
-    public Boolean GetCurrentUser() {
+    // method to get variable to know who is logged in
+    public static Boolean GetCurrentUser() {
         return GetCurrentUser();
     }
-    public void SetCurrentUser_In(Boolean CurrentUser){
+    // method to set variable when someone logs in
+    public static void SetCurrentUser_In(Boolean CurrentUser){
         CurrentUser = true;
     }
-    public void SetCurrentUser_Out(Boolean CurrentUser){
+    // method to clear variable when someone logs out
+    public static void SetCurrentUser_Out(Boolean CurrentUser){
         CurrentUser = false;
     }
 }

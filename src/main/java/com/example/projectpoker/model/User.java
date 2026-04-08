@@ -12,7 +12,7 @@ public class User {
 
     // add constructor to set initial values for object fields
     // method takes parameters which will be set by user
-    // UserID and LocalDateTime aren't provided by user directly, they are created differently
+    // UserID and LocalDateTime aren't provided by user directly so not included for now they are created separately
     public User(String Username, String Password, String Email) {
         this.Username = Username;
         this.Password = Password;
@@ -49,7 +49,7 @@ public class User {
     public void SetEmail(String Email){
         this.Email = Email;
     }
-    public void SetCreatedAt(LocalDateTime CreatedAt){
+    public void SetCreatedAt(LocalDateTime CreatedAt) {
         this.CreatedAt = CreatedAt;
     }
 }

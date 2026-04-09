@@ -11,6 +11,7 @@ module com.example.projectpoker {
     requires eu.hansolo.tilesfx;
     requires com.almasb.fxgl.all;
     requires java.desktop;
+    requires java.sql;
 
     opens com.example.projectpoker to javafx.fxml;
     exports com.example.projectpoker;
@@ -22,8 +23,8 @@ module com.example.projectpoker {
     opens com.example.projectpoker.model.game to javafx.fxml;
 //    exports com.example.projectpoker.model.game.statemachine;
 //    opens com.example.projectpoker.model.game.statemachine to javafx.fxml;
-    exports com.example.projectpoker.model.oberserver;
-    opens com.example.projectpoker.model.oberserver to javafx.fxml;
     exports com.example.projectpoker.model.game.enums;
     opens com.example.projectpoker.model.game.enums to javafx.fxml;
+    exports com.example.projectpoker.database;
+    opens com.example.projectpoker.database to javafx.fxml;
 }

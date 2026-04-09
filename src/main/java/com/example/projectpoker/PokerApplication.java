@@ -2,9 +2,11 @@ package com.example.projectpoker;
 
 import com.example.projectpoker.controller.RoundController;
 import com.example.projectpoker.controller.RoundViewUpdater;
+import com.example.projectpoker.database.DatabaseManager;
 import com.example.projectpoker.handler.GameStatusChangeHandler;
 import com.example.projectpoker.handler.PlayerStatusChangeHandler;
 import com.example.projectpoker.handler.RoundStatusChangeHandler;
+import com.example.projectpoker.model.User;
 import com.example.projectpoker.model.game.AiPlayer;
 import com.example.projectpoker.model.game.Game;
 import com.example.projectpoker.model.game.Player;
@@ -25,6 +27,7 @@ import static com.example.projectpoker.model.statistics.SkewNormalSampler.safeRo
 public class PokerApplication extends Application {
     @Override
     public void start(Stage stage) throws IOException {
+        DatabaseManager.initializeDatabase();
         FXMLLoader fxmlLoader = new FXMLLoader(PokerApplication.class.getResource("hello-view.fxml"));
         Scene scene = new Scene(fxmlLoader.load(), 320, 240);
 
@@ -50,11 +53,12 @@ public class PokerApplication extends Application {
         //      int gameLength: num of rounds game goes for, default 30,
         //      Difficulty difficulty: HBox of buttons, can only select one, on hover shows display for difficulty
 
-        Player user = new Player("User",10000);
+        User userProfile = DatabaseManager.getOrCreateUser("User", "", 10000);
+        Player user = new Player(userProfile.getUsername(), userProfile.getCurrentBalance());
         int userBuyIn = 1000;
         int blind = safeRoundToInt((userBuyIn*0.03));
         int numPlayer = 4;
-        Game game = new Game(user,userBuyIn,4,blind,10,40, Difficulty.GAMBLINGADDICT);
+        Game game = new Game(user, userProfile, userBuyIn, numPlayer, blind, 10, 40, Difficulty.GAMBLINGADDICT);
 
         RoundController controller = (RoundController) loadPokerGameView(game);
 

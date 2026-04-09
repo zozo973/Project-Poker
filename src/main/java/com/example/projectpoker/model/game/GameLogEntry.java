@@ -1,13 +1,11 @@
 package com.example.projectpoker.model.game;
 
 import com.example.projectpoker.model.game.enums.Action;
-import com.example.projectpoker.model.game.enums.Roles;
-
 public class GameLogEntry {
-    private Player player;
-    private int betSize;
-    private int toCall;
-    private Action action;
+    private final Player player;
+    private final int betSize;
+    private final int toCall;
+    private final Action action;
 
     public GameLogEntry(Player player, int toCall, int betSize, Action action) {
         this.player = player;
@@ -19,12 +17,13 @@ public class GameLogEntry {
     public GameLogEntry(Player player, int betSize) {
         this.player = player;
         this.betSize = betSize;
+        this.toCall = 0;
         if (betSize == 0) {
             this.action = Action.CHECK;
         } else if (betSize == -1) {
             this.action = Action.FOLD;
-            if (player.getRole() == Roles.SMALLBLIND) {
-            }
+        } else {
+            this.action = Action.CALL;
         }
     }
 
@@ -34,5 +33,21 @@ public class GameLogEntry {
          else if (action == Action.CALL) str = Integer.toString(toCall) + "dollars to play.";
          else { str = "."; }
         return (String) player.getName() + "decided to" + action.getDescription() + str;
+    }
+
+    public String getPlayerName() {
+        return player.getName();
+    }
+
+    public int getBetSize() {
+        return betSize;
+    }
+
+    public int getToCall() {
+        return toCall;
+    }
+
+    public Action getAction() {
+        return action;
     }
 }

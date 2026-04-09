@@ -33,4 +33,9 @@ public class Card {
     public boolean equals(Object o) {
         return (o instanceof Card && ((Card) o).rank == rank && ((Card) o).suit == suit);
     }
+
+    @Override
+    public String toString() {
+        return rank.name() + "_OF_" + suit.name();
+    }
 }

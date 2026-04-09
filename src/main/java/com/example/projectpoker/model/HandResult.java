@@ -1,6 +1,6 @@
 package com.example.projectpoker.model;
 
-import com.example.projectpoker.model.game.enums.*;
+import com.example.projectpoker.model.game.enums.Rank;
 
 public class HandResult {
     private final int handType;

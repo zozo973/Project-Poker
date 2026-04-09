@@ -6,20 +6,31 @@ public class User {
     private String password;
     private int totalHandsPlayed;
     private int totalWins;
+    private int currentBalance;
 
-    public User(int id, String username, String password, int totalHandsPlayed, int totalWins) {
+    public User(int id, String username, String password, int totalHandsPlayed, int totalWins, int currentBalance) {
         this.id = id;
         this.username = username;
         this.password = password;
         this.totalHandsPlayed = totalHandsPlayed;
         this.totalWins = totalWins;
+        this.currentBalance = currentBalance;
     }
 
     public User(String username, String password, int totalHandsPlayed, int totalWins) {
+        this(username, password, totalHandsPlayed, totalWins, 1000);
+    }
+
+    public User(String username, String password, int totalHandsPlayed, int totalWins, int currentBalance) {
         this.username = username;
         this.password = password;
         this.totalHandsPlayed = totalHandsPlayed;
         this.totalWins = totalWins;
+        this.currentBalance = currentBalance;
+    }
+
+    public User(int id, String username, String password, int totalHandsPlayed, int totalWins) {
+        this(id, username, password, totalHandsPlayed, totalWins, 1000);
     }
 
     public int getId() {
@@ -52,5 +63,13 @@ public class User {
 
     public void setTotalWins(int totalWins) {
         this.totalWins = totalWins;
+    }
+
+    public int getCurrentBalance() {
+        return currentBalance;
+    }
+
+    public void setCurrentBalance(int currentBalance) {
+        this.currentBalance = currentBalance;
     }
 }

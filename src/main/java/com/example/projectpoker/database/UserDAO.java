@@ -22,24 +22,38 @@ public class UserDAO {
                             + "username VARCHAR NOT NULL UNIQUE, "
                             + "password VARCHAR NOT NULL, "
                             + "totalHandsPlayed INTEGER NOT NULL, "
-                            + "totalWins INTEGER NOT NULL"
+                            + "totalWins INTEGER NOT NULL, "
+                            + "currentBalance INTEGER NOT NULL DEFAULT 1000"
                             + ")"
             );
+            ensureColumnExists("currentBalance", "INTEGER NOT NULL DEFAULT 1000");
         } catch (SQLException ex) {
             System.err.println(ex);
+        }
+    }
+
+    private void ensureColumnExists(String columnName, String definition) throws SQLException {
+        DatabaseMetaData metadata = connection.getMetaData();
+        try (ResultSet columns = metadata.getColumns(null, null, "users", columnName)) {
+            if (!columns.next()) {
+                try (Statement alterTable = connection.createStatement()) {
+                    alterTable.execute("ALTER TABLE users ADD COLUMN " + columnName + " " + definition);
+                }
+            }
         }
     }
 
     public void insert(User user) {
         try {
             PreparedStatement insertUser = connection.prepareStatement(
-                    "INSERT INTO users (username, password, totalHandsPlayed, totalWins) VALUES (?, ?, ?, ?)",
+                    "INSERT INTO users (username, password, totalHandsPlayed, totalWins, currentBalance) VALUES (?, ?, ?, ?, ?)",
                     Statement.RETURN_GENERATED_KEYS
             );
             insertUser.setString(1, user.getUsername());
             insertUser.setString(2, user.getPassword());
             insertUser.setInt(3, user.getTotalHandsPlayed());
             insertUser.setInt(4, user.getTotalWins());
+            insertUser.setInt(5, user.getCurrentBalance());
             insertUser.execute();
 
             ResultSet keys = insertUser.getGeneratedKeys();
@@ -54,13 +68,14 @@ public class UserDAO {
     public void update(User user) {
         try {
             PreparedStatement updateUser = connection.prepareStatement(
-                    "UPDATE users SET username = ?, password = ?, totalHandsPlayed = ?, totalWins = ? WHERE id = ?"
+                    "UPDATE users SET username = ?, password = ?, totalHandsPlayed = ?, totalWins = ?, currentBalance = ? WHERE id = ?"
             );
             updateUser.setString(1, user.getUsername());
             updateUser.setString(2, user.getPassword());
             updateUser.setInt(3, user.getTotalHandsPlayed());
             updateUser.setInt(4, user.getTotalWins());
-            updateUser.setInt(5, user.getId());
+            updateUser.setInt(5, user.getCurrentBalance());
+            updateUser.setInt(6, user.getId());
             updateUser.execute();
         } catch (SQLException ex) {
             System.err.println(ex);
@@ -91,7 +106,8 @@ public class UserDAO {
                                 rs.getString("username"),
                                 rs.getString("password"),
                                 rs.getInt("totalHandsPlayed"),
-                                rs.getInt("totalWins")
+                                rs.getInt("totalWins"),
+                                rs.getInt("currentBalance")
                         )
                 );
             }
@@ -114,7 +130,8 @@ public class UserDAO {
                         rs.getString("username"),
                         rs.getString("password"),
                         rs.getInt("totalHandsPlayed"),
-                        rs.getInt("totalWins")
+                        rs.getInt("totalWins"),
+                        rs.getInt("currentBalance")
                 );
             }
         } catch (SQLException ex) {
@@ -136,7 +153,8 @@ public class UserDAO {
                         rs.getString("username"),
                         rs.getString("password"),
                         rs.getInt("totalHandsPlayed"),
-                        rs.getInt("totalWins")
+                        rs.getInt("totalWins"),
+                        rs.getInt("currentBalance")
                 );
             }
         } catch (SQLException ex) {
@@ -145,11 +163,18 @@ public class UserDAO {
         return null;
     }
 
-    public void close() {
-        try {
-            connection.close();
-        } catch (SQLException ex) {
-            System.err.println(ex);
+    public User getOrCreate(String username, String password, int defaultBalance) {
+        User existingUser = getByUsername(username);
+        if (existingUser != null) {
+            return existingUser;
         }
+
+        User newUser = new User(username, password, 0, 0, defaultBalance);
+        insert(newUser);
+        return newUser;
+    }
+
+    public void close() {
+        // Shared singleton connection is managed centrally.
     }
 }

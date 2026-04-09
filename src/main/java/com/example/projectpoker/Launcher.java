@@ -1,13 +1,10 @@
 package com.example.projectpoker;
-import com.example.projectpoker.model.*;
+import com.example.projectpoker.model.HandEvaluation;
 import com.example.projectpoker.model.game.Card;
-import com.example.projectpoker.model.game.enums.*;
-import com.example.projectpoker.model.statistics.HandStats;
-import javafx.application.Application;
+import com.example.projectpoker.model.game.enums.Rank;
+import com.example.projectpoker.model.game.enums.Suit;
+
 import java.util.List;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 public class Launcher {
     public static void main(String[] args) {
@@ -79,4 +76,3 @@ public class Launcher {
 
     }
 }
-

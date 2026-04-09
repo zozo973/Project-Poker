@@ -1,8 +1,8 @@
 package com.example.projectpoker.model;
 
 import com.example.projectpoker.model.game.Card;
-
-import com.example.projectpoker.model.game.enums.*;
+import com.example.projectpoker.model.game.enums.PokerHand;
+import com.example.projectpoker.model.game.enums.Suit;
 
 
 import java.util.ArrayList;
@@ -13,8 +13,6 @@ import java.util.Set;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.EnumMap;
-
-
 
 public class HandEvaluation {
 

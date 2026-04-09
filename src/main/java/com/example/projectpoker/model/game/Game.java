@@ -1,6 +1,8 @@
 package com.example.projectpoker.model.game;
 
+import com.example.projectpoker.database.DatabaseManager;
 import com.example.projectpoker.handler.RoundStatusChangeHandler;
+import com.example.projectpoker.model.User;
 import com.example.projectpoker.model.game.enums.Difficulty;
 import com.example.projectpoker.model.game.enums.GameStatus;
 
@@ -21,9 +23,14 @@ public class Game {
     private final int whenIncreaseBlinds;
     private final Difficulty difficulty;
     private int numPlayers;
-    private int userBalance;
+    private int userBuyIn;
     private Round round;
     private RoundStatusChangeHandler roundHandler;
+    private final User userProfile;
+    private int gameSessionId;
+    private final int startingUserBalance;
+    private final Player userPlayer;
+    private int handsPlayed;
 
 
     // Constructor called when starting a new game of poker
@@ -37,15 +44,24 @@ public class Game {
     //
 
     public Game(Player user, int userBalance, int numPlayers, int initBlind, int whenIncreaseBlinds, int gameLength, Difficulty difficulty) {
+        this(user, null, userBalance, numPlayers, initBlind, whenIncreaseBlinds, gameLength, difficulty);
+    }
+
+    public Game(Player user, User userProfile, int userBalance, int numPlayers, int initBlind, int whenIncreaseBlinds, int gameLength, Difficulty difficulty) {
         this.players = new ArrayList<>();
         players.add(user);
         this.numPlayers = numPlayers;
-        this.userBalance = userBalance;
+        this.userBuyIn = userBalance;
         this.difficulty = difficulty;
         this.blindSize = initBlind;
         this.whenIncreaseBlinds = whenIncreaseBlinds;
         this.gameLength = gameLength;
         this.numRoundsLeft = gameLength;
+        this.userProfile = userProfile;
+        this.gameSessionId = -1;
+        this.startingUserBalance = user.getBalance();
+        this.userPlayer = user;
+        this.handsPlayed = 0;
         //GameContext gameContext = new GameContext();
         // Method for loading visual game features
     }
@@ -79,7 +95,8 @@ public class Game {
     }
 
     public void createNextRound() {
-        Round round = new Round(players,blindSize);
+        int roundNumber = handsPlayed + 1;
+        Round round = new Round(players, blindSize, gameSessionId, roundNumber);
         pcs.firePropertyChange("round",this.round,round);
         round.addPropertyChangeListener(roundHandler);
         setRound(round);
@@ -89,7 +106,7 @@ public class Game {
 
     private void setRound(Round round) { this.round = round; }
 
-    public Player getUser() { return players.getFirst(); }
+    public Player getUser() { return userPlayer; }
 
     public ArrayList<AiPlayer> getAiPlayers() {
         ArrayList<AiPlayer> AiPlayers = new ArrayList<>();
@@ -108,12 +125,13 @@ public class Game {
           RoleUtil.delegateRoles(
             initAiPlayers(
                     players,
-                    userBalance,
+                    userBuyIn,
                     numPlayers,
                     difficulty
             ), new int[]{0, 1, 2}
           )
         );
+        gameSessionId = DatabaseManager.createGameSession(userProfile, this, getUser());
         createNextRound();
         setGameStatus(GameStatus.INITIALISED);
     }
@@ -124,10 +142,11 @@ public class Game {
         while (gameStatus == GameStatus.RUNNING) {
             this.round.init();
             this.round.start();
+            this.handsPlayed++;
             // Loss Condition
-            if (players.getFirst().getBalance() == 0) { end(); break; }
+            if (getUser().getBalance() == 0) { end(); break; }
             else if (numRoundsLeft == 0) { end(); break; }
-            else if (players.size() == 1 && !(players.getFirst() instanceof AiPlayer)) {end(); break; }
+            else if (players.size() == 1 && !(getUser() instanceof AiPlayer)) {end(); break; }
             tryIncreaseBlind();
             this.numRoundsLeft--;
         }
@@ -135,8 +154,7 @@ public class Game {
 
     public void end() {
         setGameStatus(GameStatus.ENDED); // notify UI
-        // save to database
-        //      update player balance & records
+        DatabaseManager.finalizeGameSession(gameSessionId, userProfile, this, getUser());
     }
 
     private ArrayList<Player> initAiPlayers(ArrayList<Player> players, int userBalance, int numPlayers, Difficulty difficulty) {
@@ -151,5 +169,37 @@ public class Game {
         if ((gameLength - numRoundsLeft) % whenIncreaseBlinds == 0) {
             this.blindSize = blindSize * 2;
         }
+    }
+
+    public int getGameLength() {
+        return gameLength;
+    }
+
+    public int getBlindSize() {
+        return blindSize;
+    }
+
+    public int getWhenIncreaseBlinds() {
+        return whenIncreaseBlinds;
+    }
+
+    public Difficulty getDifficulty() {
+        return difficulty;
+    }
+
+    public int getNumPlayers() {
+        return numPlayers;
+    }
+
+    public int getUserBuyIn() {
+        return userBuyIn;
+    }
+
+    public int getHandsPlayed() {
+        return handsPlayed;
+    }
+
+    public int getStartingUserBalance() {
+        return startingUserBalance;
     }
 }

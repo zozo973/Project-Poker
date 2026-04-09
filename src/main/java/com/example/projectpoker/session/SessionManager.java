@@ -24,7 +24,7 @@ public class SessionManager {
         currentUser = user;
     }
     // method to clear variable when someone logs out
-    public static void setCurrentUser_Out(){
+    public static void logout(){
         currentUser = null;
     }
 }

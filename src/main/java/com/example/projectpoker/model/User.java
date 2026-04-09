@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 
 public class User {
     // fields that go into the User Database table
-    private int UserID;
+    private int userID;
     private String Username;
     private String Password;
     private String Email;
@@ -20,36 +20,36 @@ public class User {
     }
 
     // get method returns variable value
-    public int GetUserID() {
-        return UserID;
+    public int getUserID() {
+        return userID;
     }
-    public String GetUsername() {
+    public String getUsername() {
         return Username;
     }
-    public String GetPassword() {
+    public String getPassword() {
         return Password;
     }
-    public String GetEmail() {
+    public String getEmail() {
         return Email;
     }
-    public LocalDateTime GetCreatedAt() {
+    public LocalDateTime getCreatedAt() {
         return CreatedAt;
     }
 
     // set method sets variable value
-    public void SetUserID(int UserID){
-        this.UserID = UserID;
+    public void setUserID(int userID){
+        this.userID = userID;
     }
-    public void SetUsername(String Username) {
+    public void setUsername(String Username) {
         this.Username = Username;
     }
-    public void SetPassword(String Password){
+    public void setPassword(String Password){
         this.Password = Password;
     }
-    public void SetEmail(String Email){
+    public void setEmail(String Email){
         this.Email = Email;
     }
-    public void SetCreatedAt(LocalDateTime CreatedAt) {
+    public void setCreatedAt(LocalDateTime CreatedAt) {
         this.CreatedAt = CreatedAt;
     }
 }

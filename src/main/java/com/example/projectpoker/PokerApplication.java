@@ -50,6 +50,7 @@ public class PokerApplication extends Application {
         //      int gameLength: num of rounds game goes for, default 30,
         //      Difficulty difficulty: HBox of buttons, can only select one, on hover shows display for difficulty
 
+        // change to retire user data from database and other vars can be retrieved from user input into ui
         Player user = new Player("User",10000);
         int userBuyIn = 1000;
         int blind = safeRoundToInt((userBuyIn*0.03));
@@ -60,7 +61,7 @@ public class PokerApplication extends Application {
 
         PlayerStatusChangeHandler playerHandler = new PlayerStatusChangeHandler(controller);
         RoundStatusChangeHandler roundHandler = new RoundStatusChangeHandler(controller);
-        GameStatusChangeHandler gameHandler = new GameStatusChangeHandler();
+        GameStatusChangeHandler gameHandler = new GameStatusChangeHandler(controller);
 
         game.setRoundHandler(roundHandler);
         game.addPropertyChangeListener(gameHandler);

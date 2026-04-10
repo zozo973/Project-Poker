@@ -1,6 +1,7 @@
 package com.example.projectpoker.model.game;
 
 import com.example.projectpoker.handler.RoundStatusChangeHandler;
+import com.example.projectpoker.model.game.enums.Action;
 import com.example.projectpoker.model.game.enums.Difficulty;
 import com.example.projectpoker.model.game.enums.GameStatus;
 
@@ -11,6 +12,11 @@ import java.util.Collections;
 
 
 public class Game {
+
+    // Game Events
+    //      gameStatus Change
+    //      blindSize Change
+    //      players Change
 
     private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
     private GameStatus gameStatus;
@@ -89,6 +95,14 @@ public class Game {
 
     private void setRound(Round round) { this.round = round; }
 
+    public int getBlindSize() { return blindSize; }
+
+    public void setBlindSize(int blindSize) {
+        var oldVal = this.blindSize;
+        this.blindSize = blindSize;
+        pcs.firePropertyChange("blindSize",oldVal,this.blindSize);
+    }
+
     public Player getUser() { return players.getFirst(); }
 
     public ArrayList<AiPlayer> getAiPlayers() {
@@ -128,6 +142,7 @@ public class Game {
             if (players.getFirst().getBalance() == 0) { end(); break; }
             else if (numRoundsLeft == 0) { end(); break; }
             else if (players.size() == 1 && !(players.getFirst() instanceof AiPlayer)) {end(); break; }
+            checkForfeitedPlayers();
             tryIncreaseBlind();
             this.numRoundsLeft--;
         }
@@ -149,7 +164,18 @@ public class Game {
 
     private void tryIncreaseBlind() {
         if ((gameLength - numRoundsLeft) % whenIncreaseBlinds == 0) {
-            this.blindSize = blindSize * 2;
+            setBlindSize(this.blindSize*2);
+        }
+    }
+
+    // method to check if any players have lost all there money or left the game.
+    private void checkForfeitedPlayers() {
+        ArrayList<Player> activePlayers = new ArrayList<>();
+        for (Player p : this.players) {
+            if (!p.getAction().equals(Action.FORFEIT)) activePlayers.add(p);
+        }
+        if (!activePlayers.equals(this.players)) {
+            setPlayers(activePlayers);
         }
     }
 }

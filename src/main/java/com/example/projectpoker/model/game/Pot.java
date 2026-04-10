@@ -1,5 +1,8 @@
 package com.example.projectpoker.model.game;
 
+import com.example.projectpoker.model.HandEvaluation;
+import com.example.projectpoker.model.HandResult;
+import com.example.projectpoker.model.PlayerResult;
 import com.example.projectpoker.model.game.enums.Action;
 import com.example.projectpoker.model.game.enums.RoundStatus;
 
@@ -32,6 +35,8 @@ public class Pot {
     public void setPotSize(int potSize) { this.potSize = potSize; }
 
     public boolean getIsOpen() { return isOpen; }
+
+    public void setIsOpen(boolean status) { this.isOpen = status; }
 
     public void closePot() { this.isOpen = false; }
 
@@ -82,10 +87,16 @@ public class Pot {
         return RoundStatus.stepRoundStatus(status);
     }
 
-    public void showDown() {
-        // TODO add hand evaluation methods
-        Player winner = new Player(); // replace new instance with hand eval methods
-        winner.win(potSize);
+    public void showDown(ArrayList<Card> communityCards) {
+        ArrayList<PlayerResult> gameResults = new ArrayList<>();
+        gameResults = HandEvaluation.whoWins(communityCards, this.players);
+        int numWinners = gameResults.size();
+        for (int i = 0; i < numWinners; i ++) {
+            for (Player p : players) { /// break possibly breaks out of both loops requires testing
+                if (p.matchId(gameResults.get(i).getPlayerId())) p.win(potSize / numWinners);
+                break;
+            }
+        }
     }
 
     public void payOut() {

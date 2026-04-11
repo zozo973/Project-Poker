@@ -4,24 +4,39 @@ import java.time.LocalDateTime;
 
 public class User {
     // fields that go into the User Database table
-    private int userID;
+    private int id;
     private String username;
     private String password;
     private String email;
     private LocalDateTime createdAt;
+    private int totalHandsPlayed;
+    private int totalWins;
+    private int currentBalance;
 
-    // add constructor to set initial values for object fields
-    // method takes parameters which will be set by user
-    // UserID and LocalDateTime aren't provided by user directly so not included for now they are created separately
-    public User(String Username, String Password, String Email) {
-        this.username = Username;
-        this.password = Password;
-        this.email = Email;
+    // constructor for registration - stats default to 0, balance defaults to 1000
+    public User(String username, String password, String email) {
+        this.username = username;
+        this.password = password;
+        this.email = email;
+        this.totalHandsPlayed = 0;
+        this.totalWins = 0;
+        this.currentBalance = 1000;
     }
 
-    // get method returns variable value
-    public int getUserID() {
-        return userID;
+    // constructor for loading existing user from database
+    public User(int id, String username, String password, String email, int totalHandsPlayed, int totalWins, int currentBalance) {
+        this.id = id;
+        this.username = username;
+        this.password = password;
+        this.email = email;
+        this.totalHandsPlayed = totalHandsPlayed;
+        this.totalWins = totalWins;
+        this.currentBalance = currentBalance;
+    }
+
+    // getters
+    public int getId() {
+        return id;
     }
     public String getUsername() {
         return username;
@@ -35,25 +50,39 @@ public class User {
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
+    public int getTotalHandsPlayed() {
+        return totalHandsPlayed;
+    }
+    public int getTotalWins() {
+        return totalWins;
+    }
+    public int getCurrentBalance() {
+        return currentBalance;
+    }
 
-    // set method sets variable value
-    public void setUserID(int userID){
-        this.userID = userID;
+    // setters
+    public void setId(int id) {
+        this.id = id;
     }
-    public void setUsername(String Username) {
-        this.username = Username;
+    public void setUsername(String username) {
+        this.username = username;
     }
-    public void setPassword(String Password){
-        this.password = Password;
+    public void setPassword(String password) {
+        this.password = password;
     }
-    public void setEmail(String Email){
-        this.email = Email;
+    public void setEmail(String email) {
+        this.email = email;
     }
-    public void setCreatedAt(LocalDateTime CreatedAt) {
-        this.createdAt = CreatedAt;
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+    public void setTotalHandsPlayed(int totalHandsPlayed) {
+        this.totalHandsPlayed = totalHandsPlayed;
+    }
+    public void setTotalWins(int totalWins) {
+        this.totalWins = totalWins;
+    }
+    public void setCurrentBalance(int currentBalance) {
+        this.currentBalance = currentBalance;
     }
 }
-
-
-
-

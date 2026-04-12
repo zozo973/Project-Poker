@@ -34,7 +34,7 @@ Present- everyone
 Talked about progress
 Mitch- Started watching tutorials and testing API calls with open source models.
 Ben- Implemented database, was waiting on gamelogic and AI branches to be ready,
-Basilus- Done other assignments
+Basilis- Done other assignments
 Hugo- Merged game logic branch into master with observer class, waiting on Database connection and
 Jacob- Finished Hand evaluation and round evaluation logic. Merged into master branch for others to use. Started working on art/animations branch
 Bobby- Working on AI coaching with Gemini, needs to implement handcards, boardcards, stage and mode.
@@ -43,3 +43,21 @@ Outcome - Mitch and Bobby to work together on integrating AI models
 	- Hugo and Ben work on merging database into master branch and setting up calls to DB
 	- Dylan and Jacob work on UI
 	- Aim is to have more substantial progress by Friday (10/4)
+
+Meeting 12/4
+Present Basilis, Ben, Bobby, Dylan, Jacob
+Discussed progress
+Basilis done register controller, working on login controller, almost done with login page
+Ben Got the database working, has logic to save hands, wins, money, users. Waiting other parts completion.
+Problems with imports
+Bobby AI coaching almost done
+Jacob- Finished Art for cards, deck, table, card backs. Started on UI for game table.
+Dylan, done low fidelity UI sketches
+
+
+To do
+Basilis finishing login controllers and Page UI
+Dylan setting up notion management tool
+Jacob Continue on Game UI
+Bobby finish coaching branch
+Ben Troubleshoot imports

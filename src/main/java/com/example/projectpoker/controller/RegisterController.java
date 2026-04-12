@@ -47,7 +47,7 @@ public class RegisterController {
         else if (!password.equals(confirmPassword)) {
             passwordField.setText("");
             confirmPasswordField.setText("");
-            messageLabel.setText("Something went wrong, please try again.");
+            messageLabel.setText("Please makes sure passwords match.");
             return;
         }
         // hashing password then verifying password was hashed currently
@@ -58,7 +58,7 @@ public class RegisterController {
             if (!verifiedPassword) {
                 passwordField.setText("");
                 confirmPasswordField.setText("");
-                messageLabel.setText("Password doesn't match after hashing!");
+                messageLabel.setText("Something went wrong, please try again.");
                 return;
             }
 
@@ -68,8 +68,6 @@ public class RegisterController {
             UserDAO userDAO = new UserDAO();
             userDAO.createTable();
             userDAO.insert(newUser);
-            // success message
-            messageLabel.setText("Successful Registration!");
         }
     }
 

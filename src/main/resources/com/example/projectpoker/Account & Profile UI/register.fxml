@@ -37,7 +37,7 @@
     <PasswordField fx:id="confirmPasswordField" promptText="Confirm password"/>
 
     <!-- Register button -->
-    <Button fx:id="registerButton" text="Register" onAction="#handleRegister"/>
+    <Button text="Register" onAction="#handleRegister"/>
 
     <!-- Message label for errors/success -->
     <Label fx:id="messageLabel" text=""/>

@@ -42,7 +42,7 @@
     <!-- Message label for errors/success -->
     <Label fx:id="messageLabel" text=""/>
 
-    <!-- Link to login -->
+    <!-- Log out button -->
     <Label text="Already have an account?"/>
     <Button text="Go to Login" onAction="#goToLogin"/>
 

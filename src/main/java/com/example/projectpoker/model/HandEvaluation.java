@@ -2,6 +2,7 @@ package com.example.projectpoker.model;
 
 import com.example.projectpoker.model.game.Card;
 
+import com.example.projectpoker.model.game.Player;
 import com.example.projectpoker.model.game.enums.*;
 
 
@@ -14,46 +15,47 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.EnumMap;
 
-
-
 public class HandEvaluation {
 
-    public static List<PlayerResult> whoWins(List<Card> board, List<List<Card>> playerHands) {
+    public static ArrayList<PlayerResult> whoWins(ArrayList<Card> board, ArrayList<Player> players) {
 
-        List<PlayerResult> winners = new ArrayList<>();
+        ArrayList<ArrayList<Card>> playerHands = new ArrayList<>();
+        for (Player p : players) {
+            playerHands.add((ArrayList<Card>) p.getPlayerHand().getCards());
+        }
+
+        ArrayList<PlayerResult> winners = new ArrayList<>();
         HandResult bestResult = null;
 
         for (int i = 0; i < playerHands.size(); i++) {
 
-            List<Card> combined = new ArrayList<>(board);
+            ArrayList<Card> combined = new ArrayList<>(board);
             combined.addAll(playerHands.get(i));
 
             HandResult currentResult = HandEvaluation.evaluateHand(combined);
 
             if (bestResult == null) {
                 bestResult = currentResult;
-                winners.add(new PlayerResult(playerHands.get(i), currentResult));
+                winners.add(new PlayerResult(playerHands.get(i), currentResult, players.get(i).getId()));
             } else {
                 int cmp = compareHands(currentResult, bestResult);
 
                 if (cmp == 1) {
                     // New best, clear old winners
                     winners.clear();
-                    winners.add(new PlayerResult(playerHands.get(i), currentResult));
+                    winners.add(new PlayerResult(playerHands.get(i), currentResult, players.get(i).getId()));
                     bestResult = currentResult;
 
                 } else if (cmp == 0) {
                     // Tie, add to winners
-                    winners.add(new PlayerResult(playerHands.get(i), currentResult));
+                    winners.add(new PlayerResult(playerHands.get(i), currentResult, players.get(i).getId()));
                 }
             }
         }
-
         return winners;
     }
 
     private static int compareHands(HandResult a, HandResult b) {
-
         int[] aVals = {
                 a.getHandName(),
                 a.getValue(),
@@ -62,7 +64,6 @@ public class HandEvaluation {
                 a.getKicker3(),
                 a.getKicker4()
         };
-
         int[] bVals = {
                 b.getHandName(),
                 b.getValue(),
@@ -71,16 +72,14 @@ public class HandEvaluation {
                 b.getKicker3(),
                 b.getKicker4()
         };
-
         for (int i = 0; i < aVals.length; i++) {
             if (aVals[i] > bVals[i]) return 1;
             if (aVals[i] < bVals[i]) return -1;
         }
-
         return 0; // tie
     }
 
-    public static HandResult evaluateHand(List<Card> cards) {
+    public static HandResult evaluateHand(ArrayList<Card> cards) {
         HandResult testEvaluation;
 
         testEvaluation = isStraightFlush(cards);
@@ -109,15 +108,13 @@ public class HandEvaluation {
 
         testEvaluation = isHighCard(cards);
         return testEvaluation;
-
-
     }
 
-    private static HandResult isHighCard(List<Card> cards) {
+    private static HandResult isHighCard(ArrayList<Card> cards) {
         if (cards == null || cards.isEmpty()) return null;
 
         // Extract values
-        List<Integer> values = new ArrayList<>();
+        ArrayList<Integer> values = new ArrayList<>();
         for (Card card : cards) {
             values.add(card.getValue());
         }
@@ -134,7 +131,7 @@ public class HandEvaluation {
         return new HandResult(PokerHand.HIGHCARD.getValue(), value, kicker1, kicker2, kicker3, kicker4);
     }
 
-    private static HandResult isPair(List<Card> cards) {
+    private static HandResult isPair(ArrayList<Card> cards) {
         for (int i = 0; i < cards.size(); i++) {
             int count = 1;
             int rank = cards.get(i).getValue();
@@ -168,16 +165,13 @@ public class HandEvaluation {
                         kicker3 = Math.max(kicker3, card.getValue());
                     }
                 }
-
-
                 return new HandResult(PokerHand.ONEPAIR.getValue(), rank, kicker1, kicker2, kicker3);
             }
         }
-
         return null; // no pairs
     }
 
-    private static HandResult isThreeOfAKind(List<Card> cards) {
+    private static HandResult isThreeOfAKind(ArrayList<Card> cards) {
         for (int i = 0; i < cards.size(); i++) {
             int count = 1;
             int rank = cards.get(i).getValue();
@@ -207,11 +201,10 @@ public class HandEvaluation {
                 return new HandResult(PokerHand.TRIPLE.getValue(), rank, kicker1, kicker2);
             }
         }
-
         return null; // no triple
     }
 
-    private static HandResult isFourOfAKind(List<Card> cards) {
+    private static HandResult isFourOfAKind(ArrayList<Card> cards) {
         for (int i = 0; i < cards.size(); i++) {
             int count = 1;
             int rank = cards.get(i).getValue();
@@ -221,7 +214,6 @@ public class HandEvaluation {
                     count++;
                 }
             }
-
             if (count >= 4) {
                 int kicker = -1;
 
@@ -231,15 +223,13 @@ public class HandEvaluation {
                         kicker = Math.max(kicker, card.getValue());
                     }
                 }
-
                 return new HandResult(PokerHand.QUAD.getValue(), rank, kicker);
             }
         }
-
         return null; // no four of a kind
     }
 
-    private static HandResult isTwoPair(List<Card> cards) {
+    private static HandResult isTwoPair(ArrayList<Card> cards) {
         Map<Integer, Integer> counts = new HashMap<>();
 
         // Count occurrences of each value
@@ -249,7 +239,7 @@ public class HandEvaluation {
         }
 
         // Collect all pairs
-        List<Integer> pairs = new ArrayList<>();
+        ArrayList<Integer> pairs = new ArrayList<>();
         for (Map.Entry<Integer, Integer> entry : counts.entrySet()) {
             if (entry.getValue() >= 2) {
                 pairs.add(entry.getKey());
@@ -265,7 +255,7 @@ public class HandEvaluation {
         int highPair = pairs.get(0);
         int secondPair = pairs.get(1);
 
-        // Find highest kicker not part of the pairs
+        // Find the highest kicker not part of the pairs
         int kicker = -1;
         for (Card card : cards) {
             int value = card.getValue();
@@ -277,8 +267,8 @@ public class HandEvaluation {
         return new HandResult(PokerHand.TWOPAIR.getValue(), highPair, secondPair, kicker);
     }
 
-    private static HandResult isFlush(List<Card> cards) {
-        Map<Suit, List<Integer>> suitMap = new HashMap<>();
+    private static HandResult isFlush(ArrayList<Card> cards) {
+        Map<Suit, ArrayList<Integer>> suitMap = new HashMap<>();
 
         // Group card values by suit
         for (Card card : cards) {
@@ -288,7 +278,7 @@ public class HandEvaluation {
         }
 
         // Check each suit
-        for (List<Integer> values : suitMap.values()) {
+        for (ArrayList<Integer> values : suitMap.values()) {
             if (values.size() >= 5) {
 
                 // Sort descending
@@ -307,7 +297,7 @@ public class HandEvaluation {
         return null;
     }
 
-    private static HandResult isStraight(List<Card> cards) {
+    private static HandResult isStraight(ArrayList<Card> cards) {
         if (cards.size() < 5) return null;
 
         Set<Integer> uniqueValues = new HashSet<>();
@@ -320,7 +310,7 @@ public class HandEvaluation {
             uniqueValues.add(1);
         }
 
-        List<Integer> sorted = new ArrayList<>(uniqueValues);
+        ArrayList<Integer> sorted = new ArrayList<>(uniqueValues);
         Collections.sort(sorted);
 
         int streak = 1;
@@ -345,7 +335,7 @@ public class HandEvaluation {
         return null;
     }
 
-    private static HandResult isFullHouse(List<Card> cards) {
+    private static HandResult isFullHouse(ArrayList<Card> cards) {
         Map<Integer, Integer> counts = new HashMap<>();
 
         // Count occurrences
@@ -354,8 +344,8 @@ public class HandEvaluation {
             counts.put(value, counts.getOrDefault(value, 0) + 1);
         }
 
-        List<Integer> triples = new ArrayList<>();
-        List<Integer> pairs = new ArrayList<>();
+        ArrayList<Integer> triples = new ArrayList<>();
+        ArrayList<Integer> pairs = new ArrayList<>();
 
         // Separate triples and pairs
         for (Map.Entry<Integer, Integer> entry : counts.entrySet()) {
@@ -393,8 +383,8 @@ public class HandEvaluation {
         return new HandResult(PokerHand.FULLHOUSE.getValue(), tripleValue, pairValue);
     }
 
-    private static HandResult isStraightFlush(List<Card> cards) {
-        Map<Suit, List<Integer>> suitMap = new EnumMap<>(Suit.class);
+    private static HandResult isStraightFlush(ArrayList<Card> cards) {
+        Map<Suit, ArrayList<Integer>> suitMap = new EnumMap<>(Suit.class);
 
         // Group values by suit
         for (Card card : cards) {
@@ -405,7 +395,7 @@ public class HandEvaluation {
         int bestHighCard = 0;
 
         // Check each suit separately
-        for (List<Integer> values : suitMap.values()) {
+        for (ArrayList<Integer> values : suitMap.values()) {
             if (values.size() < 5) continue;
 
             // Remove duplicates
@@ -416,7 +406,7 @@ public class HandEvaluation {
                 uniqueValues.add(1);
             }
 
-            List<Integer> sorted = new ArrayList<>(uniqueValues);
+            ArrayList<Integer> sorted = new ArrayList<>(uniqueValues);
             Collections.sort(sorted);
 
             int streak = 1;
@@ -444,8 +434,8 @@ public class HandEvaluation {
         return new HandResult(PokerHand.STRAIGHTFLUSH.getValue(), bestHighCard); // Straight Flush
     }
 
-    private static List<Integer> getRanks(List<Card> cards) {
-        List<Integer> returnList = new ArrayList<>();
+    private static ArrayList<Integer> getRanks(ArrayList<Card> cards) {
+        ArrayList<Integer> returnList = new ArrayList<>();
 
         for (Card card : cards) {
             returnList.add(card.getValue());
@@ -453,8 +443,8 @@ public class HandEvaluation {
 
         return returnList;
     }
-    private static List<Suit> getSuits(List<Card> cards) {
-        List<Suit> returnList = new ArrayList<>();
+    private static ArrayList<Suit> getSuits(ArrayList<Card> cards) {
+        ArrayList<Suit> returnList = new ArrayList<>();
 
         for (Card card : cards) {
             returnList.add(card.getSuit());

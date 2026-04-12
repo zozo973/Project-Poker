@@ -1,6 +1,7 @@
 package com.example.projectpoker;
 import com.example.projectpoker.model.*;
 import com.example.projectpoker.model.game.Card;
+import com.example.projectpoker.model.game.Player;
 import com.example.projectpoker.model.game.enums.*;
 import com.example.projectpoker.model.statistics.HandStats;
 import javafx.application.Application;
@@ -72,10 +73,21 @@ public class Launcher {
         Card SA = new Card(Suit.Spades, Rank.Ace);
 
 
-        List<Card> Board = List.of(DK, DA, H2, S3, CQ);
+        ArrayList<Card> Board = (ArrayList<Card>) List.of(DK, DA, H2, S3, CQ);
         List<Card> P1Hand = List.of(HA, D5);
         List<Card> P2Hand = List.of(CJ, H4);
-        System.out.println(HandEvaluation.whoWins(Board,List.of(P1Hand,P2Hand)));
+        Player player1 = new Player("test1");
+        Player player2 = new Player("test2");
+
+        for (int i = 0; i < P1Hand.size(); i++) {
+            player1.addToPlayerHand(P1Hand.get(i));
+            player2.addToPlayerHand(P2Hand.get(i));
+        }
+        ArrayList<Player> testPlayers = new ArrayList<>();
+        testPlayers.add(player1);
+        testPlayers.add(player2);
+
+        System.out.println(HandEvaluation.whoWins(Board,testPlayers));
 
     }
 }

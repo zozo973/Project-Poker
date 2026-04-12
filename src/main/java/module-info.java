@@ -10,6 +10,7 @@ module com.example.projectpoker {
     requires org.kordamp.bootstrapfx.core;
     requires eu.hansolo.tilesfx;
     requires com.almasb.fxgl.all;
+    requires java.desktop;
 
     opens com.example.projectpoker to javafx.fxml;
     exports com.example.projectpoker;
@@ -21,8 +22,8 @@ module com.example.projectpoker {
     opens com.example.projectpoker.model.game to javafx.fxml;
 //    exports com.example.projectpoker.model.game.statemachine;
 //    opens com.example.projectpoker.model.game.statemachine to javafx.fxml;
-    exports com.example.projectpoker.model.game.oberserver;
-    opens com.example.projectpoker.model.game.oberserver to javafx.fxml;
+    exports com.example.projectpoker.model.oberserver;
+    opens com.example.projectpoker.model.oberserver to javafx.fxml;
     exports com.example.projectpoker.model.game.enums;
     opens com.example.projectpoker.model.game.enums to javafx.fxml;
 }

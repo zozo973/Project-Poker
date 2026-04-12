@@ -1,5 +1,8 @@
 package com.example.projectpoker.model.game;
 
+import com.example.projectpoker.model.HandEvaluation;
+import com.example.projectpoker.model.HandResult;
+import com.example.projectpoker.model.PlayerResult;
 import com.example.projectpoker.model.game.enums.Action;
 import com.example.projectpoker.model.game.enums.RoundStatus;
 
@@ -33,6 +36,8 @@ public class Pot {
 
     public boolean getIsOpen() { return isOpen; }
 
+    public void setIsOpen(boolean status) { this.isOpen = status; }
+
     public void closePot() { this.isOpen = false; }
 
     private void initBetTable() {
@@ -53,7 +58,7 @@ public class Pot {
     private void addBet2Table(Player player, int bet) {
         int currentBets = betTable.get(player);
         this.betTable.put(player,currentBets+bet);
-        if (betTable.get(player) == player.getRoundInvestment()) {
+        if (betTable.get(player) != player.getRoundInvestment()) {
             System.err.println(player.getName() + "'s bets does not match their round investments");
         }
     }
@@ -82,10 +87,16 @@ public class Pot {
         return RoundStatus.stepRoundStatus(status);
     }
 
-    public void showDown() {
-        // TODO add hand evaluation methods
-        Player winner = new Player(); // replace new instance with hand eval methods
-        winner.win(potSize);
+    public void showDown(ArrayList<Card> communityCards) {
+        ArrayList<PlayerResult> gameResults = new ArrayList<>();
+        gameResults = HandEvaluation.whoWins(communityCards, this.players);
+        int numWinners = gameResults.size();
+        for (int i = 0; i < numWinners; i ++) {
+            for (Player p : players) { /// break possibly breaks out of both loops requires testing
+                if (p.matchId(gameResults.get(i).getPlayerId())) p.win(potSize / numWinners);
+                break;
+            }
+        }
     }
 
     public void payOut() {

@@ -5,6 +5,7 @@ public enum Action {
     RAISE("raise"),
     CHECK("check"),
     CALL("call"),
+    FORFEIT("forfeit"),
     FOLD("fold"),
     ALLIN("all in");
 
@@ -16,7 +17,11 @@ public enum Action {
 
     public String getDescription() { return description; }
 
-    public static boolean isBet(Action action) { return (action == RAISE || action == CALL); }
+    public static boolean hasFolded(Action action) {return action.equals(FOLD); }
 
-    public boolean endBettingActions(Action action) { return (action == FOLD || action == CALL || action == CHECK);}
+    public static boolean isRaise(Action action) { return (action.equals(RAISE) ||  action.equals(ALLIN)); }
+
+    public static boolean isBet(Action action) { return (action.equals(RAISE) ||  action.equals(ALLIN) || action.equals(CALL)); }
+
+    public static boolean endBettingActions(Action action) { return (action == FOLD || action == CALL || action == CHECK);}
 }

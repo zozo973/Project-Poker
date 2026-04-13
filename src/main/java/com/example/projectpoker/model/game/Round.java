@@ -30,6 +30,7 @@ public class Round {
     private ArrayList<Integer> turnOrder;
 
     public Round(ArrayList<Player> players, int blindSize) {
+        this.roundStatus = RoundStatus.UNINITIALISED;
         this.players = players;
         this.toPlay = blindSize;
         this.numPlayers = players.size();
@@ -155,14 +156,15 @@ public class Round {
     }
 
     public void end() {
+
         for (Pot p : pots) {
             p.removeFolded(roundStatus);
             p.payOut();
         }
         // TODO send RoundLog to database exit round
-        setRoundStatus(RoundStatus.END);
-        // DAO.add(getRoundLog());
 
+        // DAO.add(getRoundLog());
+        setRoundStatus(RoundStatus.END);
     }
 
     private void createTurnOrder(int[] roleIndices) {

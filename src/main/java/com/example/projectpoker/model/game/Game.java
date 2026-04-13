@@ -17,6 +17,7 @@ public class Game {
     //      gameStatus Change
     //      blindSize Change
     //      players Change
+    //      Round Change
 
     private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
     private GameStatus gameStatus;
@@ -52,8 +53,6 @@ public class Game {
         this.whenIncreaseBlinds = whenIncreaseBlinds;
         this.gameLength = gameLength;
         this.numRoundsLeft = gameLength;
-        //GameContext gameContext = new GameContext();
-        // Method for loading visual game features
     }
 
     public void addPropertyChangeListener(PropertyChangeListener listener) {
@@ -118,6 +117,7 @@ public class Game {
     public RoundStatusChangeHandler getRoundHandler() { return this.roundHandler; }
 
     public void init() {
+        tryIncreaseBlind();
         setPlayers(
           RoleUtil.delegateRoles(
             initAiPlayers(
@@ -144,7 +144,6 @@ public class Game {
             else if (numRoundsLeft == 0) { end(); break; }
             else if (players.size() == 1 && !(players.getFirst() instanceof AiPlayer)) {end(); break; }
             checkForfeitedPlayers();
-            tryIncreaseBlind();
             this.numRoundsLeft--;
         }
     }

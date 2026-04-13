@@ -91,9 +91,9 @@ public class Pot {
         ArrayList<PlayerResult> gameResults = new ArrayList<>();
         gameResults = HandEvaluation.whoWins(communityCards, this.players);
         int numWinners = gameResults.size();
-        for (int i = 0; i < numWinners; i ++) {
-            for (Player p : players) { /// break possibly breaks out of both loops requires testing
-                if (p.matchId(gameResults.get(i).getPlayerId())) p.win(potSize / numWinners);
+        for (PlayerResult gameResult : gameResults) {
+            for (Player p : players) { /// break possibly breaks out of both loops, requires testing
+                if (p.matchId(gameResult.getPlayerId())) p.win(potSize / numWinners);
                 break;
             }
         }

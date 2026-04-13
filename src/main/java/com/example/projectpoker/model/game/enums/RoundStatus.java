@@ -11,7 +11,9 @@ public enum RoundStatus {
     BETTING3("Third round of betting",7),
     RIVER("River",8),
     SHOWDOWN("Showdown",9),
-    END("Game over",10);
+    END("Game over",10),
+    UNINITIALISED("uninitialised",11);
+
 
     private final String description;
     private final int step;
@@ -22,7 +24,7 @@ public enum RoundStatus {
     }
 
     private static RoundStatus getRoundStatus(int i) {
-        RoundStatus status = END;
+        RoundStatus status = UNINITIALISED;
         switch (i){
             case 1:
                 status = BLINDS;

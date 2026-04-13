@@ -13,8 +13,6 @@ import static com.example.projectpoker.model.statistics.SkewNormalSampler.safeRo
 
 public class Player {
     // Player Events
-    //      playerHand Change
-    //      playerCards Change
     //      balance Change
     //      Role Change
     //      isTurn Change
@@ -121,10 +119,7 @@ public class Player {
     public Hand getPlayerHand() { return playerHand; }
 
     public void addCardToHand(Card c) {
-        // Fire a change playerCards event
-        var oldVal = this.playerHand;
         this.playerHand.addCard(c);
-        pcs.firePropertyChange("playerHand", oldVal, this.playerHand);
     }
 
     // TODO implement validation for UI input

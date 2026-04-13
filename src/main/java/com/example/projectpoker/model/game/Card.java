@@ -34,9 +34,9 @@ public class Card {
         return (o instanceof Card && ((Card) o).rank == rank && ((Card) o).suit == suit);
     }
 
-    public String getCardImagePath(Card card) {
-        Character rank = card.getRank().name().toUpperCase().charAt(0);
-        Character suit = card.getSuit().name().toUpperCase().charAt(0);
+    public String getCardImagePath() {
+        Character rank = this.getRank().name().toUpperCase().charAt(0);
+        Character suit = this.getSuit().name().toUpperCase().charAt(0);
 
         return "/com/example/projectpoker/Images/" + suit + rank + ".png";
     }

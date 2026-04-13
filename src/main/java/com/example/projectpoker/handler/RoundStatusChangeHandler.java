@@ -14,9 +14,12 @@ public class RoundStatusChangeHandler implements PropertyChangeListener {
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         switch (evt.getPropertyName()) {
-            case "blindSize" -> viewUpdater.onBlindSizeChanged((int) evt.getNewValue());
-            case "pot" -> viewUpdater.onPotChanged((int) evt.getNewValue());
-            case "phase" -> viewUpdater.onRoundPhaseChanged((String) evt.getNewValue());
+            case "pots" -> viewUpdater.onPotChanged((int) evt.getNewValue());
+            case "state" -> viewUpdater.onRoundPhaseChanged((String) evt.getNewValue());
+        //    Yet to implement
+        //    case "betType";
+        //    case "communityCards";
+        //    case "toPlay";
         }
     }
 

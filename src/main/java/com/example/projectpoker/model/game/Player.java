@@ -120,7 +120,7 @@ public class Player {
 
     public Hand getPlayerHand() { return playerHand; }
 
-    public void addToPlayerHand(Card c) {
+    public void addCardToHand(Card c) {
         // Fire a change playerCards event
         var oldVal = this.playerHand;
         this.playerHand.addCard(c);

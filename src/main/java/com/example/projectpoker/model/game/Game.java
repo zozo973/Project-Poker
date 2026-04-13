@@ -138,6 +138,7 @@ public class Game {
         while (gameStatus == GameStatus.RUNNING) {
             this.round.init();
             this.round.start();
+
             // Loss Condition
             if (players.getFirst().getBalance() == 0) { end(); break; }
             else if (numRoundsLeft == 0) { end(); break; }

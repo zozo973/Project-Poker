@@ -206,7 +206,7 @@ public class Round {
     private void dealCards() {
         for (int repeat = 0; repeat < 2; repeat++) {
             for (int i = 0; i < turnOrder.size(); i++) {
-                players.get(turnOrder.get(i)).addToPlayerHand(deck.draw());
+                players.get(turnOrder.get(i)).addCardToHand(deck.draw());
             }
         }
     }

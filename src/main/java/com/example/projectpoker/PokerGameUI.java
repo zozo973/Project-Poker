@@ -25,25 +25,41 @@ public class PokerGameUI extends Application {
 
 
         List<Card> Board = List.of(DK, DA, H2, S3, CQ);
-        List<Card> Hand = List.of(SA, HA);
-
+        List<Card> Hand1 = List.of(SA, HA);
+        List<Card> Hand2 = List.of(CT, H7);
+        List<Card> Hand3 = List.of(CA, H9);
+        List<Card> Hand4 = List.of(H9, HA);
+        List<Card> Hand5 = List.of(DQ, SQ);
+        List<Card> Hand6 = List.of(C2, H5);
         displayTable(root);
         displayCards(root, Board, BoardPos, true);
-        displayCards(root, Hand, PlayerPos,true);
-        displayCards(root, Hand, TopLeftPos,true);
-        displayCards(root, Hand, TopRightPos,true);
-        displayCards(root, Hand, TopMidPos,true);
-        displayCards(root, Hand, LeftPos,true);
-        displayCards(root, Hand, RightPos,true);
+        displayCards(root, Hand1, PlayerPos,true);
+        displayCards(root, Hand2, TopLeftPos,true);
+        displayCards(root, Hand3, TopRightPos,true);
+        displayCards(root, Hand4, TopMidPos,true);
+        displayCards(root, Hand5, LeftPos,true);
+        displayCards(root, Hand6, RightPos,true);
         displayFolded(root, FoldedPos);
         displayDeck(root, DeckPos);
         stage.setTitle("Poker Game");
         stage.setScene(scene);
         stage.show();
     }
+    private Image loadImage(String path) {
+
+        var resource = PokerGameUI.class.getResource(path);
+
+        if (resource == null) {
+            throw new RuntimeException(
+                    "Resource not found: " + path
+            );
+        }
+
+        return new Image(resource.toExternalForm());
+    }
 
     private void displayTable(Pane root) {
-        Image tableImage = new Image(getClass().getResource("/com/example/projectpoker/Images/Poker_Board.png").toExternalForm());
+        Image tableImage = loadImage("/com/example/projectpoker/Images/Poker_Board.png");
 
         ImageView tableView = new ImageView(tableImage);
         tableView.setFitWidth(800);
@@ -54,7 +70,7 @@ public class PokerGameUI extends Application {
 
     private void displayFolded(Pane root, TablePosition position){
 
-        ImageView Deck_Card_Back = new ImageView(new Image(PokerGameUI.class.getResource("/com/example/projectpoker/Images/Back1.png").toExternalForm()));
+        ImageView Deck_Card_Back = new ImageView(loadImage("/com/example/projectpoker/Images/Back1.png"));
 
         Deck_Card_Back.setFitWidth(50);
         Deck_Card_Back.setPreserveRatio(true);
@@ -68,8 +84,8 @@ public class PokerGameUI extends Application {
 
     private void displayDeck(Pane root, TablePosition position){
 
-        ImageView Deck_Bottom = new ImageView(new Image(PokerGameUI.class.getResource("/com/example/projectpoker/Images/Deck_Blank.png").toExternalForm()));
-        ImageView Deck_Card_Back = new ImageView(new Image(PokerGameUI.class.getResource("/com/example/projectpoker/Images/Back1.png").toExternalForm()));
+        ImageView Deck_Bottom = new ImageView(loadImage("/com/example/projectpoker/Images/Deck_Blank.png"));
+        ImageView Deck_Card_Back = new ImageView(loadImage("/com/example/projectpoker/Images/Back1.png"));
 
         Deck_Bottom.setFitWidth(52);
         Deck_Bottom.setPreserveRatio(true);
@@ -96,11 +112,11 @@ public class PokerGameUI extends Application {
             Image img;
             if (revealed)
             {
-                img = new Image(PokerGameUI.class.getResource(card.getCardImagePath()).toExternalForm());
+                img = loadImage(card.getCardImagePath());
             }
             else
             {
-                img = new Image(PokerGameUI.class.getResource("/com/example/projectpoker/Images/Back1.png").toExternalForm());
+                img = loadImage("/com/example/projectpoker/Images/Back1.png");
             }
 
             ImageView view = new ImageView(img);
@@ -121,4 +137,6 @@ public class PokerGameUI extends Application {
 
         }
     }
+
+
 }

@@ -4,6 +4,8 @@ package com.example.projectpoker.model.game;
 import com.example.projectpoker.model.game.enums.Rank;
 import com.example.projectpoker.model.game.enums.Suit;
 
+import java.util.Map;
+
 public class Card {
 
     private Suit suit;
@@ -27,6 +29,23 @@ public class Card {
         return rank.ordinal() + 2;
     }
 
+    // Map prevents getCardImagePath from returning incorrect file paths
+    private static final Map<Rank, String> RANK_SYMBOLS =
+            Map.ofEntries(
+                    Map.entry(Rank.Two, "2"),
+                    Map.entry(Rank.Three, "3"),
+                    Map.entry(Rank.Four, "4"),
+                    Map.entry(Rank.Five, "5"),
+                    Map.entry(Rank.Six, "6"),
+                    Map.entry(Rank.Seven, "7"),
+                    Map.entry(Rank.Eight, "8"),
+                    Map.entry(Rank.Nine, "9"),
+                    Map.entry(Rank.Ten, "T"),
+                    Map.entry(Rank.Jack, "J"),
+                    Map.entry(Rank.Queen, "Q"),
+                    Map.entry(Rank.King, "K"),
+                    Map.entry(Rank.Ace, "A")
+            );
     // Possibly recode or remove method as it may not be necessary
     // as there should never be the exact same card
     @Override
@@ -35,12 +54,14 @@ public class Card {
     }
 
     public String getCardImagePath() {
-        Character rank = this.getRank().name().toUpperCase().charAt(0);
-        Character suit = this.getSuit().name().toUpperCase().charAt(0);
+
+        String rank = RANK_SYMBOLS.get(this.getRank());
+
+        char suit =
+                this.getSuit().name().toUpperCase().charAt(0);
 
         return "/com/example/projectpoker/Images/" + suit + rank + ".png";
     }
-
     // These are instantiated here for testing purposes while I build in the rest of the files.
     // Remove later
     public static Card C2 = new Card(Suit.Clubs, Rank.Two);

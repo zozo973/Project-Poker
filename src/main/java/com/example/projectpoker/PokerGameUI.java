@@ -24,7 +24,7 @@ public class PokerGameUI extends Application {
         Scene scene = new Scene(root, 800, 320);
 
 
-        List<Card> Board = List.of(DK, DA, H2, S3, CQ);
+        List<Card> Board = List.of(DK, DA, H2);
         List<Card> Hand1 = List.of(SA, HA);
         List<Card> Hand2 = List.of(CT, H7);
         List<Card> Hand3 = List.of(CA, H9);

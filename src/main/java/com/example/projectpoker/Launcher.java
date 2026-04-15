@@ -10,23 +10,7 @@ import java.util.*;
 
 public class Launcher {
     public static void main(String[] args) {
-        //Application.launch(HelloApplication.class, args);
-
-
-
-        Card C2 = new Card(Suit.Clubs, Rank.Two);
-        Card C3 = new Card(Suit.Clubs,Rank.Three);
-        Card C4 = new Card(Suit.Clubs,Rank.Four);
-        Card C5 = new Card(Suit.Clubs,Rank.Five);
-        Card C6 = new Card(Suit.Clubs,Rank.Six);
-        Card C7 = new Card(Suit.Clubs, Rank.Seven);
-        Card C8 = new Card(Suit.Clubs,Rank.Eight);
-        Card C9 = new Card(Suit.Clubs,Rank.Nine);
-        Card C0 = new Card(Suit.Clubs,Rank.Ten);
-        Card CJ = new Card(Suit.Clubs,Rank.Jack);
-        Card CQ = new Card(Suit.Clubs,Rank.Queen);
-        Card CK = new Card(Suit.Clubs, Rank.King);
-        Card CA = new Card(Suit.Clubs, Rank.Ace);
+        PokerGameUI.launch(PokerGameUI.class, args);
 
         Card D2 = new Card(Suit.Diamonds,Rank.Two);
         Card D3 = new Card(Suit.Diamonds,Rank.Three);

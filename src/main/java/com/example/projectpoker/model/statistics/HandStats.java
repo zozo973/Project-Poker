@@ -23,7 +23,7 @@ public static void CalcStats(int tests, int handsize) {
     for (int i = 0; i < tests; i++) {
         CardDeck deck = new CardDeck();
         deck.shuffle();
-        List<Card> Cards = new ArrayList<>();
+        ArrayList<Card> Cards = new ArrayList<>();
 
         for (int j = 0; j < handsize; j++) {
             Cards.add(deck.draw());

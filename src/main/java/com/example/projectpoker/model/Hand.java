@@ -4,8 +4,11 @@ import com.example.projectpoker.model.game.Card;
 import java.util.*;
 
 public class Hand {
-    private List<Card> cards;
+    public List<Card> cards;
 
+    public Hand() {
+        cards = new ArrayList<>();
+    }
     public void addCard(Card card) {
         cards.add(card);
     }

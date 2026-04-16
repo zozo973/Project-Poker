@@ -3,6 +3,7 @@ module com.example.projectpoker {
     requires javafx.fxml;
     requires javafx.web;
 
+
     requires org.controlsfx.controls;
     requires com.dlsc.formsfx;
     requires net.synedra.validatorfx;
@@ -11,6 +12,10 @@ module com.example.projectpoker {
     requires eu.hansolo.tilesfx;
     requires com.almasb.fxgl.all;
     requires java.desktop;
+    requires com.google.api.client;
+    requires com.google.api.client.json.gson;
+    requires kotlin.stdlib.jdk8;
+
 
     opens com.example.projectpoker to javafx.fxml;
     exports com.example.projectpoker;

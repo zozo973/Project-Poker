@@ -28,8 +28,8 @@ public class Game {
     private final int whenIncreaseBlinds;
     private final Difficulty difficulty;
     private int numPlayers;
-    private int userBalance;
     private Round round;
+    private ArrayList<ArrayList<RoundLogEntry>> GameLog;
     private RoundStatusChangeHandler roundHandler;
 
 
@@ -45,14 +45,15 @@ public class Game {
 
     public Game(Player user, int userBalance, int numPlayers, int initBlind, int whenIncreaseBlinds, int gameLength, Difficulty difficulty) {
         this.players = new ArrayList<>();
+        user.setBalance(userBalance);
         players.add(user);
         this.numPlayers = numPlayers;
-        this.userBalance = userBalance;
         this.difficulty = difficulty;
         this.blindSize = initBlind;
         this.whenIncreaseBlinds = whenIncreaseBlinds;
         this.gameLength = gameLength;
         this.numRoundsLeft = gameLength;
+        this.GameLog = new ArrayList<>();
     }
 
     public void addPropertyChangeListener(PropertyChangeListener listener) {
@@ -62,6 +63,10 @@ public class Game {
     public void removePropertyChangeListener(PropertyChangeListener listener) {
         pcs.removePropertyChangeListener(listener);
     }
+
+    public ArrayList<ArrayList<RoundLogEntry>> getGameLog() { return GameLog; }
+
+    public void setGameLog(ArrayList<ArrayList<RoundLogEntry>> gameLog) { GameLog = gameLog; }
 
     public GameStatus getGameStatus() {
         return gameStatus;
@@ -90,6 +95,10 @@ public class Game {
         setRound(round);
     }
 
+    public int getNumRoundsLeft() { return numRoundsLeft; }
+
+    public void setNumRoundsLeft(int numRoundsLeft) { this.numRoundsLeft = numRoundsLeft; }
+
     public Round getRound() { return this.round; }
 
     private void setRound(Round round) { this.round = round; }
@@ -101,8 +110,6 @@ public class Game {
         this.blindSize = blindSize;
         pcs.firePropertyChange("blindSize",oldVal,this.blindSize);
     }
-
-    public Player getUser() { return players.getFirst(); }
 
     public ArrayList<AiPlayer> getAiPlayers() {
         ArrayList<AiPlayer> AiPlayers = new ArrayList<>();
@@ -116,19 +123,33 @@ public class Game {
 
     public RoundStatusChangeHandler getRoundHandler() { return this.roundHandler; }
 
+    public int findUserIndex() {
+        int i = 0;
+        for (Player p : players) {
+            if (!(p instanceof AiPlayer)) return i;
+            i++;
+        }
+        return i;
+    }
+
+    public Player getUser() {
+        for (Player p : players) {
+            if (!(p instanceof AiPlayer)) return p;
+        }
+        throw new IllegalStateException("There is no User in players, only Ai player");
+    }
+
     public void init() {
         tryIncreaseBlind();
         setPlayers(
           RoleUtil.delegateRoles(
             initAiPlayers(
                     players,
-                    userBalance,
                     numPlayers,
                     difficulty
             ), new int[]{0, 1, 2}
           )
         );
-        createNextRound();
         setGameStatus(GameStatus.INITIALISED);
     }
 
@@ -136,46 +157,73 @@ public class Game {
         // Valid game before starting
         setGameStatus(GameStatus.RUNNING);
         while (gameStatus == GameStatus.RUNNING) {
+            createNextRound();
+            System.out.println(round.getRoundStatus());
             this.round.init();
+            System.out.println(round.getRoundStatus());
             this.round.start();
+            System.out.println(round.getRoundStatus());
 
             // Loss Condition
-            if (players.getFirst().getBalance() == 0) { end(); break; }
-            else if (numRoundsLeft == 0) { end(); break; }
-            else if (players.size() == 1 && !(players.getFirst() instanceof AiPlayer)) {end(); break; }
+            if (getUser().getBalance() == 0) { end(); break; }
+            else if (this.numRoundsLeft == 0) { end(); break; }
+            else if (this.players.size() == 1 && !(this.players.getFirst() instanceof AiPlayer)) { end(); break; }
             checkForfeitedPlayers();
             this.numRoundsLeft--;
         }
     }
 
+    public void start(boolean test) {
+        if (!test) return;
+        // Valid game before starting
+        setGameStatus(GameStatus.RUNNING);
+        while (gameStatus == GameStatus.RUNNING) {
+            // createNextRound();
+            // System.out.println(round.getRoundStatus());
+            // this.round.init();
+            // System.out.println(round.getRoundStatus());
+            //  this.round.start();
+            // System.out.println(round.getRoundStatus());
+
+            // Loss Condition
+            if (getUser().getBalance() == 0) { end(); break; }
+            else if (this.numRoundsLeft == 0) { end(); break; }
+            else if (this.players.size() == 1 && !(this.players.getFirst() instanceof AiPlayer)) { end(); break; }
+            checkForfeitedPlayers();
+            this.GameLog.add(round.getRoundLog());
+            this.numRoundsLeft--;
+        }
+    }
+
     public void end() {
-        setGameStatus(GameStatus.ENDED); // notify UI
-        // save to database
+        setGameStatus(GameStatus.ENDED);
+        // TODO: save to database
         //      update player balance & records
     }
 
-    private ArrayList<Player> initAiPlayers(ArrayList<Player> players, int userBalance, int numPlayers, Difficulty difficulty) {
+    private ArrayList<Player> initAiPlayers(ArrayList<Player> players, int numPlayers, Difficulty difficulty) {
         for (int i = numPlayers - 1; i > 0; i--) {
-            players.add(new AiPlayer(difficulty, userBalance));
+            players.add(new AiPlayer(difficulty, getUser().getBalance()));
         }
         Collections.reverse(players);
         return players;
     }
 
-    private void tryIncreaseBlind() {
-        if ((gameLength - numRoundsLeft) % whenIncreaseBlinds == 0) {
+    public void tryIncreaseBlind() {
+        if (gameLength != numRoundsLeft && (gameLength - numRoundsLeft) % whenIncreaseBlinds == 0) {
             setBlindSize(this.blindSize*2);
         }
     }
 
     // method to check if any players have lost all there money or left the game.
-    private void checkForfeitedPlayers() {
+    public void checkForfeitedPlayers() {
         ArrayList<Player> activePlayers = new ArrayList<>();
         for (Player p : this.players) {
             if (!p.getAction().equals(Action.FORFEIT)) activePlayers.add(p);
         }
         if (!activePlayers.equals(this.players)) {
             setPlayers(activePlayers);
+            this.numPlayers = activePlayers.size();
         }
     }
 }

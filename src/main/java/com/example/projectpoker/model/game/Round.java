@@ -25,7 +25,7 @@ public class Round {
     private CardDeck deck;
     private ArrayList<Pot> pots;
     private ArrayList<Card> communityCards;
-    private ArrayList<GameLogEntry> roundLog;
+    private ArrayList<RoundLogEntry> roundLog;
     private ArrayList<Player> players;
     private ArrayList<Integer> turnOrder;
 
@@ -63,6 +63,8 @@ public class Round {
     public BetType getBetType() {
         return betType;
     }
+
+    public ArrayList<RoundLogEntry> getRoundLog() { return roundLog; }
 
     public void setBetType(BetType betType) {
         var oldVal = this.betType;
@@ -116,7 +118,7 @@ public class Round {
         pcs.firePropertyChange("toPlay", oldVal, this.toPlay);
     }
 
-    public ArrayList<GameLogEntry> removeRoundLog() {
+    public ArrayList<RoundLogEntry> removeRoundLog() {
         return roundLog;
     }
 
@@ -199,9 +201,9 @@ public class Round {
     public void playerAction(Player player, int betSize) {
         Action action = player.getAction();
         if (Action.isBet(action)) {
-            this.roundLog.add(new GameLogEntry(player, toPlay - player.getRoundInvestment(), betSize, action));
+            this.roundLog.add(new RoundLogEntry(player, toPlay - player.getRoundInvestment(), betSize, action, getOpenPot()));
         } else {
-            this.roundLog.add(new GameLogEntry(player, betSize));
+            this.roundLog.add(new RoundLogEntry(player, betSize));
         }
     }
 

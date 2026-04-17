@@ -35,7 +35,7 @@ public class Player {
         this.id = new PlayerId();
         this.playerHand = new Hand();
         this.isTurn = false;
-        this.action = null;
+        this.action = Action.UNDECIDED;
         this.balance = 1000;
         this.role = Roles.PLAYER;
         this.roundInvestment = 0;
@@ -46,7 +46,7 @@ public class Player {
         this.id = new PlayerId();
         this.playerHand = new Hand();
         this.isTurn = false;
-        this.action = null;
+        this.action = Action.UNDECIDED;
         this.balance = 1000;
         this.role = Roles.PLAYER;
         this.roundInvestment = 0;

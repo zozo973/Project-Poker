@@ -138,6 +138,7 @@ public class RoundController implements RoundViewUpdater {
             case GameStatus.RUNNING:
                 // Animation for blinds
             case GameStatus.ENDED:
+                var gameLog = game.getGameLog();
                 // Animation ending whole game.
                 // Launch UI for post game stats.
         }

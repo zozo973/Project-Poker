@@ -164,7 +164,6 @@ class GameTest {
         assertEquals(200,game.getBlindSize());
     }
 
-
     @Test
     void testBlindSizeChangeFiresCorrectEvent() {
         TestListener listener = new TestListener();

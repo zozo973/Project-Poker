@@ -29,6 +29,7 @@ public class Game {
     private final Difficulty difficulty;
     private int numPlayers;
     private Round round;
+    private ArrayList<ArrayList<RoundLogEntry>> GameLog;
     private RoundStatusChangeHandler roundHandler;
 
 
@@ -52,6 +53,7 @@ public class Game {
         this.whenIncreaseBlinds = whenIncreaseBlinds;
         this.gameLength = gameLength;
         this.numRoundsLeft = gameLength;
+        this.GameLog = new ArrayList<>();
     }
 
     public void addPropertyChangeListener(PropertyChangeListener listener) {
@@ -61,6 +63,10 @@ public class Game {
     public void removePropertyChangeListener(PropertyChangeListener listener) {
         pcs.removePropertyChangeListener(listener);
     }
+
+    public ArrayList<ArrayList<RoundLogEntry>> getGameLog() { return GameLog; }
+
+    public void setGameLog(ArrayList<ArrayList<RoundLogEntry>> gameLog) { GameLog = gameLog; }
 
     public GameStatus getGameStatus() {
         return gameStatus;
@@ -184,6 +190,7 @@ public class Game {
             else if (this.numRoundsLeft == 0) { end(); break; }
             else if (this.players.size() == 1 && !(this.players.getFirst() instanceof AiPlayer)) { end(); break; }
             checkForfeitedPlayers();
+            this.GameLog.add(round.getRoundLog());
             this.numRoundsLeft--;
         }
     }

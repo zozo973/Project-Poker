@@ -3,20 +3,22 @@ package com.example.projectpoker.model.game;
 import com.example.projectpoker.model.game.enums.Action;
 import com.example.projectpoker.model.game.enums.Roles;
 
-public class GameLogEntry {
+public class RoundLogEntry {
     private Player player;
     private int betSize;
     private int toCall;
     private Action action;
+    private Pot currentPot;
 
-    public GameLogEntry(Player player, int toCall, int betSize, Action action) {
+    public RoundLogEntry(Player player, int toCall, int betSize, Action action, Pot currentPot) {
         this.player = player;
         this.action = action;
         this.toCall = toCall;
         this.betSize = betSize;
+        this.currentPot = currentPot;
     }
 
-    public GameLogEntry(Player player, int betSize) {
+    public RoundLogEntry(Player player, int betSize) {
         this.player = player;
         this.betSize = betSize;
         if (betSize == 0) {
@@ -33,6 +35,6 @@ public class GameLogEntry {
          if (action == Action.RAISE) str = " by " + Integer.toString(betSize - toCall) + "dollars.";
          else if (action == Action.CALL) str = Integer.toString(toCall) + "dollars to play.";
          else { str = "."; }
-        return (String) player.getName() + "decided to" + action.getDescription() + str;
+        return (String) player.getName() + "decided to" + action.getDescription() + str + " The current Pot is now at " + currentPot.getPotSize() + " dollars.";
     }
 }

@@ -317,7 +317,7 @@ class RoundTest {
 
     @Test
     void testRemoveRoundLogInitiallyNull() {
-        ArrayList<GameLogEntry> log = round.removeRoundLog();
+        ArrayList<RoundLogEntry> log = round.removeRoundLog();
         assertNull(log);
     }
 

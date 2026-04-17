@@ -1,5 +1,6 @@
 package com.example.projectpoker;
 
+import com.example.projectpoker.controller.RoundController;
 import com.example.projectpoker.model.game.TablePosition;
 import javafx.application.Application;
 import javafx.geometry.Rectangle2D;
@@ -17,30 +18,16 @@ import static com.example.projectpoker.model.game.TablePosition.*;
 
 public class PokerGameUI extends Application {
     private static final double CARD_WIDTH = 50;
+    private Pane root;
+    public Pane getRoot() {
+        return root;
+    }
+
 
     @Override
     public void start(Stage stage) {
-        Pane root = new Pane();
-        Scene scene = new Scene(root, 800, 320);
-
-
-        List<Card> Board = List.of(DK, DA, H2);
-        List<Card> Hand1 = List.of(SA, HA);
-        List<Card> Hand2 = List.of(CT, H7);
-        List<Card> Hand3 = List.of(CA, H9);
-        List<Card> Hand4 = List.of(H9, HA);
-        List<Card> Hand5 = List.of(DQ, SQ);
-        List<Card> Hand6 = List.of(C2, H5);
-        displayTable(root);
-        displayCards(root, Board, BoardPos, true);
-        displayCards(root, Hand1, PlayerPos,true);
-        displayCards(root, Hand2, TopLeftPos,true);
-        displayCards(root, Hand3, TopRightPos,true);
-        displayCards(root, Hand4, TopMidPos,true);
-        displayCards(root, Hand5, LeftPos,true);
-        displayCards(root, Hand6, RightPos,true);
-        displayFolded(root, FoldedPos);
-        displayDeck(root, DeckPos);
+        root = new Pane();
+        Scene scene = new Scene(root, 800, 500);
         stage.setTitle("Poker Game");
         stage.setScene(scene);
         stage.show();
@@ -104,7 +91,7 @@ public class PokerGameUI extends Application {
     }
 
 
-    private void displayCards(Pane root, List<Card> cards, TablePosition position, boolean revealed) {
+    public void displayCards(Pane root, List<Card> cards, TablePosition position, boolean revealed) {
 
         for (int i = 0; i < cards.size(); i++) {
             Card card = cards.get(i);
@@ -138,5 +125,10 @@ public class PokerGameUI extends Application {
         }
     }
 
-
+    public void clearCards() {
+        root.getChildren().clear();
+        displayTable(root);
+        displayDeck(root, DeckPos);
+        displayFolded(root, FoldedPos);
+    }
 }

@@ -1,5 +1,6 @@
 package com.example.projectpoker.model.game;
 
+import com.example.projectpoker.model.game.enums.Action;
 import com.example.projectpoker.model.game.enums.Difficulty;
 import com.example.projectpoker.model.game.enums.GameStatus;
 import org.junit.jupiter.api.BeforeEach;
@@ -127,6 +128,15 @@ class GameTest {
         assertEquals(0, aiPlayers.size());
     }
 
+    // Test init Method
+    @Test
+    void testGameInit() {
+        game.init();
+        assertEquals(GameStatus.INITIALISED,game.getGameStatus());
+        assertEquals(3,game.getPlayers().size());
+        testGetAiPlayersContainsOnlyAi();
+    }
+
     @Test
     void testGetAiPlayersContainsOnlyAi() {
         ArrayList<AiPlayer> aiPlayers = game.getAiPlayers();
@@ -143,6 +153,17 @@ class GameTest {
         game.setBlindSize(200);
         assertEquals(200, game.getBlindSize());
     }
+
+    @Test
+    void testIncreaseBlindSize() {
+        this.game = new Game(user, 1000, 3, 100, 5, 10, Difficulty.BABY);
+        game.setBlindSize(100);
+        game.setNumRoundsLeft(5);
+
+        game.tryIncreaseBlind();
+        assertEquals(200,game.getBlindSize());
+    }
+
 
     @Test
     void testBlindSizeChangeFiresCorrectEvent() {
@@ -185,6 +206,62 @@ class GameTest {
         assertNull(game.getRound());
     }
 
+    // Start Game Tests
+
+        // Start Game End Condition Tests
+    @Test
+    void testStartGameNumPlayersEndCondition() {
+        // Test when user is the only player left in players
+        game.init();
+        ArrayList<Player> singlePlayer = new ArrayList<>();
+        singlePlayer.add(user);
+        game.setPlayers(singlePlayer);
+        game.start(true);
+        assertEquals(1,game.getPlayers().size());
+        assertEquals(GameStatus.ENDED,game.getGameStatus());
+    }
+
+    @Test
+    void testStartGameUserbalanceEndCondition() {
+        // Test Player balance = 0
+        game.init();
+        ArrayList<Player> players = game.getPlayers();
+        int userIndex = game.findUserIndex();
+        players.get(userIndex).setBalance(0);
+        game.setPlayers(players);
+        game.start(true);
+        assertEquals(0,game.getUser().getBalance());
+        assertEquals(GameStatus.ENDED,game.getGameStatus());
+    }
+
+    @Test
+    void testStartGameNumRoundEndCondition() {
+        // Test when number of rounds left is 0;
+        game.init();
+        game.setNumRoundsLeft(1);
+        game.start(true);
+        assertEquals(0,game.getNumRoundsLeft());
+        assertEquals(GameStatus.ENDED,game.getGameStatus());
+    }
+
+    @Test
+    void TestCheckForfeitedPlayers() {
+        game.init();
+        var initialPlayers = game.getPlayers();
+        initialPlayers.get(1).setAction(Action.FORFEIT);
+        game.setPlayers(initialPlayers);
+        game.checkForfeitedPlayers();
+        var postPlayers = game.getPlayers();
+
+        assertEquals(initialPlayers.size()-1,postPlayers.size());
+    }
+
+    @Test
+    void testStartSetsGameStatusToRunning() {
+        game.start();
+        assertEquals(GameStatus.RUNNING,game.getGameStatus());
+    }
+
     // End Game Tests
 
     @Test
@@ -207,6 +284,8 @@ class GameTest {
         assertEquals(1, configuredGame.getPlayers().size());
         assertEquals(50, configuredGame.getBlindSize());
     }
+
+
 
     // Helper class for PropertyChangeListener testing
     private static class TestListener implements PropertyChangeListener {

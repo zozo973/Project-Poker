@@ -24,7 +24,7 @@ public class RoundStatusChangeHandler implements PropertyChangeListener {
             case "communityCards" -> viewUpdater.onCommunityCardsChanged((ArrayList<Card>) evt.getNewValue(), (ArrayList<Card>) evt.getOldValue());
             case "toPlay" -> viewUpdater.onToPlayChange((int) evt.getNewValue());
             //    Yet to implement
-            //    case "betType";
+            //    case "betType"; this could display some text on the ui
         }
     }
 

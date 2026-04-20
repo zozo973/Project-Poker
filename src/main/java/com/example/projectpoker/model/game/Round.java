@@ -8,6 +8,8 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 
+import static com.example.projectpoker.model.game.PotUtil.getOpenPotIndex;
+
 public class Round {
 
     // Round Events
@@ -73,9 +75,7 @@ public class Round {
         if (betType.equals(BetType.ENDROUND)) end();
     }
 
-    public ArrayList<Pot> getPots() {
-        return pots;
-    }
+    public ArrayList<Pot> getPots() { return pots; }
 
     public void setPots(ArrayList<Pot> pots) {
         var oldVal = this.pots;
@@ -95,7 +95,7 @@ public class Round {
     }
 
     public Pot getOpenPot() {
-        return pots.get(getOpenPotIndex());
+        return pots.get(getOpenPotIndex(pots));
     }
 
     public ArrayList<Card> getCommunityCards() {
@@ -126,8 +126,9 @@ public class Round {
         createTurnOrder(RoleUtil.findRoleIndices(players));
 
         // add observer to relay state changes to ui addObserver();
-
+        this.roundLog = new ArrayList<>();
         this.pots.getFirst().initBlinds(players, turnOrder, toPlay);
+        this.pots.getFirst().setPotPriority(0);
         setRoundStatus(RoundStatus.BLINDS);
     }
 
@@ -161,7 +162,7 @@ public class Round {
 
         for (Pot p : pots) {
             p.removeFolded(roundStatus);
-            p.payOut();
+            p.showDown(this.communityCards);
         }
         // TODO send RoundLog to database exit round
 
@@ -201,7 +202,7 @@ public class Round {
     public void playerAction(Player player, int betSize) {
         Action action = player.getAction();
         if (Action.isBet(action)) {
-            this.roundLog.add(new RoundLogEntry(player, toPlay - player.getRoundInvestment(), betSize, action, getOpenPot()));
+            this.roundLog.add(new RoundLogEntry(player, toPlay - player.getTotalRoundInvestment(), betSize, action, getOpenPot()));
         } else {
             this.roundLog.add(new RoundLogEntry(player, betSize));
         }
@@ -226,45 +227,75 @@ public class Round {
         }
     }
 
-    private void createSidePot() {
-        ArrayList<Player> sidePotPlayers = new ArrayList<>();
-        for (Player p : players) {
-            if (!(p.getAction().equals(Action.ALLIN)) || !(p.getAction().equals(Action.FOLD))) sidePotPlayers.add(p);
-        }
-        addPot(new Pot(sidePotPlayers));
+    private void createSidePot(Player potCreator) {
+        addPot(new Pot(potCreator));
+        pots.getLast().setPotPriority(pots.size()-1);
+        pots.getLast().addBet(potCreator, potCreator.getTotalRoundInvestment() - this.toPlay);
+        this.roundLog.add(new RoundLogEntry(potCreator, pots.getLast()));
+    }
+    private void add2NewSidePot(Player activePlayer) {
+        pots.getLast().addPlayer2Table(activePlayer);
     }
 
     private void betting() {
-        while (!endBetting()) {
-            for (int i = 0; i < turnOrder.size(); i++) {
-                Player activePlayer = players.get(turnOrder.get(i));
-                if (activePlayer.getAction() != Action.FOLD) {
+        Player activePlayer = null;
+        while (endBetting(activePlayer)) {
+            for (Integer i : turnOrder) {
+                activePlayer = players.get(i);
+                if (!Action.hasFolded(activePlayer.getAction())) {
                     activePlayer.setIsTurn(true);
                     while (activePlayer.getIsTurn()) {
                         // Wait for input on bet or check or fold
                         // call method to asked user for input
+                        // TODO Add IU input to make user decision
                         // turnOrder.get(i).setAction(actionButtonInput());
+                        int playerBet = 0; // dummy var
+                        if (this.betType.equals(BetType.SIDEPOT)) {
+                            if (activePlayer.checkAllInCreatesSidePot(playerBet,pots.getLast())) {
+                                // create new side pot with less priority, then the checked side pot
+                                pots.getLast().stepPotPriority(1);
+                                createSidePot(activePlayer);
+                                pots.getLast().stepPotPriority(-1);
+                                pots.get(pots.size()-2).adjustPot(pots.getLast());
+                            } else if (Action.isBet(activePlayer.getAction())) {
+                                add2NewSidePot(activePlayer);
+                                pots.getLast().addBet(activePlayer,playerBet);
+                            }
+                        }
                         int betSize = activePlayer.chooseBetSize();
-                        int activePotIndex = getOpenPotIndex();
-                        if (activePotIndex == -1) System.err.println("No active Pot"); // Replace with exeception.
+                        int activePotIndex = getOpenPotIndex(pots);
+                        if (activePotIndex == -1) throw new IllegalStateException("There is no active Pot");
 
                         this.pots.get(activePotIndex).addBet(activePlayer, betSize);
                         playerAction(activePlayer, betSize);
-                        if (Action.isRaise(activePlayer.getAction())) {
-                            setToPlay(activePlayer.getRoundInvestment());
-                        }
+
                     }
+
+                    if (endBetting(activePlayer)) break;
+                    activePlayer.setIsTurn(false);
                 }
-                if (endBetting()) break;
+                if (Action.isRaise(activePlayer.getAction())) {
+                    setToPlay(activePlayer.getTotalRoundInvestment()); //??
+                }
             }
         }
         updateTurnOrder();
         for (Player p : players) {
-            if (!Action.hasFolded(p.getAction())) p.setAction(Action.UNDECIDED);
+            if (!Action.hasFolded(p.getAction())) {
+                p.setAction(Action.UNDECIDED);
+            }
+            p.setIsTurn(false);
+        }
+        if (pots.size()>1) {
+            for (int i = 0; i < pots.size()-1; i++) {
+                pots.get(i).setIsOpen(false);
+            }
         }
     }
 
-    public boolean endBetting() {
+    public boolean endBetting(Player activePlayer) {
+        if (activePlayer == null) return false;
+        if (Action.isRaise(activePlayer.getAction())) return false;
         int numAllIn = 0;
         int numCall = 0;
         int numRaise = 0;
@@ -299,15 +330,15 @@ public class Round {
         //      no players action is a raise,
         //      All other players actions are call or fold.
         boolean cond4 = (players.size()-numCall-numAllIn-numFold) == 0;
-        // end betting condition 5 (SidePot):
+        // betting condition 5 (SidePot):
         //      One or more players action is all in,
-        //      One players action is to raise,
+        //      A player who goes after players that are all in has action raise,
         //      All other players actions are call or fold.
-        boolean cond5 = (numRaise == 1) && (numAllIn >= 1) && (players.size() - numFold - numCall - numAllIn - numRaise) == 0;
+        boolean cond5 = (numRaise == 1) && (numAllIn >= 1) && (players.size() - numFold - numCall - numAllIn - numRaise) == 0 && activePlayer.getAction().equals(Action.RAISE);
         if (cond5) {
-            createSidePot();
+            createSidePot(activePlayer);
             setBetType(BetType.SIDEPOT);
-        return true;
+            return false;
         } else if(cond3) {
             setBetType(BetType.ENDROUND);
             return  true;
@@ -323,7 +354,7 @@ public class Round {
             else setBetType(BetType.NORMAL);
             return true;
         }
-            return false;
+        return false;
     }
 
     public void checkBetType() {
@@ -346,12 +377,7 @@ public class Round {
         }
     }
 
-    public int getOpenPotIndex() {
-        if (pots.size() == 1) return 0;
-        for (int i = 0; i < pots.size(); i++) {
-            if (pots.get(i).getIsOpen())
-                return i;
-        }
-        return -1;
-    }
+
+
+
 }

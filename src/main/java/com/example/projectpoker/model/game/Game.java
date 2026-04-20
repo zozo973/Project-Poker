@@ -191,7 +191,7 @@ public class Game {
             else if (this.players.size() == 1 && !(this.players.getFirst() instanceof AiPlayer)) { end(); break; }
             checkForfeitedPlayers();
             this.GameLog.add(round.getRoundLog());
-            this.numRoundsLeft--;
+            nextRoundInitialisation();
         }
     }
 
@@ -199,6 +199,14 @@ public class Game {
         setGameStatus(GameStatus.ENDED);
         // TODO: save to database
         //      update player balance & records
+    }
+
+    private void nextRoundInitialisation() {
+        setPlayers(RoleUtil.delegateRoles(
+
+        ));
+
+        this.numRoundsLeft--;
     }
 
     private ArrayList<Player> initAiPlayers(ArrayList<Player> players, int numPlayers, Difficulty difficulty) {

@@ -17,6 +17,7 @@ import java.util.ArrayList;
 
 public class RoundController implements RoundViewUpdater {
 
+    @FXML private Label roundCounterLabel;
     @FXML private Label balanceLabel;
     @FXML private Label potLabel;
     @FXML private Label phaseLabel;
@@ -40,6 +41,12 @@ public class RoundController implements RoundViewUpdater {
         this.userPlayer = userPlayer;
         refreshAll();
     }
+
+    private void updateRoundCounterLabel() {
+        roundCounterLabel.setText(game.getNumRoundsLeft() + " rounds left.");
+    }
+
+
 
     @Override
     public void onUserTurnStarted() {
@@ -173,6 +180,7 @@ public class RoundController implements RoundViewUpdater {
         phaseLabel.setText("Status" + RoundStatus.UNINITIALISED);
         potLabel.setText("Pot:" + round.getMainPot());
         balanceLabel.setText("User Balance:" + userPlayer.getBalance());
+        updateRoundCounterLabel();
         refreshAll();
     }
 
@@ -184,6 +192,7 @@ public class RoundController implements RoundViewUpdater {
             potLabel.setText("Pot: " + round.getMainPot());
             phaseLabel.setText("Phase: " + round.getRoundStatus());
         }
+        updateRoundCounterLabel();
         updateBetSlider();
     }
     private void updateBetSlider() {

@@ -4,6 +4,7 @@ import com.example.projectpoker.service.PasswordHasher;
 import com.example.projectpoker.model.User;
 import com.example.projectpoker.database.UserDAO;
 import com.example.projectpoker.service.SessionManager;
+import com.example.projectpoker.PokerApplication;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import java.io.IOException;
@@ -56,7 +57,12 @@ public class LoginController {
             }
 
             SessionManager.setCurrentUser(user);
-            messageLabel.setText("Login successful!");
+            try {
+                PokerApplication app = new PokerApplication();
+                app.createPokerGame();
+            } catch (IOException e) {
+                messageLabel.setText("Could not start game.");
+            }
         }
     }
 

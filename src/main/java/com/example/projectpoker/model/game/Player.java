@@ -1,18 +1,26 @@
 package com.example.projectpoker.model.game;
 
+import com.example.projectpoker.model.Hand;
 import com.example.projectpoker.model.game.enums.Action;
 import com.example.projectpoker.model.game.enums.Roles;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import static com.example.projectpoker.model.statistics.SkewNormalSampler.safeRoundToInt;
 
 public class Player {
+    // Player Events
+    //      balance Change
+    //      Role Change
+    //      isTurn Change
+    //      Action Change
 
     private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
-    private ArrayList<Card> playerHand;
+    private Hand playerHand;
+    private PlayerId id;
     private String name;
     private boolean isTurn;
     private int balance;
@@ -24,9 +32,10 @@ public class Player {
     // game with if they do not choose to use money they have won before.
     public Player() {
         this.name = "";
-        this.playerHand = new ArrayList<>();
+        this.id = new PlayerId();
+        this.playerHand = new Hand();
         this.isTurn = false;
-        this.action = null;
+        this.action = Action.UNDECIDED;
         this.balance = 1000;
         this.role = Roles.PLAYER;
         this.roundInvestment = 0;
@@ -34,9 +43,10 @@ public class Player {
 
     public Player(String name) {
         this.name = name;
-        this.playerHand = new ArrayList<>();
+        this.id = new PlayerId();
+        this.playerHand = new Hand();
         this.isTurn = false;
-        this.action = null;
+        this.action = Action.UNDECIDED;
         this.balance = 1000;
         this.role = Roles.PLAYER;
         this.roundInvestment = 0;
@@ -44,7 +54,8 @@ public class Player {
 
     public Player(String name, Roles role) {
         this.name = name;
-        this.playerHand = new ArrayList<>();
+        this.id = new PlayerId();
+        this.playerHand = new Hand();
         this.isTurn = false;
         this.balance = 1000;
         this.action = Action.UNDECIDED;
@@ -54,7 +65,19 @@ public class Player {
 
     public Player(String name, int balance) {
         this.name = name;
-        this.playerHand = new ArrayList<>();
+        this.id = new PlayerId();
+        this.playerHand = new Hand();
+        this.isTurn = false;
+        this.balance = balance;
+        this.action = Action.UNDECIDED;
+        this.role = Roles.PLAYER;
+        this.roundInvestment = 0;
+    }
+
+    public Player(String name, int balance, String id) throws IOException {
+        this.name = name;
+        this.id = new PlayerId(id);
+        this.playerHand = new Hand();
         this.isTurn = false;
         this.balance = balance;
         this.action = Action.UNDECIDED;
@@ -82,9 +105,22 @@ public class Player {
 
     public void setName(String name) { this.name = name; }
 
-    public void addCardToHand(Card c) { this.playerHand.add(c); }
+    public PlayerId getId() { return id; }
 
-    public ArrayList<Card> getPlayerHand() { return playerHand; }
+    public void setId(PlayerId id) { this.id = id; }
+
+    public boolean matchId(PlayerId id) {
+        if (this.id.getId().compareTo(id.getId()) == 0) {
+            return true;
+        }
+        return false;
+    }
+
+    public Hand getPlayerHand() { return playerHand; }
+
+    public void addCardToHand(Card c) {
+        this.playerHand.addCard(c);
+    }
 
     // TODO implement validation for UI input
     public int getBalance() { return balance; }
@@ -92,6 +128,7 @@ public class Player {
     public void subtractBalance(int amount) { setBalance(this.balance - amount); }
 
     protected void setBalance(int balance) {
+        // Fire a change balance event
         var oldVal = this.balance;
         this.balance = balance;
         pcs.firePropertyChange("balance",oldVal,this.balance);
@@ -101,13 +138,19 @@ public class Player {
 
     protected void setRoundInvestment(int roundInvestment) { this.roundInvestment = roundInvestment; }
 
-    public void setAction(Action action) { this.action = action; }
-
     public Action getAction() { return action; }
+
+    public void setAction(Action action) {
+        // Fire a change Action event
+        var oldVal = this.action;
+        this.action = action;
+        pcs.firePropertyChange("action",oldVal,this.action);
+    }
 
     public boolean getIsTurn() { return isTurn; }
 
     public void setIsTurn(boolean isTurn) {
+        // Fire a change isTurn event
         var oldVal = this.isTurn;
         this.isTurn = isTurn;
         pcs.firePropertyChange("isTurn",oldVal,this.isTurn);
@@ -115,7 +158,21 @@ public class Player {
 
     public Roles getRole() { return role; }
 
-    public void setRole(Roles role) { this.role = role; }
+    public void setRole(Roles role) {
+        // Fire a change Role event
+        var oldVal = this.role;
+        this.role = role;
+        pcs.firePropertyChange("role",oldVal,this.role);
+    }
+
+    public void roundReset() {
+        pcs.firePropertyChange("roundReset",this, new Player(getName(),getBalance()));
+        this.playerHand.clear();
+        this.isTurn = false;
+        this.action = null;
+        this.role = Roles.PLAYER;
+        this.roundInvestment = 0;
+    }
 
     public void win(int potSize) {
         this.balance += potSize;
@@ -176,6 +233,17 @@ public class Player {
         // return rounded slider value from the view
 
         return 0;
+    }
+
+    public void forfeitGame() {
+        // Send current balance to database and exit game.
+        if (this.action.equals(Action.FOLD)) {
+            setAction(Action.FORFEIT);
+        } else {
+            System.out.println("Do you wish to forfeit all invested money in the round and exit?");
+
+        }
+
     }
 
 

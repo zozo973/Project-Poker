@@ -1,8 +1,12 @@
 package com.example.projectpoker.handler;
 
 import com.example.projectpoker.controller.RoundViewUpdater;
+import com.example.projectpoker.model.Hand;
 import com.example.projectpoker.model.game.AiPlayer;
 import com.example.projectpoker.model.game.Player;
+import com.example.projectpoker.model.game.enums.Action;
+import com.example.projectpoker.model.game.enums.Roles;
+
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
@@ -18,6 +22,8 @@ public class PlayerStatusChangeHandler implements PropertyChangeListener {
         switch (evt.getPropertyName()) {
             case "isTurn" -> handleTurnChange(evt);
             case "balance" -> handleBalanceChange(evt);
+            case "action" -> viewUpdater.onPlayerActionChange((Action) evt.getNewValue());
+            case "role" -> viewUpdater.onPlayerRoleUpdate((Roles) evt.getNewValue());
         }
     }
 

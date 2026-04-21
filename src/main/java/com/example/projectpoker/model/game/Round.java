@@ -1,6 +1,5 @@
 package com.example.projectpoker.model.game;
 
-import com.example.projectpoker.database.DatabaseManager;
 import com.example.projectpoker.model.game.enums.Action;
 import com.example.projectpoker.model.game.enums.BetType;
 import com.example.projectpoker.model.game.enums.RoundStatus;
@@ -8,9 +7,15 @@ import com.example.projectpoker.model.game.enums.RoundStatus;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
-import java.util.stream.Collectors;
 
 public class Round {
+
+    // Round Events
+    //      roundStatus Change
+    //      pots Change
+    //      communityCards Change
+    //      toPlay Change
+    //      betType Change
 
     private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
     private RoundStatus roundStatus;
@@ -20,18 +25,12 @@ public class Round {
     private CardDeck deck;
     private ArrayList<Pot> pots;
     private ArrayList<Card> communityCards;
-    private ArrayList<GameLogEntry> roundLog;
+    private ArrayList<RoundLogEntry> roundLog;
     private ArrayList<Player> players;
     private ArrayList<Integer> turnOrder;
-    private final int gameSessionId;
-    private final int roundNumber;
-    private boolean persisted;
 
     public Round(ArrayList<Player> players, int blindSize) {
-        this(players, blindSize, -1, 1);
-    }
-
-    public Round(ArrayList<Player> players, int blindSize, int gameSessionId, int roundNumber) {
+        this.roundStatus = RoundStatus.UNINITIALISED;
         this.players = players;
         this.toPlay = blindSize;
         this.numPlayers = players.size();
@@ -41,10 +40,6 @@ public class Round {
         this.pots.add(new Pot(players));
         this.turnOrder = new ArrayList<>();
         this.betType = BetType.NORMAL;
-        this.roundLog = new ArrayList<>();
-        this.gameSessionId = gameSessionId;
-        this.roundNumber = roundNumber;
-        this.persisted = false;
     }
 
     public void addPropertyChangeListener(PropertyChangeListener listener) {
@@ -62,31 +57,77 @@ public class Round {
     public void setRoundStatus(RoundStatus roundStatus) {
         var oldVal = this.roundStatus;
         this.roundStatus = roundStatus;
-        pcs.firePropertyChange("state",oldVal,this.roundStatus);
+        pcs.firePropertyChange("state", oldVal, this.roundStatus);
     }
 
-    public Pot getMainPot() { return this.pots.getFirst(); }
+    public BetType getBetType() {
+        return betType;
+    }
 
-    public Pot getOpenPot() { return pots.get(getOpenPotIndex()); }
+    public ArrayList<RoundLogEntry> getRoundLog() { return roundLog; }
 
-    public int getToPlay() { return toPlay; }
+    public void setBetType(BetType betType) {
+        var oldVal = this.betType;
+        this.betType = betType;
+        pcs.firePropertyChange("betType", oldVal, this.betType);
+        if (betType.equals(BetType.ENDROUND)) end();
+    }
 
-    public void setToPlay(int toPlay) { this.toPlay = toPlay; }
+    public ArrayList<Pot> getPots() {
+        return pots;
+    }
 
-    public ArrayList<GameLogEntry> removeRoundLog() { return roundLog; }
+    public void setPots(ArrayList<Pot> pots) {
+        var oldVal = this.pots;
+        this.pots = pots;
+        pcs.firePropertyChange("pots", oldVal, this.pots);
+    }
 
-    public ArrayList<GameLogEntry> getRoundLog() { return roundLog; }
+    public void addPot(Pot pot) {
+        ArrayList<Pot> pots = getPots();
+        pots.getLast().setIsOpen(false);
+        pots.add(pot);
+        setPots(pots);
+    }
 
-    public BetType getBetType() { return betType; }
+    public Pot getMainPot() {
+        return this.pots.getFirst();
+    }
 
-    public int getRoundNumber() { return roundNumber; }
+    public Pot getOpenPot() {
+        return pots.get(getOpenPotIndex());
+    }
+
+    public ArrayList<Card> getCommunityCards() {
+        return communityCards;
+    }
+
+    public void setCommunityCards(ArrayList<Card> communityCards) {
+        var oldVal = this.communityCards;
+        this.communityCards = communityCards;
+        pcs.firePropertyChange("communityCards", oldVal, this.communityCards);
+    }
+
+    public int getToPlay() {
+        return toPlay;
+    }
+
+    public void setToPlay(int toPlay) {
+        var oldVal = this.toPlay;
+        this.toPlay = toPlay;
+        pcs.firePropertyChange("toPlay", oldVal, this.toPlay);
+    }
+
+    public ArrayList<RoundLogEntry> removeRoundLog() {
+        return roundLog;
+    }
 
     public void init() {
         createTurnOrder(RoleUtil.findRoleIndices(players));
 
         // add observer to relay state changes to ui addObserver();
 
-        this.pots.getFirst().initBlinds(players,turnOrder,toPlay);
+        this.pots.getFirst().initBlinds(players, turnOrder, toPlay);
         setRoundStatus(RoundStatus.BLINDS);
     }
 
@@ -109,7 +150,6 @@ public class Round {
         setRoundStatus(RoundStatus.BETTING3);
         checkBetType();
 
-
         setRoundStatus(RoundStatus.RIVER);
         deal2Table();
 
@@ -117,23 +157,42 @@ public class Round {
         checkBetType();
     }
 
-    public void End() {
-        if (persisted) {
-            return;
-        }
-        setRoundStatus(RoundStatus.END);
-        DatabaseManager.recordRound(gameSessionId, this);
-        persisted = true;
+    public void end() {
 
+        for (Pot p : pots) {
+            p.removeFolded(roundStatus);
+            p.payOut();
+        }
+        // TODO send RoundLog to database exit round
+
+        // DAO.add(getRoundLog());
+        setRoundStatus(RoundStatus.END);
     }
 
     private void createTurnOrder(int[] roleIndices) {
         turnOrder.add((roleIndices[1]));
-        for (int i = roleIndices[2]; i < numPlayers; i++){
+        for (int i = roleIndices[2]; i < numPlayers; i++) {
             turnOrder.add(i);
         }
-        for (int i = 0 ; i <= roleIndices[0]; i++){
+        for (int i = 0; i <= roleIndices[0]; i++) {
             turnOrder.add(i);
+        }
+    }
+
+    public int getUserIndex() {
+        for (int i = 0; i < players.size();i++) {
+            if (!(players.get(i) instanceof AiPlayer)) return i;
+        }
+        return -1;
+    }
+
+    private void updateTurnOrder() {
+        for (Player p : players) {
+            if (Action.hasFolded(p.getAction()))
+                for (int i : turnOrder) {
+                    if (players.get(turnOrder.get(i)).equals(p))
+                        this.turnOrder.remove(i);
+                }
         }
     }
 
@@ -141,10 +200,10 @@ public class Round {
     // On click method depending on player choice
     public void playerAction(Player player, int betSize) {
         Action action = player.getAction();
-        if (action.isBet(action)) {
-            this.roundLog.add(new GameLogEntry(player,toPlay-player.getRoundInvestment(),betSize,action));
+        if (Action.isBet(action)) {
+            this.roundLog.add(new RoundLogEntry(player, toPlay - player.getRoundInvestment(), betSize, action, getOpenPot()));
         } else {
-            this.roundLog.add(new GameLogEntry(player,betSize));
+            this.roundLog.add(new RoundLogEntry(player, betSize));
         }
     }
 
@@ -158,7 +217,7 @@ public class Round {
 
     private void deal2Table() {
         deck.burnCard();
-        if(roundStatus == RoundStatus.FLOP) {
+        if (roundStatus == RoundStatus.FLOP) {
             this.communityCards.add(deck.draw());
             this.communityCards.add(deck.draw());
             this.communityCards.add(deck.draw());
@@ -167,15 +226,20 @@ public class Round {
         }
     }
 
+    private void createSidePot() {
+        ArrayList<Player> sidePotPlayers = new ArrayList<>();
+        for (Player p : players) {
+            if (!(p.getAction().equals(Action.ALLIN)) || !(p.getAction().equals(Action.FOLD))) sidePotPlayers.add(p);
+        }
+        addPot(new Pot(sidePotPlayers));
+    }
+
     private void betting() {
         while (!endBetting()) {
             for (int i = 0; i < turnOrder.size(); i++) {
                 Player activePlayer = players.get(turnOrder.get(i));
                 if (activePlayer.getAction() != Action.FOLD) {
                     activePlayer.setIsTurn(true);
-//                    if (! (activePlayer instanceof AiPlayer)) {
-//                        pcs.firePropertyChange("isTurn",false,true);
-//                    }
                     while (activePlayer.getIsTurn()) {
                         // Wait for input on bet or check or fold
                         // call method to asked user for input
@@ -186,17 +250,17 @@ public class Round {
 
                         this.pots.get(activePotIndex).addBet(activePlayer, betSize);
                         playerAction(activePlayer, betSize);
-                        if (activePlayer.getAction() == Action.RAISE) {
-                            this.toPlay = activePlayer.getRoundInvestment();
+                        if (Action.isRaise(activePlayer.getAction())) {
+                            setToPlay(activePlayer.getRoundInvestment());
                         }
                     }
                 }
-
                 if (endBetting()) break;
             }
         }
+        updateTurnOrder();
         for (Player p : players) {
-            if (p.getAction() != Action.FOLD) p.setAction(Action.UNDECIDED);
+            if (!Action.hasFolded(p.getAction())) p.setAction(Action.UNDECIDED);
         }
     }
 
@@ -241,26 +305,22 @@ public class Round {
         //      All other players actions are call or fold.
         boolean cond5 = (numRaise == 1) && (numAllIn >= 1) && (players.size() - numFold - numCall - numAllIn - numRaise) == 0;
         if (cond5) {
-            ArrayList<Player> sidePotPlayers = new ArrayList<>();
-            for (Player p : players) {
-                if (p.getAction() != Action.ALLIN || p.getAction() != Action.FOLD) sidePotPlayers.add(p);
-            }
-            pots.add(new Pot(sidePotPlayers));
-            this.betType = BetType.SIDEPOT;
+            createSidePot();
+            setBetType(BetType.SIDEPOT);
         return true;
         } else if(cond3) {
-            this.betType = BetType.ENDROUND;
+            setBetType(BetType.ENDROUND);
             return  true;
         } else if(cond4) {
-            this.betType = BetType.SKIP2SHOWDOWN;
+            setBetType(BetType.SKIP2SHOWDOWN);
             return true;
         } else if(cond1) {
-            if (numAllIn > 0) this.betType = BetType.SKIP2SHOWDOWN;
-            else this.betType = BetType.NORMAL;
+            if (numAllIn > 0) setBetType(BetType.SKIP2SHOWDOWN);
+            else setBetType(BetType.NORMAL);
             return true;
         } else if(cond2) {
-            if (numFold == players.size()-1) this.betType = BetType.SKIP2SHOWDOWN;
-            else this.betType = BetType.NORMAL;
+            if (numFold == players.size()-1) setBetType(BetType.SKIP2SHOWDOWN);
+            else setBetType(BetType.NORMAL);
             return true;
         }
             return false;
@@ -272,20 +332,16 @@ public class Round {
             betting();
         }
         switch (betType) {
-            case NORMAL:
+            case BetType.NORMAL:
                 betting();
-            case ENDROUND:
-                pots.getFirst().removeFolded(roundStatus);
-                pots.getFirst().payOut();
-                End();
-            case SKIP2SHOWDOWN:
+            case BetType.SKIP2SHOWDOWN:
                 if (roundStatus == RoundStatus.SHOWDOWN) {
                     betting();
                     for (Pot p : pots) {
-                        p.showDown();
+                        p.showDown(this.communityCards);
                     }
                 }
-            case SIDEPOT:
+            case BetType.SIDEPOT:
                 betting();
         }
     }
@@ -297,17 +353,5 @@ public class Round {
                 return i;
         }
         return -1;
-    }
-
-    public String getCommunityCardsAsString() {
-        return communityCards.stream()
-                .map(Card::toString)
-                .collect(Collectors.joining(","));
-    }
-
-    public String getRemainingPlayersAsString() {
-        return players.stream()
-                .map(Player::getName)
-                .collect(Collectors.joining(","));
     }
 }

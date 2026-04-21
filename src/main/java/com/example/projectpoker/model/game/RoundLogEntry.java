@@ -1,29 +1,32 @@
 package com.example.projectpoker.model.game;
 
 import com.example.projectpoker.model.game.enums.Action;
-public class GameLogEntry {
-    private final Player player;
-    private final int betSize;
-    private final int toCall;
-    private final Action action;
+import com.example.projectpoker.model.game.enums.Roles;
 
-    public GameLogEntry(Player player, int toCall, int betSize, Action action) {
+public class RoundLogEntry {
+    private Player player;
+    private int betSize;
+    private int toCall;
+    private Action action;
+    private Pot currentPot;
+
+    public RoundLogEntry(Player player, int toCall, int betSize, Action action, Pot currentPot) {
         this.player = player;
         this.action = action;
         this.toCall = toCall;
         this.betSize = betSize;
+        this.currentPot = currentPot;
     }
 
-    public GameLogEntry(Player player, int betSize) {
+    public RoundLogEntry(Player player, int betSize) {
         this.player = player;
         this.betSize = betSize;
-        this.toCall = 0;
         if (betSize == 0) {
             this.action = Action.CHECK;
         } else if (betSize == -1) {
             this.action = Action.FOLD;
-        } else {
-            this.action = Action.CALL;
+            if (player.getRole() == Roles.SMALLBLIND) {
+            }
         }
     }
 
@@ -32,22 +35,6 @@ public class GameLogEntry {
          if (action == Action.RAISE) str = " by " + Integer.toString(betSize - toCall) + "dollars.";
          else if (action == Action.CALL) str = Integer.toString(toCall) + "dollars to play.";
          else { str = "."; }
-        return (String) player.getName() + "decided to" + action.getDescription() + str;
-    }
-
-    public String getPlayerName() {
-        return player.getName();
-    }
-
-    public int getBetSize() {
-        return betSize;
-    }
-
-    public int getToCall() {
-        return toCall;
-    }
-
-    public Action getAction() {
-        return action;
+        return (String) player.getName() + "decided to" + action.getDescription() + str + " The current Pot is now at " + currentPot.getPotSize() + " dollars.";
     }
 }

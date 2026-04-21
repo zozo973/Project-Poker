@@ -1,5 +1,6 @@
 package com.example.projectpoker.model.game;
 
+import com.example.projectpoker.model.game.enums.Action;
 import com.example.projectpoker.model.game.enums.Difficulty;
 import com.example.projectpoker.model.statistics.SkewNormalSampler;
 import static java.lang.Math.abs;
@@ -22,9 +23,19 @@ public class AiPlayer extends Player {
         return skewNormalSampler.sample(playerBalance, omega, alpha);
     }
 
+    private void generatePlayerId() {
+
+
+    }
+
     @Override
     public int chooseBetSize() {
         // get AI Instance to decide on bet size (as int)
         return 0;
+    }
+
+    @Override
+    public void forfeitGame() {
+        setAction(Action.FORFEIT);
     }
 }

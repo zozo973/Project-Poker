@@ -27,6 +27,7 @@ public class Player {
     private RoundInvestment roundInvestment;
     private Action action;
     private Roles role;
+    private Integer activeBet;
 
     // No args constructor, minimum balance a player starts a
     // game with if they do not choose to use money they have won before.
@@ -39,6 +40,7 @@ public class Player {
         this.balance = 1000;
         this.role = Roles.PLAYER;
         this.roundInvestment = new RoundInvestment();
+        this.activeBet = null;
     }
 
     public Player(String name) {
@@ -50,6 +52,7 @@ public class Player {
         this.balance = 1000;
         this.role = Roles.PLAYER;
         this.roundInvestment = new RoundInvestment();
+        this.activeBet = null;
     }
 
     public Player(String name, Roles role) {
@@ -61,6 +64,7 @@ public class Player {
         this.action = Action.UNDECIDED;
         this.role = role;
         this.roundInvestment = new RoundInvestment();
+        this.activeBet = null;
     }
 
     public Player(String name, int balance) {
@@ -72,6 +76,7 @@ public class Player {
         this.action = Action.UNDECIDED;
         this.role = Roles.PLAYER;
         this.roundInvestment = new RoundInvestment();
+        this.activeBet = null;
     }
 
     public Player(String name, int balance, String id) throws IOException {
@@ -83,6 +88,7 @@ public class Player {
         this.action = Action.UNDECIDED;
         this.role = Roles.PLAYER;
         this.roundInvestment = new RoundInvestment();
+        this.activeBet = null;
     }
 
     public void addPropertyChangeListener(PropertyChangeListener listener) {
@@ -99,6 +105,10 @@ public class Player {
 
     public void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
         pcs.removePropertyChangeListener(propertyName, listener);
+    }
+
+    public PropertyChangeListener[] getPropertyChangeListener(String propertyName) {
+        return pcs.getPropertyChangeListeners(propertyName);
     }
 
     public String getName() { return name; }
@@ -138,7 +148,16 @@ public class Player {
 
     public RoundInvestment getRoundInvestment() { return roundInvestment; }
 
-    public int getTotalRoundInvestment() { return roundInvestment.getTotalInvestment(); }
+    public int getTotalInvestment() { return roundInvestment.getTotalInvestment(); }
+
+    public int getTotalPotInvestment(Pot pot) {
+        ArrayList<Bet> betsInPot = roundInvestment.getBetsByPot(pot);
+        int potInvestment = 0;
+        for (Bet b : betsInPot) {
+            potInvestment += b.getBetSize();
+        }
+        return potInvestment;
+    }
 
     protected void setRoundInvestment(RoundInvestment roundInvestment) { this.roundInvestment = roundInvestment; }
 
@@ -162,6 +181,7 @@ public class Player {
         var oldVal = this.isTurn;
         this.isTurn = isTurn;
         pcs.firePropertyChange("isTurn",oldVal,this.isTurn);
+        if (!this.isTurn) this.activeBet = null;
     }
 
     public Roles getRole() { return role; }
@@ -173,6 +193,10 @@ public class Player {
         pcs.firePropertyChange("role",oldVal,this.role);
     }
 
+    public Integer getActiveBet() { return activeBet; }
+
+    public void setActiveBet(Integer activeBet) { this.activeBet = activeBet; }
+
     public void roundReset() {
         pcs.firePropertyChange("roundReset",this, new Player(getName(),getBalance()));
         this.playerHand.clear();
@@ -180,6 +204,7 @@ public class Player {
         this.action = null;
         this.role = Roles.PLAYER;
         this.roundInvestment.reset();
+        this.activeBet = null;
     }
 
     public boolean checkAllInCreatesSidePot(int bet, Pot pot) {
@@ -227,6 +252,7 @@ public class Player {
         } else {
             setBalance((b - betSize));
         }
+        this.activeBet = betSize;
         this.roundInvestment.add2Bets(betSize,pot);
         return betSize;
     }
@@ -244,10 +270,9 @@ public class Player {
         }
     }
 
-    public int chooseBetSize() {
+    public void chooseBetSize() {
         // return rounded slider value from the view
-
-        return 0;
+        this.activeBet = 0; //  TODO implement method.
     }
 
     public void forfeitGame() {

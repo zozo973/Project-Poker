@@ -8,7 +8,7 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 
-import static com.example.projectpoker.model.game.PotUtil.getOpenPotIndex;
+import static com.example.projectpoker.model.game.PotUtil.*;
 
 public class Round {
 
@@ -24,12 +24,12 @@ public class Round {
     private int numPlayers;
     private int toPlay;
     private BetType betType;
-    private CardDeck deck;
+    private final CardDeck deck;
     private ArrayList<Pot> pots;
     private ArrayList<Card> communityCards;
     private ArrayList<RoundLogEntry> roundLog;
-    private ArrayList<Player> players;
-    private ArrayList<Integer> turnOrder;
+    private final ArrayList<Player> players;
+    private final ArrayList<Integer> turnOrder;
 
     public Round(ArrayList<Player> players, int blindSize) {
         this.roundStatus = RoundStatus.UNINITIALISED;
@@ -73,6 +73,7 @@ public class Round {
         this.betType = betType;
         pcs.firePropertyChange("betType", oldVal, this.betType);
         if (betType.equals(BetType.ENDROUND)) end();
+        if (betType.equals(BetType.SKIP2SHOWDOWN) && !roundStatus.equals(RoundStatus.SHOWDOWN)) deal2Table();
     }
 
     public ArrayList<Pot> getPots() { return pots; }
@@ -165,7 +166,6 @@ public class Round {
             p.showDown(this.communityCards);
         }
         // TODO send RoundLog to database exit round
-
         // DAO.add(getRoundLog());
         setRoundStatus(RoundStatus.END);
     }
@@ -199,10 +199,11 @@ public class Round {
 
     // TODO Attach to the game controller
     // On click method depending on player choice
-    public void playerAction(Player player, int betSize) {
+    public void recordPlayerAction(Player player) {
+        int betSize = player.getActiveBet();
         Action action = player.getAction();
         if (Action.isBet(action)) {
-            this.roundLog.add(new RoundLogEntry(player, toPlay - player.getTotalRoundInvestment(), betSize, action, getOpenPot()));
+            this.roundLog.add(new RoundLogEntry(player, toPlay - player.getTotalInvestment(), betSize, action, getOpenPot()));
         } else {
             this.roundLog.add(new RoundLogEntry(player, betSize));
         }
@@ -210,13 +211,32 @@ public class Round {
 
     private void dealCards() {
         for (int repeat = 0; repeat < 2; repeat++) {
-            for (int i = 0; i < turnOrder.size(); i++) {
-                players.get(turnOrder.get(i)).addCardToHand(deck.draw());
+            for (Integer integer : turnOrder) {
+                players.get(integer).addCardToHand(deck.draw());
             }
         }
     }
 
     private void deal2Table() {
+        if (betType.equals(BetType.SKIP2SHOWDOWN)) {
+            switch (communityCards.size()) {
+                case 0:
+                    deck.burnCard();
+                    this.communityCards.add(deck.draw());
+                    this.communityCards.add(deck.draw());
+                    this.communityCards.add(deck.draw());
+                case 3:
+                    deck.burnCard();
+                    this.communityCards.add(deck.draw());
+                case 4:
+                    deck.burnCard();
+                    this.communityCards.add(deck.draw());
+                case 5:
+                    throw new IllegalStateException("RoundStatus must be showdown, to have 5 community cards.");
+                default:
+                    throw new IllegalStateException("community cards has illegal amount of cards");
+            }
+        }
         deck.burnCard();
         if (roundStatus == RoundStatus.FLOP) {
             this.communityCards.add(deck.draw());
@@ -228,18 +248,13 @@ public class Round {
     }
 
     private void createSidePot(Player potCreator) {
-        addPot(new Pot(potCreator));
-        pots.getLast().setPotPriority(pots.size()-1);
-        pots.getLast().addBet(potCreator, potCreator.getTotalRoundInvestment() - this.toPlay);
+        this.pots = addNewSidePot(this.pots,potCreator);
         this.roundLog.add(new RoundLogEntry(potCreator, pots.getLast()));
-    }
-    private void add2NewSidePot(Player activePlayer) {
-        pots.getLast().addPlayer2Table(activePlayer);
     }
 
     private void betting() {
         Player activePlayer = null;
-        while (endBetting(activePlayer)) {
+        do {
             for (Integer i : turnOrder) {
                 activePlayer = players.get(i);
                 if (!Action.hasFolded(activePlayer.getAction())) {
@@ -249,39 +264,41 @@ public class Round {
                         // call method to asked user for input
                         // TODO Add IU input to make user decision
                         // turnOrder.get(i).setAction(actionButtonInput());
-                        int playerBet = 0; // dummy var
-                        if (this.betType.equals(BetType.SIDEPOT)) {
-                            if (activePlayer.checkAllInCreatesSidePot(playerBet,pots.getLast())) {
-                                // create new side pot with less priority, then the checked side pot
-                                pots.getLast().stepPotPriority(1);
-                                createSidePot(activePlayer);
-                                pots.getLast().stepPotPriority(-1);
-                                pots.get(pots.size()-2).adjustPot(pots.getLast());
-                            } else if (Action.isBet(activePlayer.getAction())) {
-                                add2NewSidePot(activePlayer);
-                                pots.getLast().addBet(activePlayer,playerBet);
-                            }
+                        activePlayer.chooseBetSize();
+                        if (activePlayer.getActiveBet() > this.toPlay && Action.isRaise(activePlayer.getAction())) {
+                            this.toPlay = activePlayer.getActiveBet();
                         }
-                        int betSize = activePlayer.chooseBetSize();
-                        int activePotIndex = getOpenPotIndex(pots);
-                        if (activePotIndex == -1) throw new IllegalStateException("There is no active Pot");
-
-                        this.pots.get(activePotIndex).addBet(activePlayer, betSize);
-                        playerAction(activePlayer, betSize);
-
+                        if (this.betType.equals(BetType.SIDEPOT)) {
+                            betIntoSidePots(activePlayer);
+                        } else {
+                            setPots(payOpenPot(this.pots, activePlayer));
+                        }
+                        recordPlayerAction(activePlayer);
+                        if (endBetting(activePlayer)) break;
+                        if (!activePlayer.getAction().equals(Action.UNDECIDED)) {
+                            activePlayer.setIsTurn(false);
+                        }
                     }
-
-                    if (endBetting(activePlayer)) break;
-                    activePlayer.setIsTurn(false);
                 }
-                if (Action.isRaise(activePlayer.getAction())) {
-                    setToPlay(activePlayer.getTotalRoundInvestment()); //??
-                }
+                if (endBetting(activePlayer)) break;
             }
+        } while (endBetting(activePlayer));
+        postBetting();
+    }
+
+    private void betIntoSidePots(Player activePlayer) {
+        var paidPots = tryPayMultiplePots(this.pots,activePlayer);
+        if (paidPots != null ) {
+            this.pots = paidPots;
+        } else {
+            setPots(payOpenPot(this.pots,activePlayer));
         }
+    }
+
+    private void postBetting() {
         updateTurnOrder();
         for (Player p : players) {
-            if (!Action.hasFolded(p.getAction())) {
+            if (!Action.hasFolded(p.getAction()) || !p.getAction().equals(Action.FORFEIT)) {
                 p.setAction(Action.UNDECIDED);
             }
             p.setIsTurn(false);
@@ -291,6 +308,7 @@ public class Round {
                 pots.get(i).setIsOpen(false);
             }
         }
+        this.toPlay = 0;
     }
 
     public boolean endBetting(Player activePlayer) {
@@ -301,9 +319,11 @@ public class Round {
         int numRaise = 0;
         int numFold = 0;
         int numCheck = 0;
+        Player recentAllIn = new Player();
         for (Player p : players) {
             if (p.getAction() == Action.ALLIN) {
                 numAllIn += 1;
+                recentAllIn = p;
             } else if (p.getAction() == Action.CALL) {
                 numCall += 1;
             } else if (p.getAction() == Action.RAISE) {
@@ -314,6 +334,8 @@ public class Round {
                 numCheck += 1;
             }
         }
+
+        // TODO Test and check betting end conditions possible add more.
         // end betting condition 1 (Normal or All In):
         //      One player action is Raise or All In,
         //      All other players actions are call or fold.
@@ -325,17 +347,33 @@ public class Round {
         //      One player action is not fold,
         //      All other players actions are fold.
         boolean cond3 = (players.size() - numFold) == 1;
-        // end betting condition 4 (All In):
+        // end betting condition 4 (All In - sidePot and end):
         //      Multiple players action is All In,
         //      no players action is a raise,
-        //      All other players actions are call or fold.
-        boolean cond4 = (players.size()-numCall-numAllIn-numFold) == 0;
-        // betting condition 5 (SidePot):
+        //      one or no player has called
+        //      All other players actions are fold.
+        boolean cond4 = (players.size()-numCall-numAllIn-numFold) == 0 && (numCall == 1 || numCall == 0);
+        // sidePot creation condition 1:
         //      One or more players action is all in,
         //      A player who goes after players that are all in has action raise,
         //      All other players actions are call or fold.
-        boolean cond5 = (numRaise == 1) && (numAllIn >= 1) && (players.size() - numFold - numCall - numAllIn - numRaise) == 0 && activePlayer.getAction().equals(Action.RAISE);
-        if (cond5) {
+        boolean sidePotCond1 = (numAllIn >= 1) && activePlayer.getAction().equals(Action.RAISE) &&
+                recentAllIn.getActiveBet() < activePlayer.getActiveBet();
+
+        // sidePot creation condition 2
+        //      Previous player raise, current player goes all in
+        //      current players all in < the raise
+        boolean createSidePot = true;
+        for (Pot pot : pots) {
+            if (activePlayer.getActiveBet() == pot.getToPlay()) {
+                createSidePot = false;
+                break;
+            }
+        }
+        boolean sidePotCond2 = activePlayer.getAction().equals(Action.ALLIN) && activePlayer.getActiveBet() < this.toPlay
+                && createSidePot;
+
+        if (sidePotCond1 || sidePotCond2) {
             createSidePot(activePlayer);
             setBetType(BetType.SIDEPOT);
             return false;
@@ -344,6 +382,8 @@ public class Round {
             return  true;
         } else if(cond4) {
             setBetType(BetType.SKIP2SHOWDOWN);
+            createSidePot(activePlayer);
+            setBetType(BetType.SIDEPOT);
             return true;
         } else if(cond1) {
             if (numAllIn > 0) setBetType(BetType.SKIP2SHOWDOWN);
@@ -366,18 +406,23 @@ public class Round {
             case BetType.NORMAL:
                 betting();
             case BetType.SKIP2SHOWDOWN:
-                if (roundStatus == RoundStatus.SHOWDOWN) {
-                    betting();
-                    for (Pot p : pots) {
-                        p.showDown(this.communityCards);
-                    }
+                if (!roundStatus.equals(RoundStatus.SHOWDOWN)) deal2Table();
+                betting();
+                for (Pot p : pots) {
+                    p.showDown(this.communityCards);
                 }
             case BetType.SIDEPOT:
                 betting();
         }
     }
 
-
-
-
+    public void removeForfeited() {
+        for (Player p : this.players) {
+            if (p.getAction().equals(Action.FORFEIT)) {
+                p.forfeitGame();
+                players.remove(p);
+                this.numPlayers--;
+            }
+        }
+    }
 }

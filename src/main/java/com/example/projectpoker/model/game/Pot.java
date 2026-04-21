@@ -37,6 +37,16 @@ public class Pot {
         initBetTable();
     }
 
+    public Pot(Player player, int potPriority) {
+        this.players = new ArrayList<>();
+        this.players.add(player);
+        this.potSize = 0;
+        this.potPriority = potPriority;
+        this.toPlay = 0;
+        this.isOpen = true;
+        initBetTable();
+    }
+
     public Pot(ArrayList<Player> players) {
         this.players = players;
         this.potSize = 0;
@@ -45,6 +55,12 @@ public class Pot {
         this.isOpen = true;
         initBetTable();
     }
+
+    public ArrayList<Player> getPlayers() { return players; }
+
+    public void addPlayer(Player player) { this.players.add(player); }
+
+    public void setPlayers(ArrayList<Player> players) { this.players = players; }
 
     public int getToPlay() { return toPlay; }
 
@@ -94,6 +110,21 @@ public class Pot {
 
     public void addBet(Player player, int bet) {
         player.placeBet(bet, this);
+        int playerPotInvest = player.getTotalPotInvestment(this);
+        if (playerPotInvest > this.toPlay) this.toPlay = playerPotInvest;
+        addBet2Table(player, bet);
+
+        //     if (Action.isRaise(player.getAction()) && player.getRoundInvestment() > this.toPlay) {
+        //        this.toPlay = player.getTotalRoundInvestment();
+        //          }
+        this.potSize += bet;
+    }
+
+    public void addBet(Player player) {
+        int bet = player.getActiveBet();
+        player.placeBet(bet, this);
+        int playerPotInvest = player.getTotalPotInvestment(this);
+        if (playerPotInvest>this.toPlay) this.toPlay = playerPotInvest;
         addBet2Table(player,bet);
 
    //     if (Action.isRaise(player.getAction()) && player.getRoundInvestment() > this.toPlay) {
@@ -136,7 +167,8 @@ public class Pot {
         if (sidePot.isOpen) {
             if (sidePot.getPotPriority() < this.potPriority) {
                 int removeToPlay = sidePot.getToPlay() - this.toPlay;
-                int removePotTotal = sidePot.getPotSize() - this.potSize;
+                int removePotTotal = this.potSize - removeToPlay*players.size();
+                if (this.potSize <= 0) throw new IllegalStateException("THe pot can't have 0 or negative amount of money in it");
                 if (removeToPlay <= 0 ) throw new IllegalStateException("adjustPot Method has been implemented on the incorrect pot");
                 reInitPot(removeToPlay,removePotTotal);
             }

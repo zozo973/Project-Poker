@@ -25,6 +25,14 @@ public class RoundInvestment {
         return bets;
     }
 
+    public ArrayList<Bet> getBetsByPot(Pot pot) {
+        ArrayList<Bet> betsIntoPot = new ArrayList<>();
+        for (Bet b  : this.bets) {
+            if (b.getPot().equals(pot)) betsIntoPot.add(b);
+        }
+        return betsIntoPot;
+    }
+
     public Bet getLastBet() { return bets.getLast(); }
 
     public void setBets(ArrayList<Bet> bets) {

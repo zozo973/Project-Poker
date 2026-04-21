@@ -1,5 +1,6 @@
 package com.example.projectpoker.model.game;
 
+import com.example.projectpoker.handler.RoundPlayerListener;
 import com.example.projectpoker.handler.RoundStatusChangeHandler;
 import com.example.projectpoker.model.game.enums.Action;
 import com.example.projectpoker.model.game.enums.Difficulty;
@@ -20,6 +21,7 @@ public class Game {
     //      Round Change
 
     private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
+    private final RoundPlayerListener roundPlayerListener = new RoundPlayerListener();
     private GameStatus gameStatus;
     private ArrayList<Player> players;
     private int numRoundsLeft;
@@ -83,6 +85,11 @@ public class Game {
     }
 
     public void setPlayers(ArrayList<Player> players) {
+        if (!(players.getFirst().getPropertyChangeListener("roundPlayerListener") instanceof RoundPlayerListener[])) {
+            for (Player p : players) {
+                p.addPropertyChangeListener("roundPlayerListener", this.roundPlayerListener);
+            }
+        }
         var oldVal = this.players;
         this.players = players;
         pcs.firePropertyChange("players",oldVal,this.players);
@@ -93,6 +100,7 @@ public class Game {
         pcs.firePropertyChange("round",this.round,round);
         round.addPropertyChangeListener(roundHandler);
         setRound(round);
+        roundPlayerListener.setRound(round);
     }
 
     public int getNumRoundsLeft() { return numRoundsLeft; }
@@ -168,8 +176,8 @@ public class Game {
             if (getUser().getBalance() == 0) { end(); break; }
             else if (this.numRoundsLeft == 0) { end(); break; }
             else if (this.players.size() == 1 && !(this.players.getFirst() instanceof AiPlayer)) { end(); break; }
-            checkForfeitedPlayers();
-            this.numRoundsLeft--;
+            this.GameLog.add(round.getRoundLog());
+            nextRoundInitialisation();
         }
     }
 
@@ -189,7 +197,6 @@ public class Game {
             if (getUser().getBalance() == 0) { end(); break; }
             else if (this.numRoundsLeft == 0) { end(); break; }
             else if (this.players.size() == 1 && !(this.players.getFirst() instanceof AiPlayer)) { end(); break; }
-            checkForfeitedPlayers();
             this.GameLog.add(round.getRoundLog());
             nextRoundInitialisation();
         }
@@ -202,10 +209,14 @@ public class Game {
     }
 
     private void nextRoundInitialisation() {
-        setPlayers(RoleUtil.delegateRoles(
-
-        ));
-
+        setPlayers(
+            RoleUtil.delegateRoles(
+                this.players,
+                RoleUtil.stepRoleIndices(
+                    this.players
+                )
+            )
+        );
         this.numRoundsLeft--;
     }
 
@@ -220,18 +231,6 @@ public class Game {
     public void tryIncreaseBlind() {
         if (gameLength != numRoundsLeft && (gameLength - numRoundsLeft) % whenIncreaseBlinds == 0) {
             setBlindSize(this.blindSize*2);
-        }
-    }
-
-    // method to check if any players have lost all there money or left the game.
-    public void checkForfeitedPlayers() {
-        ArrayList<Player> activePlayers = new ArrayList<>();
-        for (Player p : this.players) {
-            if (!p.getAction().equals(Action.FORFEIT)) activePlayers.add(p);
-        }
-        if (!activePlayers.equals(this.players)) {
-            setPlayers(activePlayers);
-            this.numPlayers = activePlayers.size();
         }
     }
 }

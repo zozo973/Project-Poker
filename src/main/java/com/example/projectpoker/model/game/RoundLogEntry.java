@@ -24,7 +24,7 @@ public class RoundLogEntry {
         this.player = player;
         this.betSize = 0;
         this.currentPot = currentPot;
-        this.entryDescription = player.getName() + " has created a new side pot, with a value of " + currentPot.getPotSize();
+        this.entryDescription = player.getName() + " has created a new side pot, with a priority of "+ currentPot.getPotPriority() +" and a value of " + currentPot.getPotSize();
     }
 
     // Default constructor for calling, raising or all-in actions

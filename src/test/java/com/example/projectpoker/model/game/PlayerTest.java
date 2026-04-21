@@ -206,9 +206,9 @@ class PlayerTest {
 
     @Test
     void testGetAndSetRoundInvestment() {
-        assertEquals(0, player.getTotalRoundInvestment());
+        assertEquals(0, player.getTotalInvestment());
         player.setRoundInvestment(100);
-        assertEquals(100, player.getTotalRoundInvestment());
+        assertEquals(100, player.getTotalInvestment());
     }
 
     // Action Tests
@@ -260,7 +260,7 @@ class PlayerTest {
         assertFalse(player.getIsTurn());
         assertNull(player.getAction());
         assertEquals(Roles.PLAYER, player.getRole());
-        assertEquals(0, player.getTotalRoundInvestment());
+        assertEquals(0, player.getTotalInvestment());
     }
 
     // Win Tests

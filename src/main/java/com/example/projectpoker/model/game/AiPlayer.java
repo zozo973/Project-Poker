@@ -29,9 +29,9 @@ public class AiPlayer extends Player {
     }
 
     @Override
-    public int chooseBetSize() {
+    public void chooseBetSize() {
         // get AI Instance to decide on bet size (as int)
-        return 0;
+        this.setActiveBet(0);
     }
 
     @Override

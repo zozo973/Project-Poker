@@ -48,8 +48,8 @@ public class DatabaseManager {
 
         initializeDatabase();
 
-        int handsPlayed = Math.max(game.getHandsPlayed(), 0);
-        boolean wonGame = player.getBalance() > game.getStartingUserBalance();
+        int handsPlayed = Math.max(game.getHandsPlayed(), 0); // calculating hands played
+        boolean wonGame = player.getBalance() > game.getStartingUserBalance(); // calculating whether player won or lost
         user.setCurrentBalance(player.getBalance());
         user.setTotalHandsPlayed(user.getTotalHandsPlayed() + handsPlayed);
         if (wonGame) {

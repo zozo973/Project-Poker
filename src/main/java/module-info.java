@@ -11,6 +11,8 @@ module com.example.projectpoker {
     requires eu.hansolo.tilesfx;
     requires com.almasb.fxgl.all;
     requires java.desktop;
+    requires java.sql;
+    requires bcrypt;
 
     opens com.example.projectpoker to javafx.fxml;
     exports com.example.projectpoker;

@@ -1,8 +1,10 @@
 package com.example.projectpoker.controller;
 
+import com.example.projectpoker.PokerApplication;
 import com.example.projectpoker.service.PasswordHasher;
 import com.example.projectpoker.model.User;
 import com.example.projectpoker.database.UserDAO;
+import com.example.projectpoker.service.SessionManager;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import java.io.IOException;
@@ -68,6 +70,19 @@ public class RegisterController {
             UserDAO userDAO = new UserDAO();
             userDAO.createTable();
             userDAO.insert(newUser);
+            }
+
+        // look up the user
+        UserDAO userDAO = new UserDAO();
+        User user = userDAO.getByUsername(username);
+        // set user as logged in
+        SessionManager.setCurrentUser(user);
+
+        try {
+            PokerApplication app = new PokerApplication();
+            app.createPokerGame();
+        } catch (IOException e) {
+            messageLabel.setText("Could not start game.");
         }
     }
 

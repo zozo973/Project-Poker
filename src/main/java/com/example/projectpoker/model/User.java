@@ -24,7 +24,7 @@ public class User {
     }
 
     // constructor for loading existing user from database
-    public User(int id, String username, String password, String email, int totalHandsPlayed, int totalWins, int currentBalance) {
+     public User(int id, String username, String password, String email, int totalHandsPlayed, int totalWins, int currentBalance) {
         this.id = id;
         this.username = username;
         this.password = password;

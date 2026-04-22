@@ -1,10 +1,9 @@
 package com.example.projectpoker.controller;
 
+import com.example.projectpoker.PokerGameUI;
 import com.example.projectpoker.model.Hand;
-import com.example.projectpoker.model.game.Card;
-import com.example.projectpoker.model.game.Game;
-import com.example.projectpoker.model.game.Player;
-import com.example.projectpoker.model.game.Round;
+import com.example.projectpoker.model.game.*;
+import com.example.projectpoker.model.game.TablePosition;
 import com.example.projectpoker.model.game.enums.Action;
 import com.example.projectpoker.model.game.enums.GameStatus;
 import com.example.projectpoker.model.game.enums.Roles;
@@ -31,6 +30,12 @@ public class RoundController implements RoundViewUpdater {
     private Game game;
     private Round round;
     private Player userPlayer;
+    private PokerGameUI pokerUI;
+
+    public void setUI(PokerGameUI pokerUI)
+    {
+        this.pokerUI = pokerUI;
+    }
 
     public void setGame(Game game) {
         this.game = game;
@@ -99,19 +104,30 @@ public class RoundController implements RoundViewUpdater {
 
         Platform.runLater(() -> phaseLabel.setText("Phase: " + phase));
         if (round.getRoundStatus().equals(RoundStatus.DEAL)) {
-            Hand userHand = userPlayer.getPlayerHand();
-            // Display users hand in ui.
+
+            pokerUI.displayCards(pokerUI.getRoot(), userPlayer.getPlayerHand().getCards(), TablePosition.PlayerPos, true);
+            for(int i = 1; i<game.getPlayers().size(); i++) {
+                Player AI = game.getPlayers().get(i);
+                if (AI.getAction() != Action.FOLD) {
+                    pokerUI.displayCards(pokerUI.getRoot(), AI.getPlayerHand().getCards(), TablePosition.PosList.get(i), false);
+                }
+            }
+
         }
     }
 
     @Override
     public void onCommunityCardsChanged(ArrayList<Card> newCC,ArrayList<Card> oldCC) {
+        pokerUI.displayCards(pokerUI.getRoot(), newCC, TablePosition.BoardPos, true);
+
+        /* Leaving this commented out in case you wanted it available for testing
         for (Card c : newCC) {
             if (!oldCC.contains(c)) {
                 // display(c);
                 System.out.println(c);
             }
         }
+        */
     }
 
     @Override

@@ -33,9 +33,10 @@ public class PokerApplication extends Application {
         // scene.getStylesheets().add(stylesheet);
         //
 
-        stage.setTitle("Hello!");
+        stage.setTitle("App Name");
         stage.setScene(scene);
         stage.show();
+        createPokerGame();
     }
 
     private void createPokerGame() throws IOException {

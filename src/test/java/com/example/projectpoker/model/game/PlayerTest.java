@@ -279,34 +279,35 @@ class PlayerTest {
     void testPlaceBetValidBet() {
         int initialBalance = player.getBalance();
         int bet = 100;
+        Pot testPot = new Pot();
 
-        int actualBet = player.placeBet(bet,new Pot());
+        int actualBet = player.placeBet(bet, testPot);
 
         assertEquals(bet, actualBet);
         assertEquals(initialBalance - bet, player.getBalance());
-        assertEquals(bet, player.getRoundInvestment());
+        assertEquals(bet, player.getRoundInvestment().getTotalInvestment());
     }
 
     @Test
     void testPlaceBetZeroThrows() {
-        assertThrows(IllegalArgumentException.class, () -> player.placeBet(0,new Pot()));
+        assertThrows(IllegalArgumentException.class, () -> player.placeBet(0, new Pot()));
     }
 
     @Test
     void testPlaceBetNegativeThrows() {
-        assertThrows(IllegalArgumentException.class, () -> player.placeBet(-50,new Pot()));
+        assertThrows(IllegalArgumentException.class, () -> player.placeBet(-50, new Pot()));
     }
 
     @Test
     void testPlaceBetExceedsBalanceThrows() {
-        assertThrows(IllegalArgumentException.class, () -> player.placeBet(2000,new Pot()));
+        assertThrows(IllegalArgumentException.class, () -> player.placeBet(2000, new Pot()));
     }
 
     @Test
     void testPlaceBetUpdatesRoundInvestment() {
-        player.placeBet(100,new Pot());
-        player.placeBet(50,new Pot());
-        assertEquals(150, player.getRoundInvestment());
+        player.placeBet(100, new Pot());
+        player.placeBet(50, new Pot());
+        assertEquals(150, player.getRoundInvestment().getTotalInvestment());
     }
 
     // Pay Blind Tests
@@ -333,7 +334,7 @@ class PlayerTest {
         int result = player.payBlind(100, new Pot());
         assertEquals(50, result);
         assertEquals(950, player.getBalance());
-        assertEquals(50, player.getRoundInvestment());
+        assertEquals(50, player.getRoundInvestment().getTotalInvestment());
     }
 
     @Test
@@ -342,7 +343,7 @@ class PlayerTest {
         int result = player.payBlind(100, new Pot());
         assertEquals(100, result);
         assertEquals(900, player.getBalance());
-        assertEquals(100, player.getRoundInvestment());
+        assertEquals(100, player.getRoundInvestment().getTotalInvestment());
     }
 
     // All In Tests

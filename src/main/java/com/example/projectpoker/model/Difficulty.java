@@ -1,5 +1,6 @@
 package com.example.projectpoker.model;
 
+
 public enum Difficulty {
     BABY("Like playing with a bunch of infant children"),
     WHATISPOKER("Someone who has never played the game before"),

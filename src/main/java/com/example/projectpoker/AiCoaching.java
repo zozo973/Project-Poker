@@ -5,6 +5,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
 import java.net.URI;
+import java.net.http.*;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -26,6 +27,7 @@ public class AiCoaching {
 
     // Main Feature; Send (User's hand cards / BoardCards / Stage / Advice Mode) to Gemini
     // Return (result.action / result.condifence / result.reason / result.errormsg)
+    //-----
     public AiAdvice getAdvice(Card[] handCards, Card[] boardCards, Stage stage, AiAdviceMode mode) {
         AiAdvice result = new AiAdvice();
 
@@ -111,7 +113,8 @@ public class AiCoaching {
                     "RISKY mode: Aim for the biggest benefit. Be aggressive, look for opportunities to bluff or BET heavily to maximize the pot size, even with marginal hands.";
             case SAFE ->
                     "SAFE mode: Aim to minimize losses. Play very conservatively, FOLD if facing aggression without a strong hand, and prioritize protecting your chip stack.";
-            case NORMAL -> "NORMAL mode: Play a balanced, standard Game Theory Optimal (GTO) style.";
+            case NORMAL ->
+                    "NORMAL mode: Play a balanced, standard Game Theory Optimal (GTO) style.";
         };
 
         return String.format("""

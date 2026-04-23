@@ -43,30 +43,28 @@ public class RoundController implements RoundViewUpdater {
 
     @Override
     public void onDealCards() {
+
         Platform.runLater(() -> {
 
-            if (round.getRoundStatus() == RoundStatus.DEAL) {
-                pokerUI.clearCards();
-            }
-            var round = game.getRound();
+            if (round.getRoundStatus() == RoundStatus.DEAL) {pokerUI.clearCards();}
 
-            int userIndex = round.getUserIndex();
+            ArrayList<Player> players = game.getPlayers();
 
-            var players = game.getPlayers();
+            // Render user hand first
+            pokerUI.displayCards(userPlayer.getPlayerHand().getCards(), TablePosition.PlayerPos, true);
 
-            for (int i = 0; i < players.size(); i++) {
+            int seatIndex = 1; // next seat after PlayerPos
 
-                var player = players.get(i);
+            for (Player player : players) {
 
-                boolean revealed =
-                        i == userIndex;
+                if (player == userPlayer) {continue;}
 
-                pokerUI.displayCards(
-                        player.getPlayerHand().getCards(),
-                        TablePosition.PosList.get(i),
-                        revealed
-                );
+                if (player.getAction() == Action.FOLD) {continue;}
 
+                if (seatIndex >= TablePosition.PosList.size()) {break;}
+
+                pokerUI.displayCards(player.getPlayerHand().getCards(), TablePosition.PosList.get(seatIndex), false);
+                seatIndex++;
             }
         });
     }
@@ -78,9 +76,7 @@ public class RoundController implements RoundViewUpdater {
 
     @Override
     public void onRoundStarted() {
-        Platform.runLater(() -> {
-            pokerUI.clearCards();
-        });
+        Platform.runLater(() -> pokerUI.clearCards());
     }
 
     private void updateRoundCounterLabel() {

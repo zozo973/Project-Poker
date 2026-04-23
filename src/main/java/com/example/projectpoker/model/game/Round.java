@@ -136,27 +136,7 @@ public class Round {
     public void start() {
         dealCards();
         setRoundStatus(RoundStatus.DEAL);
-
         setRoundStatus(RoundStatus.BETTING1);
-        checkBetType();
-
-        setRoundStatus(RoundStatus.FLOP);
-        deal2Table();
-
-        setRoundStatus(RoundStatus.BETTING2);
-        checkBetType();
-
-        setRoundStatus(RoundStatus.TURN);
-        deal2Table();
-
-        setRoundStatus(RoundStatus.BETTING3);
-        checkBetType();
-
-        setRoundStatus(RoundStatus.RIVER);
-        deal2Table();
-
-        setRoundStatus(RoundStatus.SHOWDOWN);
-        checkBetType();
     }
 
     public void end() {
@@ -405,14 +385,49 @@ public class Round {
         switch (betType) {
             case BetType.NORMAL:
                 betting();
+                break;
             case BetType.SKIP2SHOWDOWN:
                 if (!roundStatus.equals(RoundStatus.SHOWDOWN)) deal2Table();
                 betting();
                 for (Pot p : pots) {
                     p.showDown(this.communityCards);
                 }
+                break;
             case BetType.SIDEPOT:
                 betting();
+                break;
+        }
+    }
+
+    public void continueRound() {
+
+        checkBetType();
+
+        advanceRoundState();
+    }
+    private void advanceRoundState() {
+
+        switch (roundStatus) {
+
+            case BETTING1 -> {
+                setRoundStatus(RoundStatus.FLOP);
+                deal2Table();
+                setRoundStatus(RoundStatus.BETTING2);
+            }
+
+            case BETTING2 -> {
+                setRoundStatus(RoundStatus.TURN);
+                deal2Table();
+                setRoundStatus(RoundStatus.BETTING3);
+            }
+
+            case BETTING3 -> {
+                setRoundStatus(RoundStatus.RIVER);
+                deal2Table();
+                setRoundStatus(RoundStatus.SHOWDOWN);
+            }
+
+            case SHOWDOWN -> end();
         }
     }
 

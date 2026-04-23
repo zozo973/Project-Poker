@@ -40,19 +40,27 @@ public class RoundStatusChangeHandler implements PropertyChangeListener {
         RoundStatus status =
                 (RoundStatus) evt.getNewValue();
 
+        // Always update phase label
+        viewUpdater.onRoundStatusChanged(status.name());
+
         switch (status) {
 
+            case DEAL,
+                 BETTING1 -> viewUpdater.onDealCards();
+
+            case FLOP,
+                 TURN,
+                 RIVER ->
+                    viewUpdater.onCommunityCardsChanged(
+                            null,
+                            null
+                    );
+
             case END -> {
-                viewUpdater.onRoundStatusChanged(status.name());
-
-                game.onRoundEnded();
+                // future logic
             }
-
-            default ->
-                    viewUpdater.onRoundStatusChanged(status.name());
         }
     }
-
-    }
+}
 
 

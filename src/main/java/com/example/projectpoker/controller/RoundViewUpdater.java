@@ -24,4 +24,5 @@ public interface RoundViewUpdater {
     void onPlayerChange(ArrayList<Player> newPlayers, ArrayList<Player> oldPlayers);
     void onPlayerActionChange(Action action);
     void onPlayerRoleUpdate(Roles role);
+    void onDealCards();
 }

@@ -47,6 +47,36 @@ public class RoundController implements RoundViewUpdater {
         this.game = game;
     }
 
+    @Override
+    public void onDealCards() {
+        Platform.runLater(() -> {
+
+            if (round.getRoundStatus() == RoundStatus.DEAL) {
+                pokerUI.clearCards();
+            }
+            var round = game.getRound();
+
+            int userIndex = round.getUserIndex();
+
+            var players = game.getPlayers();
+
+            for (int i = 0; i < players.size(); i++) {
+
+                var player = players.get(i);
+
+                boolean revealed =
+                        i == userIndex;
+
+                pokerUI.displayCards(
+                        player.getPlayerHand().getCards(),
+                        TablePosition.PosList.get(i),
+                        revealed
+                );
+
+            }
+        });
+    System.out.println("Cards Rendered");
+    }
     public void setRound(Round round, Player userPlayer) {
         this.round = round;
         this.userPlayer = userPlayer;
@@ -111,33 +141,16 @@ public class RoundController implements RoundViewUpdater {
 
     @Override
     public void onRoundStatusChanged(String phase) {
-
-        Platform.runLater(() -> phaseLabel.setText("Phase: " + phase));
-        if (round.getRoundStatus().equals(RoundStatus.DEAL)) {
-
-            pokerUI.displayCards(userPlayer.getPlayerHand().getCards(), TablePosition.PlayerPos, true);
-            for(int i = 1; i<game.getPlayers().size(); i++) {
-                Player AI = game.getPlayers().get(i);
-                if (AI.getAction() != Action.FOLD) {
-                    pokerUI.displayCards(AI.getPlayerHand().getCards(), TablePosition.PosList.get(i), false);
-                }
-            }
-
-        }
+        Platform.runLater(() ->
+                phaseLabel.setText("Phase: " + phase)
+        );
     }
+
 
     @Override
     public void onCommunityCardsChanged(ArrayList<Card> newCC,ArrayList<Card> oldCC) {
-        pokerUI.displayCards(newCC, TablePosition.BoardPos, true);
 
-        /* Leaving this commented out in case you wanted it available for testing
-        for (Card c : newCC) {
-            if (!oldCC.contains(c)) {
-                // display(c);
-                System.out.println(c);
-            }
-        }
-        */
+        pokerUI.displayCards(newCC, TablePosition.BoardPos, true);
     }
 
     @Override

@@ -60,6 +60,7 @@ public class PokerGameUI {
      */
     public void clearCards() {
         initialiseTable();
+        System.out.println("Cards Cleared");
     }
 
     /*

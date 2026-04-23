@@ -25,8 +25,8 @@ import static com.example.projectpoker.model.statistics.SkewNormalSampler.safeRo
 public class PokerApplication extends Application {
     @Override
     public void start(Stage stage) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(PokerApplication.class.getResource("hello-view.fxml"));
-        Scene scene = new Scene(fxmlLoader.load(), 320, 240);
+        FXMLLoader fxmlLoader = new FXMLLoader(PokerApplication.class.getResource("poker-round-view.fxml"));
+        Scene scene = new Scene(fxmlLoader.load(), 1025, 450);
 
         // TODO implement stylesheet for welcome to app screen
         // String stylesheet = HelloApplication.class.getResource("welcome-stylesheet.css").toExternalForm();
@@ -61,16 +61,20 @@ public class PokerApplication extends Application {
         RoundController controller = (RoundController) loadPokerGameView(game);
 
         PlayerStatusChangeHandler playerHandler = new PlayerStatusChangeHandler(controller);
-        RoundStatusChangeHandler roundHandler = new RoundStatusChangeHandler(controller);
+
+
+        RoundStatusChangeHandler roundHandler = new RoundStatusChangeHandler(controller, game);
         GameStatusChangeHandler gameHandler = new GameStatusChangeHandler(controller);
 
         game.setRoundHandler(roundHandler);
         game.addPropertyChangeListener(gameHandler);
-        game.init();
+
 
         Round currentRound = game.getRound();
+        controller.setGame(game);
         controller.setRound(currentRound,user);
-
+        game.init();
+        game.start();
         ArrayList<AiPlayer> AiPlayers = game.getAiPlayers();
         user.addPropertyChangeListener(playerHandler);
         for (AiPlayer p : AiPlayers) p.addPropertyChangeListener(playerHandler);

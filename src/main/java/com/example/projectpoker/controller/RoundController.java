@@ -11,6 +11,7 @@ import com.example.projectpoker.model.game.enums.RoundStatus;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.layout.Pane;
 
 import java.util.ArrayList;
 
@@ -26,11 +27,16 @@ public class RoundController implements RoundViewUpdater {
     @FXML private Button toCallButton;
     @FXML private Button allInButton;
     @FXML private Button foldButton;
+    @FXML private Pane tablePane;
+    private PokerGameUI pokerUI = new PokerGameUI();
+    @FXML public void initialize() {
 
+        pokerUI.setTablePane(tablePane);
+
+    }
     private Game game;
     private Round round;
     private Player userPlayer;
-    private PokerGameUI pokerUI;
 
     public void setUI(PokerGameUI pokerUI)
     {
@@ -48,9 +54,13 @@ public class RoundController implements RoundViewUpdater {
     }
 
     private void updateRoundCounterLabel() {
-        roundCounterLabel.setText(game.getNumRoundsLeft() + " rounds left.");
-    }
 
+        if (game == null) return;
+
+        roundCounterLabel.setText(
+                game.getNumRoundsLeft() + " rounds left."
+        );
+    }
 
 
     @Override
@@ -105,11 +115,11 @@ public class RoundController implements RoundViewUpdater {
         Platform.runLater(() -> phaseLabel.setText("Phase: " + phase));
         if (round.getRoundStatus().equals(RoundStatus.DEAL)) {
 
-            pokerUI.displayCards(pokerUI.getRoot(), userPlayer.getPlayerHand().getCards(), TablePosition.PlayerPos, true);
+            pokerUI.displayCards(userPlayer.getPlayerHand().getCards(), TablePosition.PlayerPos, true);
             for(int i = 1; i<game.getPlayers().size(); i++) {
                 Player AI = game.getPlayers().get(i);
                 if (AI.getAction() != Action.FOLD) {
-                    pokerUI.displayCards(pokerUI.getRoot(), AI.getPlayerHand().getCards(), TablePosition.PosList.get(i), false);
+                    pokerUI.displayCards(AI.getPlayerHand().getCards(), TablePosition.PosList.get(i), false);
                 }
             }
 
@@ -118,7 +128,7 @@ public class RoundController implements RoundViewUpdater {
 
     @Override
     public void onCommunityCardsChanged(ArrayList<Card> newCC,ArrayList<Card> oldCC) {
-        pokerUI.displayCards(pokerUI.getRoot(), newCC, TablePosition.BoardPos, true);
+        pokerUI.displayCards(newCC, TablePosition.BoardPos, true);
 
         /* Leaving this commented out in case you wanted it available for testing
         for (Card c : newCC) {
@@ -135,19 +145,40 @@ public class RoundController implements RoundViewUpdater {
 
     @Override
     public void onGameStatusChanged(GameStatus gameStatus) {
-        switch(gameStatus){
-            case GameStatus.INITIALISED:
-                if (!round.getRoundStatus().equals(RoundStatus.UNINITIALISED)) {
-                    throw new IllegalArgumentException("Round must be unInitialised when game is uninitialised");
+
+        switch (gameStatus) {
+
+            case INITIALISED:
+
+                // Ensure round exists before using it
+                if (round == null) {
+
+                    if (game != null) {
+                        setRound(game.getRound(), game.getUser());
+                    }
+
+                    return;
                 }
-                setRound(game.getRound(), game.getUser());
+
+                if (!round.getRoundStatus()
+                        .equals(RoundStatus.UNINITIALISED)) {
+
+                    throw new IllegalArgumentException(
+                            "Round must be unInitialised when game is uninitialised"
+                    );
+                }
+
                 reset();
-            case GameStatus.RUNNING:
+                break;
+
+            case RUNNING:
                 // Animation for blinds
-            case GameStatus.ENDED:
+                break;
+
+            case ENDED:
                 var gameLog = game.getGameLog();
-                // Animation ending whole game.
-                // Launch UI for post game stats.
+                // TODO post-game UI
+                break;
         }
     }
 

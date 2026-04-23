@@ -1,37 +1,33 @@
 package com.example.projectpoker;
 
-import com.example.projectpoker.controller.RoundController;
+import com.example.projectpoker.model.game.Card;
 import com.example.projectpoker.model.game.TablePosition;
-import javafx.application.Application;
 import javafx.geometry.Rectangle2D;
-import javafx.scene.Scene;
-import javafx.scene.layout.Pane;
-import javafx.stage.Stage;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.Pane;
+
 import java.util.List;
 
-import com.example.projectpoker.model.game.Card;
-
-import static com.example.projectpoker.model.game.Card.*;
 import static com.example.projectpoker.model.game.TablePosition.*;
 
-public class PokerGameUI extends Application {
+public class PokerGameUI {
+
     private static final double CARD_WIDTH = 50;
-    private Pane root;
-    public Pane getRoot() {
-        return root;
+
+    private Pane tablePane;
+
+    /*
+     * Controller injects the Pane from FXML
+     */
+    public void setTablePane(Pane tablePane) {
+        this.tablePane = tablePane;
+        initialiseTable();
     }
 
-
-    @Override
-    public void start(Stage stage) {
-        root = new Pane();
-        Scene scene = new Scene(root, 800, 500);
-        stage.setTitle("Poker Game");
-        stage.setScene(scene);
-        stage.show();
-    }
+    /*
+     * Load images safely
+     */
     private Image loadImage(String path) {
 
         var resource = PokerGameUI.class.getResource(path);
@@ -45,65 +41,117 @@ public class PokerGameUI extends Application {
         return new Image(resource.toExternalForm());
     }
 
-    private void displayTable(Pane root) {
-        Image tableImage = loadImage("/com/example/projectpoker/Images/Poker_Board.png");
+    /*
+     * Draw static table elements
+     */
+    private void initialiseTable() {
+
+        if (tablePane == null) return;
+
+        tablePane.getChildren().clear();
+
+        displayTable();
+        displayDeck(DeckPos);
+        displayFolded(FoldedPos);
+    }
+
+    /*
+     * Public reset method
+     */
+    public void clearCards() {
+        initialiseTable();
+    }
+
+    /*
+     * TABLE
+     */
+    private void displayTable() {
+
+        Image tableImage =
+                loadImage("/com/example/projectpoker/Images/Poker_Board.png");
 
         ImageView tableView = new ImageView(tableImage);
+
         tableView.setFitWidth(800);
         tableView.setPreserveRatio(true);
 
-        root.getChildren().add(tableView);
+        tablePane.getChildren().add(tableView);
     }
 
-    private void displayFolded(Pane root, TablePosition position){
+    /*
+     * DECK
+     */
+    private void displayDeck(TablePosition position) {
 
-        ImageView Deck_Card_Back = new ImageView(loadImage("/com/example/projectpoker/Images/Back1.png"));
+        ImageView deckBottom =
+                new ImageView(loadImage(
+                        "/com/example/projectpoker/Images/Deck_Blank.png"
+                ));
 
-        Deck_Card_Back.setFitWidth(50);
-        Deck_Card_Back.setPreserveRatio(true);
-        Deck_Card_Back.setLayoutX(position.x);
-        Deck_Card_Back.setLayoutY(position.y);
-        Deck_Card_Back.setRotate(position.rotation);
+        ImageView cardBack =
+                new ImageView(loadImage(
+                        "/com/example/projectpoker/Images/Back1.png"
+                ));
 
-        root.getChildren().add(Deck_Card_Back);
+        deckBottom.setFitWidth(52);
+        deckBottom.setPreserveRatio(true);
+        deckBottom.setLayoutX(position.x);
+        deckBottom.setLayoutY(position.y);
+        deckBottom.setRotate(position.rotation);
 
+        cardBack.setFitWidth(50);
+        cardBack.setPreserveRatio(true);
+        cardBack.setLayoutX(position.x + position.spacingX);
+        cardBack.setLayoutY(position.y + position.spacingY);
+        cardBack.setRotate(position.rotation);
+
+        tablePane.getChildren().add(deckBottom);
+        tablePane.getChildren().add(cardBack);
     }
 
-    private void displayDeck(Pane root, TablePosition position){
+    /*
+     * FOLDED PILE
+     */
+    private void displayFolded(TablePosition position) {
 
-        ImageView Deck_Bottom = new ImageView(loadImage("/com/example/projectpoker/Images/Deck_Blank.png"));
-        ImageView Deck_Card_Back = new ImageView(loadImage("/com/example/projectpoker/Images/Back1.png"));
+        ImageView cardBack =
+                new ImageView(loadImage(
+                        "/com/example/projectpoker/Images/Back1.png"
+                ));
 
-        Deck_Bottom.setFitWidth(52);
-        Deck_Bottom.setPreserveRatio(true);
-        Deck_Bottom.setLayoutX(position.x);
-        Deck_Bottom.setLayoutY(position.y);
-        Deck_Bottom.setRotate(position.rotation);
-        Deck_Card_Back.setFitWidth(50);
-        Deck_Card_Back.setPreserveRatio(true);
-        Deck_Card_Back.setLayoutX(position.x + position.spacingX);
-        Deck_Card_Back.setLayoutY(position.y + position.spacingY);
-        Deck_Card_Back.setRotate(position.rotation);
+        cardBack.setFitWidth(50);
+        cardBack.setPreserveRatio(true);
+        cardBack.setLayoutX(position.x);
+        cardBack.setLayoutY(position.y);
+        cardBack.setRotate(position.rotation);
 
-        root.getChildren().add(Deck_Bottom);
-        root.getChildren().add(Deck_Card_Back);
-
+        tablePane.getChildren().add(cardBack);
     }
 
+    /*
+     * CARDS
+     */
+    public void displayCards(
+            List<Card> cards,
+            TablePosition position,
+            boolean revealed
+    ) {
 
-    public void displayCards(Pane root, List<Card> cards, TablePosition position, boolean revealed) {
+        if (tablePane == null) return;
 
         for (int i = 0; i < cards.size(); i++) {
+
             Card card = cards.get(i);
 
             Image img;
-            if (revealed)
-            {
+
+            if (revealed) {
                 img = loadImage(card.getCardImagePath());
             }
-            else
-            {
-                img = loadImage("/com/example/projectpoker/Images/Back1.png");
+            else {
+                img = loadImage(
+                        "/com/example/projectpoker/Images/Back1.png"
+                );
             }
 
             ImageView view = new ImageView(img);
@@ -111,24 +159,29 @@ public class PokerGameUI extends Application {
             double width = img.getWidth();
             double height = img.getHeight();
 
-            view.setViewport(new Rectangle2D(0, 0, width, height * position.vScale));
+            view.setViewport(
+                    new Rectangle2D(
+                            0,
+                            0,
+                            width,
+                            height * position.vScale
+                    )
+            );
 
             view.setFitWidth(CARD_WIDTH);
             view.setPreserveRatio(true);
 
-            view.setLayoutX(position.x + i * position.spacingX);
-            view.setLayoutY(position.y + i * position.spacingY);
+            view.setLayoutX(
+                    position.x + i * position.spacingX
+            );
+
+            view.setLayoutY(
+                    position.y + i * position.spacingY
+            );
+
             view.setRotate(position.rotation);
 
-            root.getChildren().add(view);
-
+            tablePane.getChildren().add(view);
         }
-    }
-
-    public void clearCards() {
-        root.getChildren().clear();
-        displayTable(root);
-        displayDeck(root, DeckPos);
-        displayFolded(root, FoldedPos);
     }
 }

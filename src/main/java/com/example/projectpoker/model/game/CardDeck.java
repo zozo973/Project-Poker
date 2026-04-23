@@ -42,6 +42,7 @@ public class CardDeck {
         Card c = cardDeck.getFirst();
         cardDeck.removeFirst();
         drawnCards.add(c);
+        System.out.println(c.getCardImagePath()); //Here for testing
         return c;
     }
 

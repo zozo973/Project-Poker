@@ -2,6 +2,7 @@ package com.example.projectpoker.handler;
 
 import com.example.projectpoker.controller.RoundViewUpdater;
 import com.example.projectpoker.model.game.Card;
+import com.example.projectpoker.model.game.Game;
 import com.example.projectpoker.model.game.Round;
 import com.example.projectpoker.model.game.enums.RoundStatus;
 
@@ -9,11 +10,17 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 
+
+
 public class RoundStatusChangeHandler implements PropertyChangeListener {
     private final RoundViewUpdater viewUpdater;
-
-    public RoundStatusChangeHandler(RoundViewUpdater viewUpdater) {
+    private final Game game;
+    public RoundStatusChangeHandler(
+            RoundViewUpdater viewUpdater,
+            Game game
+    ) {
         this.viewUpdater = viewUpdater;
+        this.game = game;
     }
 
     @Override
@@ -29,13 +36,23 @@ public class RoundStatusChangeHandler implements PropertyChangeListener {
     }
 
     private void executeStateUpdate(PropertyChangeEvent evt) {
-        switch(evt.getNewValue()) {
-       //     case RoundStatus.END -> viewUpdater.
-            default -> viewUpdater.onRoundStatusChanged((String) evt.getNewValue());
+
+        RoundStatus status =
+                (RoundStatus) evt.getNewValue();
+
+        switch (status) {
+
+            case END -> {
+                viewUpdater.onRoundStatusChanged(status.name());
+
+                game.onRoundEnded();
+            }
+
+            default ->
+                    viewUpdater.onRoundStatusChanged(status.name());
         }
-
-
+    }
 
     }
 
-}
+

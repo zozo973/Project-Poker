@@ -8,12 +8,10 @@ import java.util.Collections;
 
 public class CardDeck {
 
-    private ArrayList<Card> cardDeck;
-    private ArrayList<Card> drawnCards;
+    private final ArrayList<Card> cardDeck;
 
     public CardDeck() {
-        drawnCards = new ArrayList<>();
-        cardDeck = new ArrayList<Card>(Suit.values().length * Rank.values().length);
+        cardDeck = new ArrayList<>(52);
         reset();
     }
 
@@ -23,7 +21,6 @@ public class CardDeck {
 
     public void reset() {
         cardDeck.clear();
-        drawnCards.clear();
         for (Suit s : Suit.values()) {
             for (Rank r : Rank.values()) {
                 Card c = new Card(s,r);
@@ -41,15 +38,12 @@ public class CardDeck {
         if (cardDeck.isEmpty()) { return null; }
         Card c = cardDeck.getFirst();
         cardDeck.removeFirst();
-        drawnCards.add(c);
-        System.out.println(c.getCardImagePath()); //Here for testing
         return c;
     }
 
     public void burnCard() {
-        Card c = cardDeck.getFirst();
         cardDeck.removeFirst();
-        drawnCards.add(c);
+
     }
 }
 

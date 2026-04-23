@@ -3,7 +3,6 @@ package com.example.projectpoker.handler;
 import com.example.projectpoker.controller.RoundViewUpdater;
 import com.example.projectpoker.model.game.Card;
 import com.example.projectpoker.model.game.Game;
-import com.example.projectpoker.model.game.Round;
 import com.example.projectpoker.model.game.enums.RoundStatus;
 
 import java.beans.PropertyChangeEvent;
@@ -42,23 +41,21 @@ public class RoundStatusChangeHandler implements PropertyChangeListener {
 
         // Always update phase label
         viewUpdater.onRoundStatusChanged(status.name());
-
         switch (status) {
 
-            case DEAL,
-                 BETTING1 -> viewUpdater.onDealCards();
+            case UNINITIALISED ->
+                    viewUpdater.onRoundStarted();
+
+            case DEAL ->
+                    viewUpdater.onDealCards();
 
             case FLOP,
                  TURN,
                  RIVER ->
                     viewUpdater.onCommunityCardsChanged(
-                            null,
+                            game.getRound().getCommunityCards(),
                             null
                     );
-
-            case END -> {
-                // future logic
-            }
         }
     }
 }

@@ -17,17 +17,11 @@ public class PokerGameUI {
 
     private Pane tablePane;
 
-    /*
-     * Controller injects the Pane from FXML
-     */
     public void setTablePane(Pane tablePane) {
         this.tablePane = tablePane;
         initialiseTable();
     }
 
-    /*
-     * Load images safely
-     */
     private Image loadImage(String path) {
 
         var resource = PokerGameUI.class.getResource(path);
@@ -41,9 +35,6 @@ public class PokerGameUI {
         return new Image(resource.toExternalForm());
     }
 
-    /*
-     * Draw static table elements
-     */
     private void initialiseTable() {
 
         if (tablePane == null) return;
@@ -55,17 +46,10 @@ public class PokerGameUI {
         displayFolded(FoldedPos);
     }
 
-    /*
-     * Public reset method
-     */
     public void clearCards() {
         initialiseTable();
-        System.out.println("Cards Cleared");
     }
 
-    /*
-     * TABLE
-     */
     private void displayTable() {
 
         Image tableImage =
@@ -76,12 +60,10 @@ public class PokerGameUI {
         tableView.setFitWidth(800);
         tableView.setPreserveRatio(true);
 
+
         tablePane.getChildren().add(tableView);
     }
 
-    /*
-     * DECK
-     */
     private void displayDeck(TablePosition position) {
 
         ImageView deckBottom =
@@ -108,11 +90,10 @@ public class PokerGameUI {
 
         tablePane.getChildren().add(deckBottom);
         tablePane.getChildren().add(cardBack);
+
+
     }
 
-    /*
-     * FOLDED PILE
-     */
     private void displayFolded(TablePosition position) {
 
         ImageView cardBack =
@@ -129,15 +110,7 @@ public class PokerGameUI {
         tablePane.getChildren().add(cardBack);
     }
 
-    /*
-     * CARDS
-     */
-    public void displayCards(
-            List<Card> cards,
-            TablePosition position,
-            boolean revealed
-    ) {
-
+    public void displayCards(List<Card> cards, TablePosition position, boolean revealed){
         if (tablePane == null) return;
 
         for (int i = 0; i < cards.size(); i++) {
@@ -181,8 +154,10 @@ public class PokerGameUI {
             );
 
             view.setRotate(position.rotation);
-
+            view.toFront();
             tablePane.getChildren().add(view);
+
+
         }
     }
 }

@@ -101,12 +101,7 @@ public class RoundController implements RoundViewUpdater {
 
     @Override
     public void onAiTurnStarted() {
-        Platform.runLater(() -> {
-            toCallButton.setDisable(true);
-            betButton.setDisable(true);
-            allInButton.setDisable(true);
-            foldButton.setDisable(true);
-        });
+        Platform.runLater(this::disableActionButtons);
     }
 
     @Override
@@ -289,4 +284,56 @@ public class RoundController implements RoundViewUpdater {
         if (current > maxBet) current = maxBet;
         betSlider.setValue(current);
     }
+
+    @FXML
+    private void handleCall() {
+        //TODO figure out where this is stored and fix it
+        userPlayer.setActiveBet(100);
+        submitPlayerAction(Action.CALL, round.getToPlay());
+        disableActionButtons();
+    }
+    @FXML
+    private void handleRaise() {
+        int raiseAmount = (int) betSlider.getValue();
+        userPlayer.setActiveBet(userPlayer.getActiveBet() + raiseAmount);
+        submitPlayerAction(Action.RAISE, raiseAmount);
+        disableActionButtons();
+    }
+    @FXML
+    private void handleFold() {
+        submitPlayerAction(Action.FOLD,0);
+        disableActionButtons();
+    }
+    @FXML
+    private void handleAllIn() {
+        userPlayer.setActiveBet(userPlayer.getBalance());
+        submitPlayerAction(Action.ALLIN, userPlayer.getBalance());
+        disableActionButtons();
+    }
+    private void disableActionButtons() {
+
+        toCallButton.setDisable(true);
+        betButton.setDisable(true);
+        foldButton.setDisable(true);
+        allInButton.setDisable(true);
+    }
+
+    private void submitPlayerAction(Action action, int amount) {
+
+        if (userPlayer == null) return;
+
+        userPlayer.setAction(action);
+        userPlayer.setActiveBet(amount);
+
+        System.out.println("Action submitted: " + action + " amount=" + amount
+        );
+
+        // Release the betting loop
+        userPlayer.setIsTurn(false);
+
+        round.recordPlayerAction(userPlayer);
+
+        round.checkBetType();
+    }
+
 }

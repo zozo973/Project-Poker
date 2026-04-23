@@ -59,7 +59,7 @@
 
             <Label text="Coach / Chat Window"/>
 
-            <TextArea prefHeight="400"
+            <TextArea prefHeight="300"
                       editable="false"
                       wrapText="true"/>
 
@@ -88,19 +88,23 @@
 
                 <Button fx:id="toCallButton"
                         text="Check / Call"
-                        prefWidth="120"/>
+                        prefWidth="120"
+                        onAction="#handleCall"/>
 
                 <Button fx:id="betButton"
                         text="Raise"
-                        prefWidth="120"/>
+                        prefWidth="120"
+                        onAction="#handleRaise"/>
 
                 <Button fx:id="foldButton"
                         text="Fold"
-                        prefWidth="120"/>
+                        prefWidth="120"
+                        onAction="#handleFold"/>
 
                 <Button fx:id="allInButton"
                         text="All In"
-                        prefWidth="120"/>
+                        prefWidth="120"
+                        onAction="#handleAllIn"/>
 
             </HBox>
 

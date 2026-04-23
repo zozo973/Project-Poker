@@ -399,38 +399,6 @@ public class Round {
         }
     }
 
-    public void continueRound() {
-
-        checkBetType();
-
-        advanceRoundState();
-    }
-    private void advanceRoundState() {
-
-        switch (roundStatus) {
-
-            case BETTING1 -> {
-                setRoundStatus(RoundStatus.FLOP);
-                deal2Table();
-                setRoundStatus(RoundStatus.BETTING2);
-            }
-
-            case BETTING2 -> {
-                setRoundStatus(RoundStatus.TURN);
-                deal2Table();
-                setRoundStatus(RoundStatus.BETTING3);
-            }
-
-            case BETTING3 -> {
-                setRoundStatus(RoundStatus.RIVER);
-                deal2Table();
-                setRoundStatus(RoundStatus.SHOWDOWN);
-            }
-
-            case SHOWDOWN -> end();
-        }
-    }
-
     public void removeForfeited() {
         for (Player p : this.players) {
             if (p.getAction().equals(Action.FORFEIT)) {

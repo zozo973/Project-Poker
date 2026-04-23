@@ -1,8 +1,12 @@
 package com.example.projectpoker;
 
 import com.example.projectpoker.model.*;
+import com.example.projectpoker.model.game.Card;
+import com.example.projectpoker.model.game.enums.Action;
+import com.example.projectpoker.model.game.Card.*;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import javafx.stage.Stage;
 
 import java.net.URI;
 import java.net.http.*;
@@ -10,6 +14,8 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
+
+import static com.example.projectpoker.model.game.Card.*;
 
 
 public class AiCoaching {
@@ -113,8 +119,7 @@ public class AiCoaching {
                     "RISKY mode: Aim for the biggest benefit. Be aggressive, look for opportunities to bluff or BET heavily to maximize the pot size, even with marginal hands.";
             case SAFE ->
                     "SAFE mode: Aim to minimize losses. Play very conservatively, FOLD if facing aggression without a strong hand, and prioritize protecting your chip stack.";
-            case NORMAL ->
-                    "NORMAL mode: Play a balanced, standard Game Theory Optimal (GTO) style.";
+            case NORMAL -> "NORMAL mode: Play a balanced, standard Game Theory Optimal (GTO) style.";
         };
 
         return String.format("""
@@ -145,7 +150,7 @@ public class AiCoaching {
         return sb.toString();
     }
 
-
+/*
     // For Test API connection ----------------------------------------------------------------------------------------
     public static void main(String[] args) {
         System.out.println("Preparing 3 different test for Ai Coaching...\n");
@@ -161,31 +166,16 @@ public class AiCoaching {
         // Test 2: test the situation when user get the great cards
         System.out.println("-------------------------------------------------");
         System.out.println("Test 2 ：A pair of Ace + 'RISKY' Mode");
-        Card[] strongHand = {
-                new Card(com.example.projectpoker.model.Suit.SPADES, com.example.projectpoker.model.Rank.ACE),
-                new Card(com.example.projectpoker.model.Suit.HEARTS, com.example.projectpoker.model.Rank.ACE)
-        };
-        Card[] flopBoard = {
-                new Card(com.example.projectpoker.model.Suit.CLUBS, com.example.projectpoker.model.Rank.TWO),
-                new Card(com.example.projectpoker.model.Suit.DIAMONDS, com.example.projectpoker.model.Rank.FIVE),
-                new Card(com.example.projectpoker.model.Suit.SPADES, com.example.projectpoker.model.Rank.NINE)
-        };
+        Card[] strongHand = {SA,HA};
+        Card[] flopBoard = {C2,D5,S9};
         AiAdvice advice2 = coach.getAdvice(strongHand, flopBoard, Stage.FLOP, AiAdviceMode.RISKY);
         printResult(advice2);
 
         // Test 3: test the situation when user get the bad cards
         System.out.println("-------------------------------------------------");
         System.out.println("Test 3：2(Hearts) & 7(Clubs) + 'SAFE' Mode");
-        Card[] weakHand = {
-                new Card(com.example.projectpoker.model.Suit.HEARTS, com.example.projectpoker.model.Rank.TWO),
-                new Card(com.example.projectpoker.model.Suit.CLUBS, com.example.projectpoker.model.Rank.SEVEN)
-        };
-        Card[] turnBoard = {
-                new Card(com.example.projectpoker.model.Suit.DIAMONDS, com.example.projectpoker.model.Rank.ACE),
-                new Card(com.example.projectpoker.model.Suit.HEARTS, com.example.projectpoker.model.Rank.KING),
-                new Card(com.example.projectpoker.model.Suit.SPADES, com.example.projectpoker.model.Rank.QUEEN),
-                new Card(com.example.projectpoker.model.Suit.CLUBS, com.example.projectpoker.model.Rank.JACK)
-        };
+        Card[] weakHand = {H2,C7};
+        Card[] turnBoard = {DA,HK,SQ,CJ};
         AiAdvice advice3 = coach.getAdvice(weakHand, turnBoard, Stage.TURN, AiAdviceMode.SAFE);
         printResult(advice3);
 
@@ -200,9 +190,9 @@ public class AiCoaching {
             System.out.println("Reason: " + advice.reason + "\n");
         }
     }
+
+
+
+*/
 }
-
-
-
-
 

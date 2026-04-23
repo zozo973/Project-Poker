@@ -1,7 +1,6 @@
 package com.example.projectpoker.controller;
 
 import com.example.projectpoker.PokerGameUI;
-import com.example.projectpoker.model.Hand;
 import com.example.projectpoker.model.game.*;
 import com.example.projectpoker.model.game.TablePosition;
 import com.example.projectpoker.model.game.enums.Action;
@@ -28,19 +27,14 @@ public class RoundController implements RoundViewUpdater {
     @FXML private Button allInButton;
     @FXML private Button foldButton;
     @FXML private Pane tablePane;
-    private PokerGameUI pokerUI = new PokerGameUI();
-    @FXML public void initialize() {
-
-        pokerUI.setTablePane(tablePane);
-
-    }
+    private PokerGameUI pokerUI;
     private Game game;
     private Round round;
     private Player userPlayer;
 
-    public void setUI(PokerGameUI pokerUI)
-    {
+    public void setUI(PokerGameUI pokerUI) {
         this.pokerUI = pokerUI;
+        pokerUI.setTablePane(tablePane);
     }
 
     public void setGame(Game game) {
@@ -75,12 +69,18 @@ public class RoundController implements RoundViewUpdater {
 
             }
         });
-    System.out.println("Cards Rendered");
     }
     public void setRound(Round round, Player userPlayer) {
         this.round = round;
         this.userPlayer = userPlayer;
         refreshAll();
+    }
+
+    @Override
+    public void onRoundStarted() {
+        Platform.runLater(() -> {
+            pokerUI.clearCards();
+        });
     }
 
     private void updateRoundCounterLabel() {
@@ -91,7 +91,6 @@ public class RoundController implements RoundViewUpdater {
                 game.getNumRoundsLeft() + " rounds left."
         );
     }
-
 
     @Override
     public void onUserTurnStarted() {
@@ -146,7 +145,6 @@ public class RoundController implements RoundViewUpdater {
         );
     }
 
-
     @Override
     public void onCommunityCardsChanged(ArrayList<Card> newCC,ArrayList<Card> oldCC) {
 
@@ -189,7 +187,7 @@ public class RoundController implements RoundViewUpdater {
                 break;
 
             case ENDED:
-                var gameLog = game.getGameLog();
+                //var gameLog = game.getGameLog();
                 // TODO post-game UI
                 break;
         }
@@ -202,15 +200,18 @@ public class RoundController implements RoundViewUpdater {
 
     @Override
     public void onPlayerChange(ArrayList<Player> newPlayers, ArrayList<Player> oldPlayers) {
+        /*
         for (Player oP : oldPlayers) {
             if (!newPlayers.contains(oP)) {
                 // remove player oP from ui as they have left the game;
             }
-        }
+        }*/
+
     }
 
     @Override
     public void onPlayerActionChange(Action action) {
+        /*
         if (Action.isBet(action)) {
             // Ui annimation/methods for adding money to pot
         } else if (Action.hasFolded(action)) {
@@ -218,6 +219,7 @@ public class RoundController implements RoundViewUpdater {
         } else if (action.equals(Action.CALL)) {
             // Animation of double tap on table.
         }
+        */
     }
 
     @Override

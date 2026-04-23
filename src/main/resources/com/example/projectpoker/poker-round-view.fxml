@@ -2,7 +2,6 @@
 
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.control.*?>
-<?import javafx.geometry.*?>
 
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
@@ -22,9 +21,9 @@
 
         <StackPane>
 
-            <Pane fx:id="tablePane"
-                  prefWidth="800"
-                  prefHeight="500"/>
+            <AnchorPane fx:id="tablePane"
+                        minWidth="600"
+                        minHeight="400"/>
 
             <VBox alignment="TOP_LEFT"
                   spacing="5"

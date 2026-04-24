@@ -1,6 +1,8 @@
 package com.example.projectpoker.model.game;
 
+import com.example.projectpoker.database.DatabaseManager;
 import com.example.projectpoker.handler.RoundStatusChangeHandler;
+import com.example.projectpoker.model.User;
 import com.example.projectpoker.model.game.enums.Action;
 import com.example.projectpoker.model.game.enums.Difficulty;
 import com.example.projectpoker.model.game.enums.GameStatus;
@@ -28,9 +30,14 @@ public class Game {
     private final int whenIncreaseBlinds;
     private final Difficulty difficulty;
     private int numPlayers;
+    private final int userBuyIn;
     private Round round;
     private ArrayList<ArrayList<RoundLogEntry>> GameLog;
     private RoundStatusChangeHandler roundHandler;
+    private final int startingUserBalance;
+    private int handsPlayed;
+    private final User userProfile;
+    private int gameSessionId;
 
 
     // Constructor called when starting a new game of poker
@@ -44,16 +51,25 @@ public class Game {
     //
 
     public Game(Player user, int userBalance, int numPlayers, int initBlind, int whenIncreaseBlinds, int gameLength, Difficulty difficulty) {
+        this(user, null, userBalance, numPlayers, initBlind, whenIncreaseBlinds, gameLength, difficulty);
+    }
+
+    public Game(Player user, User userProfile, int userBalance, int numPlayers, int initBlind, int whenIncreaseBlinds, int gameLength, Difficulty difficulty) {
         this.players = new ArrayList<>();
         user.setBalance(userBalance);
         players.add(user);
         this.numPlayers = numPlayers;
+        this.userBuyIn = userBalance;
         this.difficulty = difficulty;
         this.blindSize = initBlind;
         this.whenIncreaseBlinds = whenIncreaseBlinds;
         this.gameLength = gameLength;
         this.numRoundsLeft = gameLength;
         this.GameLog = new ArrayList<>();
+        this.startingUserBalance = user.getBalance();
+        this.handsPlayed = 0;
+        this.userProfile = userProfile;
+        this.gameSessionId = -1;
     }
 
     public void addPropertyChangeListener(PropertyChangeListener listener) {
@@ -89,7 +105,7 @@ public class Game {
     }
 
     public void createNextRound() {
-        Round round = new Round(players,blindSize);
+        Round round = new Round(players, blindSize, gameSessionId, handsPlayed + 1);
         pcs.firePropertyChange("round",this.round,round);
         round.addPropertyChangeListener(roundHandler);
         setRound(round);
@@ -150,6 +166,7 @@ public class Game {
             ), new int[]{0, 1, 2}
           )
         );
+        this.gameSessionId = DatabaseManager.createGameSession(userProfile, this, getUser());
         setGameStatus(GameStatus.INITIALISED);
     }
 
@@ -163,6 +180,7 @@ public class Game {
             System.out.println(round.getRoundStatus());
             this.round.start();
             System.out.println(round.getRoundStatus());
+            this.handsPlayed++;
 
             // Loss Condition
             if (getUser().getBalance() == 0) { end(); break; }
@@ -197,8 +215,7 @@ public class Game {
 
     public void end() {
         setGameStatus(GameStatus.ENDED);
-        // TODO: save to database
-        //      update player balance & records
+        DatabaseManager.finalizeGameSession(gameSessionId, userProfile, this, getUser());
     }
 
     private ArrayList<Player> initAiPlayers(ArrayList<Player> players, int numPlayers, Difficulty difficulty) {
@@ -225,5 +242,33 @@ public class Game {
             setPlayers(activePlayers);
             this.numPlayers = activePlayers.size();
         }
+    }
+
+    public int getHandsPlayed() {
+        return handsPlayed;
+    }
+
+    public int getStartingUserBalance() {
+        return startingUserBalance;
+    }
+
+    public Difficulty getDifficulty() {
+        return difficulty;
+    }
+
+    public int getNumPlayers() {
+        return numPlayers;
+    }
+
+    public int getUserBuyIn() {
+        return userBuyIn;
+    }
+
+    public int getWhenIncreaseBlinds() {
+        return whenIncreaseBlinds;
+    }
+
+    public int getGameLength() {
+        return gameLength;
     }
 }

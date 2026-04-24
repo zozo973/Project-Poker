@@ -64,7 +64,7 @@ public class PokerApplication extends Application {
 
         int blind = safeRoundToInt((userBuyIn*0.03));
         int numPlayer = 4;
-        Game game = new Game(user,userBuyIn,4,blind,10,40, Difficulty.GAMBLINGADDICT);
+        Game game = new Game(user, loggedInUser, userBuyIn, 4, blind, 10, 40, Difficulty.GAMBLINGADDICT);
 
         RoundController controller = (RoundController) loadPokerGameView(game);
 

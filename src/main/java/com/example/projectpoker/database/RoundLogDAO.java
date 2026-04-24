@@ -1,7 +1,7 @@
 package com.example.projectpoker.database;
 
-import com.example.projectpoker.model.game.GameLogEntry;
 import com.example.projectpoker.model.game.Round;
+import com.example.projectpoker.model.game.RoundLogEntry;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -101,7 +101,10 @@ public class RoundLogDAO {
                 """;
         try (PreparedStatement statement = connection.prepareStatement(actionSql)) {
             int actionOrder = 1;
-            for (GameLogEntry entry : round.getRoundLog()) {
+            if (round.getRoundLog() == null) {
+                return;
+            }
+            for (RoundLogEntry entry : round.getRoundLog()) {
                 statement.setInt(1, roundLogId);
                 statement.setInt(2, actionOrder++);
                 statement.setString(3, entry.getPlayerName());

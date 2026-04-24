@@ -1,5 +1,6 @@
 package com.example.projectpoker.model.game;
 
+import com.example.projectpoker.database.DatabaseManager;
 import com.example.projectpoker.model.game.enums.Action;
 import com.example.projectpoker.model.game.enums.BetType;
 import com.example.projectpoker.model.game.enums.RoundStatus;
@@ -7,6 +8,7 @@ import com.example.projectpoker.model.game.enums.RoundStatus;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 import static com.example.projectpoker.model.game.PotUtil.*;
 
@@ -31,7 +33,11 @@ public class Round {
     private final ArrayList<Player> players;
     private final ArrayList<Integer> turnOrder;
 
-    public Round(ArrayList<Player> players, int blindSize) {
+    private final int gameSessionId;
+    private final int roundNumber;
+    private boolean persisted;
+
+    public Round(ArrayList<Player> players, int blindSize, int gameSessionId, int roundNumber) {
         this.roundStatus = RoundStatus.UNINITIALISED;
         this.players = players;
         this.toPlay = blindSize;
@@ -42,6 +48,9 @@ public class Round {
         this.pots.add(new Pot(players));
         this.turnOrder = new ArrayList<>();
         this.betType = BetType.NORMAL;
+        this.gameSessionId = gameSessionId;
+        this.roundNumber = roundNumber;
+        this.persisted = false;
     }
 
     public void addPropertyChangeListener(PropertyChangeListener listener) {
@@ -427,5 +436,21 @@ public class Round {
                 this.numPlayers--;
             }
         }
+    }
+
+    public int getRoundNumber() {
+        return roundNumber;
+    }
+
+    public String getCommunityCardsAsString() {
+        return communityCards.stream()
+                .map(Card::toString)
+                .collect(Collectors.joining(","));
+    }
+
+    public String getRemainingPlayersAsString() {
+        return players.stream()
+                .map(Player::getName)
+                .collect(Collectors.joining(","));
     }
 }

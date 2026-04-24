@@ -58,4 +58,29 @@ public class RoundLogEntry {
     }
 
     public String getEntryDescription() { return this.entryDescription; }
+
+    public String displayGameLogEntry(){
+        String str;
+        if (action == Action.RAISE) str = " by " + Integer.toString(betSize - toCall) + "dollars.";
+        else if (action == Action.CALL) str = Integer.toString(toCall) + "dollars to play.";
+        else { str = "."; }
+        String potDescription = currentPot == null ? "" : " The current Pot is now at " + currentPot.getPotSize() + " dollars.";
+        return (String) player.getName() + "decided to" + action.getDescription() + str + potDescription;
+    }
+
+    public String getPlayerName() {
+        return player.getName();
+    }
+
+    public int getBetSize() {
+        return betSize;
+    }
+
+    public int getToCall() {
+        return toCall;
+    }
+
+    public Action getAction() {
+        return action;
+    }
 }

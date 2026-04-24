@@ -112,8 +112,7 @@ public class Game {
     }
 
     public void createNextRound() {
-        // Round round = new Round(players, blindSize, gameSessionId, handsPlayed + 1);
-        Round round = new Round(players, blindSize);
+        Round round = new Round(players, blindSize, gameSessionId, handsPlayed + 1);
         pcs.firePropertyChange("round",this.round,round);
         round.addPropertyChangeListener(roundHandler);
         setRound(round);

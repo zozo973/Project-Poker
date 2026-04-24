@@ -1,11 +1,11 @@
 package com.example.projectpoker;
 
-import com.example.projectpoker.model.*;
+import com.example.projectpoker.model.game.Card;
+import com.example.projectpoker.model.game.enums.*;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
 import java.net.URI;
-import java.net.http.*;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -28,13 +28,13 @@ public class AiCoaching {
     // Main Feature; Send (User's hand cards / BoardCards / Stage / Advice Mode) to Gemini
     // Return (result.action / result.condifence / result.reason / result.errormsg)
     //-----
-    public AiAdvice getAdvice(Card[] handCards, Card[] boardCards, Stage stage, AiAdviceMode mode) {
+    public AiAdvice getAdvice(Card[] handCards, Card[] boardCards, RoundStatus currentStatus, AiAdviceMode mode) {
         AiAdvice result = new AiAdvice();
 
         try {
             //prompt contact
             String systemPrompt = getSystemPrompt();
-            String userPrompt = getUserPrompt(handCards, boardCards, stage, mode);
+            String userPrompt = getUserPrompt(handCards, boardCards, currentStatus, mode);
 
             Gson gson = new Gson();
             String GsonSystemPrompt = gson.toJson(systemPrompt);
@@ -98,15 +98,17 @@ public class AiCoaching {
                 1. You must output ONLY pure JSON data. Do NOT include any Markdown formatting (e.g., no ```json).
                 2. Do not include any greetings, conversational text, or additional explanations outside the JSON.
                 3. The JSON must exactly contain the following three fields:
-                   - "action": Must be exactly one of the following: "FOLD", "CHECK", "CALL", "BET".
+                   - "action": Must be exactly one of the following: "FOLD", "CHECK", "CALL", "RAISE", "ALLIN".
                    - "confidence": An integer between 0 and 100 representing your confidence level.
                    - "reasoning": A brief, one-sentence explanation for your decision.
                 """;
     }
 
-    public String getUserPrompt(Card[] handCards, Card[] boardCards, Stage stage, AiAdviceMode mode) {
+    public String getUserPrompt(Card[] handCards, Card[] boardCards, RoundStatus currentStatus, AiAdviceMode mode) {
         String handStr = formatCards(handCards);
         String boardStr = formatCards(boardCards);
+        String aiStageStr = translateToAiStage(currentStatus);
+
 
         String styleInstructions = switch (mode) {
             case RISKY ->
@@ -125,7 +127,31 @@ public class AiCoaching {
                 Community Cards (Board): %s
                 
                 Based on the information above, provide your decision JSON.
-                """, stage.toString(), styleInstructions, handStr, boardStr);
+                """, aiStageStr, styleInstructions, handStr, boardStr);
+    }
+
+    // For New Stage(RoundStatus)
+    private String translateToAiStage(RoundStatus currentStatus) {
+        if (currentStatus == null) return "UNKNOWN STAGE";
+
+        switch (currentStatus) {
+            case BLINDS:
+            case DEAL:
+            case BETTING1:
+                return "PRE-FLOP";
+            case FLOP:
+            case BETTING2:
+                return "FLOP";
+            case TURN:
+            case BETTING3:
+                return "TURN";
+            case RIVER:
+            case SHOWDOWN:
+            case END:
+                return "RIVER";
+            default:
+                return "UNKNOWN STAGE";
+        }
     }
 
     //Change the card from array to text for the prompt input
@@ -155,38 +181,38 @@ public class AiCoaching {
         // Test 1: test Null situation
         System.out.println("-------------------------------------------------");
         System.out.println("Test 1：Null + 'Normal' Mode");
-        AiAdvice advice1 = coach.getAdvice(null, null, Stage.PREFLOP, AiAdviceMode.NORMAL);
+        AiAdvice advice1 = coach.getAdvice(null, null, RoundStatus.BETTING1, AiAdviceMode.NORMAL);
         printResult(advice1);
 
         // Test 2: test the situation when user get the great cards
         System.out.println("-------------------------------------------------");
         System.out.println("Test 2 ：A pair of Ace + 'RISKY' Mode");
         Card[] strongHand = {
-                new Card(com.example.projectpoker.model.Suit.SPADES, com.example.projectpoker.model.Rank.ACE),
-                new Card(com.example.projectpoker.model.Suit.HEARTS, com.example.projectpoker.model.Rank.ACE)
+                new Card(Suit.Spades, Rank.Ace),
+                new Card(Suit.Hearts, Rank.Ace)
         };
         Card[] flopBoard = {
-                new Card(com.example.projectpoker.model.Suit.CLUBS, com.example.projectpoker.model.Rank.TWO),
-                new Card(com.example.projectpoker.model.Suit.DIAMONDS, com.example.projectpoker.model.Rank.FIVE),
-                new Card(com.example.projectpoker.model.Suit.SPADES, com.example.projectpoker.model.Rank.NINE)
+                new Card(Suit.Clubs, Rank.Two),
+                new Card(Suit.Diamonds, Rank.Five),
+                new Card(Suit.Spades, Rank.Nine)
         };
-        AiAdvice advice2 = coach.getAdvice(strongHand, flopBoard, Stage.FLOP, AiAdviceMode.RISKY);
+        AiAdvice advice2 = coach.getAdvice(strongHand, flopBoard, RoundStatus.FLOP, AiAdviceMode.RISKY);
         printResult(advice2);
 
         // Test 3: test the situation when user get the bad cards
         System.out.println("-------------------------------------------------");
         System.out.println("Test 3：2(Hearts) & 7(Clubs) + 'SAFE' Mode");
         Card[] weakHand = {
-                new Card(com.example.projectpoker.model.Suit.HEARTS, com.example.projectpoker.model.Rank.TWO),
-                new Card(com.example.projectpoker.model.Suit.CLUBS, com.example.projectpoker.model.Rank.SEVEN)
+                new Card(Suit.Hearts, Rank.Two),
+                new Card(Suit.Clubs, Rank.Seven)
         };
         Card[] turnBoard = {
-                new Card(com.example.projectpoker.model.Suit.DIAMONDS, com.example.projectpoker.model.Rank.ACE),
-                new Card(com.example.projectpoker.model.Suit.HEARTS, com.example.projectpoker.model.Rank.KING),
-                new Card(com.example.projectpoker.model.Suit.SPADES, com.example.projectpoker.model.Rank.QUEEN),
-                new Card(com.example.projectpoker.model.Suit.CLUBS, com.example.projectpoker.model.Rank.JACK)
+                new Card(Suit.Diamonds, Rank.Ace),
+                new Card(Suit.Hearts, Rank.King),
+                new Card(Suit.Spades, Rank.Queen),
+                new Card(Suit.Clubs, Rank.Jack)
         };
-        AiAdvice advice3 = coach.getAdvice(weakHand, turnBoard, Stage.TURN, AiAdviceMode.SAFE);
+        AiAdvice advice3 = coach.getAdvice(weakHand, turnBoard, RoundStatus.TURN, AiAdviceMode.SAFE);
         printResult(advice3);
 
         System.out.println("-----Finish-----");

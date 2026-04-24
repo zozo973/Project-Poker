@@ -3,10 +3,37 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.control.*?>
 
-<AnchorPane xmlns="http://javafx.com/javafx"
+<BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="com.example.projectpoker.controller.RoundController"
-            prefHeight="400.0" prefWidth="600.0">
+            prefWidth="1000"
+            prefHeight="700">
+
+    <top>
+        <HBox spacing="20" alignment="CENTER_LEFT" style="-fx-padding: 10;">
+            <Label text="App Name"/>
+            <Label text="Profile Name"/>
+            <Label text="Settings / Options"/>
+        </HBox>
+    </top>
+
+    <center>
+
+        <StackPane>
+
+            <AnchorPane fx:id="tablePane"
+                        minWidth="600"
+                        minHeight="400"/>
+
+            <VBox alignment="TOP_LEFT"
+                  spacing="5"
+                  style="-fx-padding: 10;">
+
+                <Label fx:id="roundCounterLabel"
+                       text="Rounds Left"/>
+
+                <Label fx:id="phaseLabel"
+                       text="Phase"/>
 
                 <Label fx:id="potLabel"
                        text="Pot"/>

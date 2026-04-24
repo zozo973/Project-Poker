@@ -78,8 +78,9 @@ public class PokerApplication extends Application {
         Round currentRound = game.getRound();
         controller.setGame(game);
         controller.setRound(currentRound,user);
+
         game.init();
-        game.start();
+        //game.start();
         ArrayList<AiPlayer> AiPlayers = game.getAiPlayers();
         user.addPropertyChangeListener(playerHandler);
         for (AiPlayer p : AiPlayers) p.addPropertyChangeListener(playerHandler);

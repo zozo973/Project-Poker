@@ -10,12 +10,14 @@ import com.example.projectpoker.model.game.enums.RoundStatus;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 
 import java.util.ArrayList;
 
 public class RoundController implements RoundViewUpdater {
 
+    public BorderPane mainBorderPane;
     @FXML private Label roundCounterLabel;
     @FXML private Label balanceLabel;
     @FXML private Label potLabel;
@@ -26,6 +28,7 @@ public class RoundController implements RoundViewUpdater {
     @FXML private Button toCallButton;
     @FXML private Button allInButton;
     @FXML private Button foldButton;
+    @FXML private Button startGameButton;
     @FXML private Pane tablePane;
     private PokerGameUI pokerUI;
     private Game game;
@@ -35,6 +38,7 @@ public class RoundController implements RoundViewUpdater {
     public void setUI(PokerGameUI pokerUI) {
         this.pokerUI = pokerUI;
         pokerUI.setTablePane(tablePane);
+        disableActionButtons();
     }
 
     public void setGame(Game game) {
@@ -77,6 +81,7 @@ public class RoundController implements RoundViewUpdater {
     @Override
     public void onRoundStarted() {
         Platform.runLater(() -> pokerUI.clearCards());
+        disableActionButtons();
     }
 
     private void updateRoundCounterLabel() {
@@ -283,6 +288,13 @@ public class RoundController implements RoundViewUpdater {
         if (current < minBet) current = minBet;
         if (current > maxBet) current = maxBet;
         betSlider.setValue(current);
+    }
+
+    @FXML
+    private void onStartGameButton() {
+        game.start();
+        this.startGameButton.setVisible(false);
+
     }
 
     @FXML

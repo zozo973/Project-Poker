@@ -3,113 +3,126 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.control.*?>
 
-<BorderPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="com.example.projectpoker.controller.RoundController"
-            prefWidth="1000"
-            prefHeight="700">
 
-    <top>
-        <HBox spacing="20" alignment="CENTER_LEFT" style="-fx-padding: 10;">
-            <Label text="App Name"/>
-            <Label text="Profile Name"/>
-            <Label text="Settings / Options"/>
-        </HBox>
-    </top>
+<StackPane xmlns="http://javafx.com/javafx"
+        xmlns:fx="http://javafx.com/fxml"
+        fx:controller="com.example.projectpoker.controller.RoundController"
+        prefWidth="1000"
+        prefHeight="700">
 
-    <center>
+    <BorderPane fx:id="mainBorderPane">
 
-        <StackPane>
+        <top>
+            <HBox spacing="20" alignment="CENTER_LEFT" style="-fx-padding: 10;">
+                <Label text="App Name"/>
+                <Label text="Profile Name"/>
+                <Label text="Settings / Options"/>
+            </HBox>
+        </top>
 
-            <AnchorPane fx:id="tablePane"
-                        minWidth="600"
-                        minHeight="400"/>
+        <center>
 
-            <VBox alignment="TOP_LEFT"
-                  spacing="5"
+            <StackPane>
+
+                <AnchorPane fx:id="tablePane"
+                            minWidth="600"
+                            minHeight="400"/>
+
+                <VBox alignment="TOP_LEFT"
+                      spacing="5"
+                      style="-fx-padding: 10;">
+
+                    <Label fx:id="roundCounterLabel"
+                           text="Rounds Left"/>
+
+                    <Label fx:id="phaseLabel"
+                           text="Phase"/>
+
+                    <Label fx:id="potLabel"
+                           text="Pot"/>
+
+                    <Label fx:id="toCallLabel"
+                           text="To Call"/>
+
+                    <Label fx:id="balanceLabel"
+                           text="Balance"/>
+
+                </VBox>
+
+            </StackPane>
+
+        </center>
+
+
+        <right>
+
+            <VBox spacing="10"
+                  prefWidth="220"
                   style="-fx-padding: 10;">
 
-                <Label fx:id="roundCounterLabel"
-                       text="Rounds Left"/>
+                <Label text="Coach / Chat Window"/>
 
-                <Label fx:id="phaseLabel"
-                       text="Phase"/>
+                <TextArea prefHeight="300"
+                          editable="false"
+                          wrapText="true"/>
 
-                <Label fx:id="potLabel"
-                       text="Pot"/>
-
-                <Label fx:id="toCallLabel"
-                       text="To Call"/>
-
-                <Label fx:id="balanceLabel"
-                       text="Balance"/>
+                <TextField promptText="User input"/>
 
             </VBox>
 
-        </StackPane>
-
-    </center>
+        </right>
 
 
-    <right>
+        <bottom>
 
-        <VBox spacing="10"
-              prefWidth="220"
-              style="-fx-padding: 10;">
-
-            <Label text="Coach / Chat Window"/>
-
-            <TextArea prefHeight="300"
-                      editable="false"
-                      wrapText="true"/>
-
-            <TextField promptText="User input"/>
-
-        </VBox>
-
-    </right>
+            <VBox spacing="10"
+                  alignment="CENTER"
+                  style="-fx-padding: 15;">
 
 
-    <bottom>
-
-        <VBox spacing="10"
-              alignment="CENTER"
-              style="-fx-padding: 15;">
-
-
-            <Slider fx:id="betSlider"
-                    prefWidth="400"
-                    showTickMarks="true"
-                    showTickLabels="true"/>
+                <Slider fx:id="betSlider"
+                        prefWidth="400"
+                        showTickMarks="true"
+                        showTickLabels="true"/>
 
 
-            <HBox spacing="20"
-                  alignment="CENTER">
+                <HBox spacing="20"
+                      alignment="CENTER">
 
-                <Button fx:id="toCallButton"
-                        text="Check / Call"
-                        prefWidth="120"
-                        onAction="#handleCall"/>
+                    <Button fx:id="toCallButton"
+                            text="Check / Call"
+                            prefWidth="120"
+                            onAction="#handleCall"/>
 
-                <Button fx:id="betButton"
-                        text="Raise"
-                        prefWidth="120"
-                        onAction="#handleRaise"/>
+                    <Button fx:id="betButton"
+                            text="Raise"
+                            prefWidth="120"
+                            onAction="#handleRaise"/>
 
-                <Button fx:id="foldButton"
-                        text="Fold"
-                        prefWidth="120"
-                        onAction="#handleFold"/>
+                    <Button fx:id="foldButton"
+                            text="Fold"
+                            prefWidth="120"
+                            onAction="#handleFold"/>
 
-                <Button fx:id="allInButton"
-                        text="All In"
-                        prefWidth="120"
-                        onAction="#handleAllIn"/>
+                    <Button fx:id="allInButton"
+                            text="All In"
+                            prefWidth="120"
+                            onAction="#handleAllIn"
+                    />
 
-            </HBox>
+                </HBox>
 
-        </VBox>
+            </VBox>
 
-    </bottom>
+        </bottom>
 
-</BorderPane>
+    </BorderPane>
+
+    <Button fx:id="startGameButton"
+            text="Start Game"
+            StackPane.alignment="CENTER"
+            prefWidth="120"
+            onAction="#onStartGameButton"
+    />
+
+</StackPane>

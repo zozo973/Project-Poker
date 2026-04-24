@@ -137,26 +137,26 @@ public class Round {
         dealCards();
         setRoundStatus(RoundStatus.DEAL);
 
-        setRoundStatus(RoundStatus.BETTING1);
-        checkBetType();
-
-        setRoundStatus(RoundStatus.FLOP);
-        deal2Table();
-
-        setRoundStatus(RoundStatus.BETTING2);
-        checkBetType();
-
-        setRoundStatus(RoundStatus.TURN);
-        deal2Table();
-
-        setRoundStatus(RoundStatus.BETTING3);
-        checkBetType();
-
-        setRoundStatus(RoundStatus.RIVER);
-        deal2Table();
-
-        setRoundStatus(RoundStatus.SHOWDOWN);
-        checkBetType();
+//        setRoundStatus(RoundStatus.BETTING1);
+//        checkBetType();
+//
+//        setRoundStatus(RoundStatus.FLOP);
+//        deal2Table();
+//
+//        setRoundStatus(RoundStatus.BETTING2);
+//        checkBetType();
+//
+//        setRoundStatus(RoundStatus.TURN);
+//        deal2Table();
+//
+//        setRoundStatus(RoundStatus.BETTING3);
+//        checkBetType();
+//
+//        setRoundStatus(RoundStatus.RIVER);
+//        deal2Table();
+//
+//        setRoundStatus(RoundStatus.SHOWDOWN);
+//        checkBetType();
     }
 
     public void end() {

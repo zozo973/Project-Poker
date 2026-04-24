@@ -2,14 +2,22 @@ package com.example.projectpoker;
 
 import com.example.projectpoker.model.game.Card;
 import com.example.projectpoker.model.game.enums.*;
+import com.example.projectpoker.model.*;
+import com.example.projectpoker.model.game.Card;
+import com.example.projectpoker.model.game.enums.Action;
+import com.example.projectpoker.model.game.Card.*;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import javafx.stage.Stage;
 
 import java.net.URI;
+import java.net.http.*;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
+
+import static com.example.projectpoker.model.game.Card.*;
 
 
 public class AiCoaching {
@@ -171,7 +179,7 @@ public class AiCoaching {
         return sb.toString();
     }
 
-
+/*
     // For Test API connection ----------------------------------------------------------------------------------------
     public static void main(String[] args) {
         System.out.println("Preparing 3 different test for Ai Coaching...\n");
@@ -187,32 +195,17 @@ public class AiCoaching {
         // Test 2: test the situation when user get the great cards
         System.out.println("-------------------------------------------------");
         System.out.println("Test 2 ：A pair of Ace + 'RISKY' Mode");
-        Card[] strongHand = {
-                new Card(Suit.Spades, Rank.Ace),
-                new Card(Suit.Hearts, Rank.Ace)
-        };
-        Card[] flopBoard = {
-                new Card(Suit.Clubs, Rank.Two),
-                new Card(Suit.Diamonds, Rank.Five),
-                new Card(Suit.Spades, Rank.Nine)
-        };
-        AiAdvice advice2 = coach.getAdvice(strongHand, flopBoard, RoundStatus.FLOP, AiAdviceMode.RISKY);
+        Card[] strongHand = {SA,HA};
+        Card[] flopBoard = {C2,D5,S9};
+        AiAdvice advice2 = coach.getAdvice(strongHand, flopBoard, Stage.FLOP, AiAdviceMode.RISKY);
         printResult(advice2);
 
         // Test 3: test the situation when user get the bad cards
         System.out.println("-------------------------------------------------");
         System.out.println("Test 3：2(Hearts) & 7(Clubs) + 'SAFE' Mode");
-        Card[] weakHand = {
-                new Card(Suit.Hearts, Rank.Two),
-                new Card(Suit.Clubs, Rank.Seven)
-        };
-        Card[] turnBoard = {
-                new Card(Suit.Diamonds, Rank.Ace),
-                new Card(Suit.Hearts, Rank.King),
-                new Card(Suit.Spades, Rank.Queen),
-                new Card(Suit.Clubs, Rank.Jack)
-        };
-        AiAdvice advice3 = coach.getAdvice(weakHand, turnBoard, RoundStatus.TURN, AiAdviceMode.SAFE);
+        Card[] weakHand = {H2,C7};
+        Card[] turnBoard = {DA,HK,SQ,CJ};
+        AiAdvice advice3 = coach.getAdvice(weakHand, turnBoard, Stage.TURN, AiAdviceMode.SAFE);
         printResult(advice3);
 
         System.out.println("-----Finish-----");
@@ -226,9 +219,9 @@ public class AiCoaching {
             System.out.println("Reason: " + advice.reason + "\n");
         }
     }
+
+
+
+*/
 }
-
-
-
-
 

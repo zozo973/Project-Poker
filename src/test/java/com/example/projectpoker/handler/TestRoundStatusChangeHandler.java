@@ -41,8 +41,8 @@ public class TestRoundStatusChangeHandler {
 
         RoundController controller = loader.getController();
         controller.setRound(round,testPlayers.getFirst());
-        PropertyChangeListener roundStatusChangeHandler = new RoundStatusChangeHandler(controller);
-        round.addPropertyChangeListener(roundStatusChangeHandler);
+        //PropertyChangeListener roundStatusChangeHandler = new RoundStatusChangeHandler(controller);
+        //round.addPropertyChangeListener(roundStatusChangeHandler);
 
         round.init();
 

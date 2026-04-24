@@ -162,24 +162,53 @@ public class Game {
     }
 
     public void start() {
-        // Valid game before starting
-        setGameStatus(GameStatus.RUNNING);
-        while (gameStatus == GameStatus.RUNNING) {
-            createNextRound();
-            System.out.println(round.getRoundStatus());
-            this.round.init();
-            System.out.println(round.getRoundStatus());
-            this.round.start();
-            System.out.println(round.getRoundStatus());
 
-            // Loss Condition
-            if (getUser().getBalance() == 0) { end(); break; }
-            else if (this.numRoundsLeft == 0) { end(); break; }
-            else if (this.players.size() == 1 && !(this.players.getFirst() instanceof AiPlayer)) { end(); break; }
-            this.GameLog.add(round.getRoundLog());
-            nextRoundInitialisation();
-        }
+        setGameStatus(GameStatus.RUNNING);
+
+        startNextRound();
     }
+
+    public void startNextRound() {
+
+        if (gameStatus != GameStatus.RUNNING)
+            return;
+
+        // Loss conditions
+        if (getUser().getBalance() == 0) {
+            end();
+            return;
+        }
+
+        if (numRoundsLeft == 0) {
+            end();
+            return;
+        }
+
+        if (players.size() == 1 &&
+                !(players.getFirst() instanceof AiPlayer)) {
+            end();
+            return;
+        }
+
+        createNextRound();
+
+        System.out.println(round.getRoundStatus());
+
+        round.init();
+
+        System.out.println(round.getRoundStatus());
+
+        round.start();
+    }
+    public void onRoundEnded() {
+
+        GameLog.add(round.getRoundLog());
+
+        nextRoundInitialisation();
+
+        startNextRound();
+    }
+
 
     public void start(boolean test) {
         if (!test) return;

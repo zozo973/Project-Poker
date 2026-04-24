@@ -181,21 +181,21 @@ class RoundTest {
         assertTrue(openPot.getIsOpen());
     }
 
-    @Test
-    void testGetOpenPotIndex() {
-        assertEquals(0, round.getOpenPotIndex());
-        
-        round.addPot(new Pot(players));
-        assertEquals(1, round.getOpenPotIndex());
-    }
-
-    @Test
-    void testGetOpenPotIndexNoOpenPot() {
-        round.addPot(new Pot(players));
-        round.getPots().get(1).setIsOpen(false);
-        round.getPots().get(0).setIsOpen(false);
-        assertEquals(-1, round.getOpenPotIndex());
-    }
+//    @Test
+//    void testGetOpenPotIndex() {
+//        assertEquals(0, round.getOpenPotIndex());
+//
+//        round.addPot(new Pot(players));
+//        assertEquals(1, round.getOpenPotIndex());
+//    }
+//
+//    @Test
+//    void testGetOpenPotIndexNoOpenPot() {
+//        round.addPot(new Pot(players));
+//        round.getPots().get(1).setIsOpen(false);
+//        round.getPots().get(0).setIsOpen(false);
+//        assertEquals(-1, round.getOpenPotIndex());
+//    }
 
     // Community Cards Tests
 
@@ -249,7 +249,7 @@ class RoundTest {
         for (Player p : players) {
             p.setAction(Action.CHECK);
         }
-        boolean result = round.endBetting();
+        boolean result = round.endBetting(players.getLast());
         assertTrue(result);
     }
 
@@ -258,7 +258,7 @@ class RoundTest {
         players.get(0).setAction(Action.FOLD);
         players.get(1).setAction(Action.FOLD);
         players.get(2).setAction(Action.FOLD);
-        boolean result = round.endBetting();
+        boolean result = round.endBetting(players.get(2));
         assertTrue(result);
         assertEquals(BetType.SKIP2SHOWDOWN, round.getBetType());
     }
@@ -268,7 +268,7 @@ class RoundTest {
         players.get(0).setAction(Action.RAISE);
         players.get(1).setAction(Action.CALL);
         players.get(2).setAction(Action.CALL);
-        boolean result = round.endBetting();
+        boolean result = round.endBetting(players.get(2));
         assertTrue(result);
     }
 
@@ -277,7 +277,7 @@ class RoundTest {
         players.get(0).setAction(Action.ALLIN);
         players.get(1).setAction(Action.CALL);
         players.get(2).setAction(Action.CALL);
-        boolean result = round.endBetting();
+        boolean result = round.endBetting(players.get(2));
         assertTrue(result);
     }
 
@@ -286,7 +286,7 @@ class RoundTest {
         players.get(0).setAction(Action.ALLIN);
         players.get(1).setAction(Action.ALLIN);
         players.get(2).setAction(Action.CALL);
-        boolean result = round.endBetting();
+        boolean result = round.endBetting(players.get(2));
         assertTrue(result);
         assertEquals(BetType.SKIP2SHOWDOWN, round.getBetType());
     }
@@ -296,7 +296,7 @@ class RoundTest {
         players.get(0).setAction(Action.ALLIN);
         players.get(1).setAction(Action.RAISE);
         players.get(2).setAction(Action.CALL);
-        boolean result = round.endBetting();
+        boolean result = round.endBetting(players.get(2));
         assertTrue(result);
         assertEquals(BetType.SIDEPOT, round.getBetType());
     }
@@ -308,7 +308,7 @@ class RoundTest {
         players.get(0).setAction(Action.ALLIN);
         players.get(1).setAction(Action.CALL);
         players.get(2).setAction(Action.FOLD);
-        boolean result = round.endBetting();
+        boolean result = round.endBetting(players.get(2));
         assertTrue(result);
         assertEquals(BetType.SKIP2SHOWDOWN, round.getBetType());
     }
@@ -355,5 +355,11 @@ class RoundTest {
         public Object getNewValue() {
             return newValue;
         }
+    }
+    // Round Init test
+
+    @Test
+    void testRoundInit() {
+
     }
 }

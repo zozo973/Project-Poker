@@ -19,12 +19,39 @@ public class GameStatusChangeHandler implements PropertyChangeListener {
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        switch (evt.getPropertyName()){
-            case "gameStatus" -> viewUpdater.onGameStatusChanged((GameStatus) evt.getNewValue());
-            case "blindSize" -> viewUpdater.onBlindSizeChanged((int) evt.getNewValue());
-            case "round" -> viewUpdater.onRoundCreation((Round) evt.getNewValue());
-            case "players" -> viewUpdater.onPlayerChange((ArrayList<Player>) evt.getNewValue(), (ArrayList<Player>) evt.getOldValue());
-            default -> throw new IllegalStateException("Unexpected value: " + evt.getPropertyName());
+
+        switch (evt.getPropertyName()) {
+
+            case "gameStatus":
+            case "state":
+                viewUpdater.onGameStatusChanged(
+                        (GameStatus) evt.getNewValue()
+                );
+                break;
+
+            case "blindSize":
+                viewUpdater.onBlindSizeChanged(
+                        (int) evt.getNewValue()
+                );
+                break;
+
+            case "round":
+                viewUpdater.onRoundCreation(
+                        (Round) evt.getNewValue()
+                );
+                break;
+
+            case "players":
+                viewUpdater.onPlayerChange(
+                        (ArrayList<Player>) evt.getNewValue(),
+                        (ArrayList<Player>) evt.getOldValue()
+                );
+                break;
+
+            default:
+                System.out.println(
+                        "Unhandled property: "
+                                + evt.getPropertyName()
+                );
         }
-    }
-}
+    }}

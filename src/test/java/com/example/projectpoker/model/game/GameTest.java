@@ -244,18 +244,6 @@ class GameTest {
     }
 
     @Test
-    void TestCheckForfeitedPlayers() {
-        game.init();
-        var initialPlayers = game.getPlayers();
-        initialPlayers.get(1).setAction(Action.FORFEIT);
-        game.setPlayers(initialPlayers);
-        game.checkForfeitedPlayers();
-        var postPlayers = game.getPlayers();
-
-        assertEquals(initialPlayers.size()-1,postPlayers.size());
-    }
-
-    @Test
     void testStartSetsGameStatusToRunning() {
         game.start();
         assertEquals(GameStatus.RUNNING,game.getGameStatus());

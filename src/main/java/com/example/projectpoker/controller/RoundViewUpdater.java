@@ -1,6 +1,5 @@
 package com.example.projectpoker.controller;
 
-import com.example.projectpoker.model.Hand;
 import com.example.projectpoker.model.game.Card;
 import com.example.projectpoker.model.game.Player;
 import com.example.projectpoker.model.game.Round;
@@ -24,4 +23,6 @@ public interface RoundViewUpdater {
     void onPlayerChange(ArrayList<Player> newPlayers, ArrayList<Player> oldPlayers);
     void onPlayerActionChange(Action action);
     void onPlayerRoleUpdate(Roles role);
+    void onDealCards();
+    void onRoundStarted();
 }

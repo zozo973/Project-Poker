@@ -24,9 +24,10 @@ public class Player {
     private String name;
     private boolean isTurn;
     private int balance;
-    private int roundInvestment;
+    private RoundInvestment roundInvestment;
     private Action action;
     private Roles role;
+    private Integer activeBet;
 
     // No args constructor, minimum balance a player starts a
     // game with if they do not choose to use money they have won before.
@@ -38,7 +39,8 @@ public class Player {
         this.action = Action.UNDECIDED;
         this.balance = 1000;
         this.role = Roles.PLAYER;
-        this.roundInvestment = 0;
+        this.roundInvestment = new RoundInvestment();
+        this.activeBet = null;
     }
 
     public Player(String name) {
@@ -49,7 +51,8 @@ public class Player {
         this.action = Action.UNDECIDED;
         this.balance = 1000;
         this.role = Roles.PLAYER;
-        this.roundInvestment = 0;
+        this.roundInvestment = new RoundInvestment();
+        this.activeBet = null;
     }
 
     public Player(String name, Roles role) {
@@ -60,7 +63,8 @@ public class Player {
         this.balance = 1000;
         this.action = Action.UNDECIDED;
         this.role = role;
-        this.roundInvestment = 0;
+        this.roundInvestment = new RoundInvestment();
+        this.activeBet = null;
     }
 
     public Player(String name, int balance) {
@@ -71,7 +75,8 @@ public class Player {
         this.balance = balance;
         this.action = Action.UNDECIDED;
         this.role = Roles.PLAYER;
-        this.roundInvestment = 0;
+        this.roundInvestment = new RoundInvestment();
+        this.activeBet = null;
     }
 
     public Player(String name, int balance, String id) throws IOException {
@@ -82,7 +87,8 @@ public class Player {
         this.balance = balance;
         this.action = Action.UNDECIDED;
         this.role = Roles.PLAYER;
-        this.roundInvestment = 0;
+        this.roundInvestment = new RoundInvestment();
+        this.activeBet = null;
     }
 
     public void addPropertyChangeListener(PropertyChangeListener listener) {
@@ -99,6 +105,10 @@ public class Player {
 
     public void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
         pcs.removePropertyChangeListener(propertyName, listener);
+    }
+
+    public PropertyChangeListener[] getPropertyChangeListener(String propertyName) {
+        return pcs.getPropertyChangeListeners(propertyName);
     }
 
     public String getName() { return name; }
@@ -134,9 +144,26 @@ public class Player {
         pcs.firePropertyChange("balance",oldVal,this.balance);
     }
 
-    public int getRoundInvestment() { return roundInvestment; }
+    public Bet getLastBet() { return roundInvestment.getLastBet(); }
 
-    protected void setRoundInvestment(int roundInvestment) { this.roundInvestment = roundInvestment; }
+    public RoundInvestment getRoundInvestment() { return roundInvestment; }
+
+    public int getTotalInvestment() { return roundInvestment.getTotalInvestment(); }
+
+    public int getTotalPotInvestment(Pot pot) {
+        ArrayList<Bet> betsInPot = roundInvestment.getBetsByPot(pot);
+        int potInvestment = 0;
+        for (Bet b : betsInPot) {
+            potInvestment += b.getBetSize();
+        }
+        return potInvestment;
+    }
+
+    protected void setRoundInvestment(RoundInvestment roundInvestment) { this.roundInvestment = roundInvestment; }
+
+    protected void setRoundInvestment(int totalInvested) { this.roundInvestment = new RoundInvestment(totalInvested); }
+
+    protected void setRoundInvestment(int totalInvested, ArrayList<Bet> bets) { this.roundInvestment = new RoundInvestment(totalInvested, bets); }
 
     public Action getAction() { return action; }
 
@@ -154,6 +181,7 @@ public class Player {
         var oldVal = this.isTurn;
         this.isTurn = isTurn;
         pcs.firePropertyChange("isTurn",oldVal,this.isTurn);
+        if (!this.isTurn) this.activeBet = null;
     }
 
     public Roles getRole() { return role; }
@@ -165,13 +193,25 @@ public class Player {
         pcs.firePropertyChange("role",oldVal,this.role);
     }
 
+    public Integer getActiveBet() { return activeBet; }
+
+    public void setActiveBet(Integer activeBet) { this.activeBet = activeBet; }
+
     public void roundReset() {
         pcs.firePropertyChange("roundReset",this, new Player(getName(),getBalance()));
         this.playerHand.clear();
         this.isTurn = false;
         this.action = null;
         this.role = Roles.PLAYER;
-        this.roundInvestment = 0;
+        this.roundInvestment.reset();
+        this.activeBet = null;
+    }
+
+    public boolean checkAllInCreatesSidePot(int bet, Pot pot) {
+        if (action.equals(Action.ALLIN) && pot.getToPlay() > bet) {
+            return true;
+        }
+        return false;
     }
 
     public void win(int potSize) {
@@ -179,7 +219,7 @@ public class Player {
         //
     }
 
-    public int placeBet(int betSize) {
+    public int placeBet(int betSize, Pot pot) {
         int b = getBalance();
 
         if (betSize <= 0) {
@@ -212,14 +252,15 @@ public class Player {
         } else {
             setBalance((b - betSize));
         }
-        this.roundInvestment += betSize;
+        this.activeBet = betSize;
+        this.roundInvestment.add2Bets(betSize,pot);
         return betSize;
     }
 
-    public int payBlind(int blindSize) {
+    public int payBlind(int blindSize, Pot pot) {
         if (this.role == Roles.PLAYER || this.role == Roles.DEALER) return 0;
         int blind = safeRoundToInt(role.getBlindMultiplier() * blindSize);
-        return placeBet(blind);
+        return placeBet(blind,pot);
     }
 
     public void allIn() {
@@ -229,10 +270,9 @@ public class Player {
         }
     }
 
-    public int chooseBetSize() {
+    public void chooseBetSize() {
         // return rounded slider value from the view
-
-        return 0;
+        this.activeBet = 0; //  TODO implement method.
     }
 
     public void forfeitGame() {

@@ -1,33 +1,128 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.control.Button?>
-
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="com.example.projectpoker.controller.RoundController"
-            prefHeight="400.0" prefWidth="600.0">
-
-    <VBox alignment="CENTER" spacing="20.0" xmlns:fx="http://javafx.com/fxml">
-
-        <padding>
-            <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
-        </padding>
-
-        <Label fx:id="welcomeText"/>
-
-        <Slider fx:id="betSlider" blockIncrement="15" layoutX="26.0" layoutY="32.0" min="15" max/>
-
-    </VBox>
-</AnchorPane>
+<?import javafx.scene.control.*?>
 
 
+<StackPane xmlns="http://javafx.com/javafx"
+        xmlns:fx="http://javafx.com/fxml"
+        fx:controller="com.example.projectpoker.controller.RoundController"
+        prefWidth="1000"
+        prefHeight="700">
+
+    <BorderPane fx:id="mainBorderPane">
+
+        <top>
+            <HBox spacing="20" alignment="CENTER_LEFT" style="-fx-padding: 10;">
+                <Label text="App Name"/>
+                <Label text="Profile Name"/>
+                <Label text="Settings / Options"/>
+            </HBox>
+        </top>
+
+        <center>
+
+            <StackPane>
+
+                <AnchorPane fx:id="tablePane"
+                            minWidth="600"
+                            minHeight="400"/>
+
+                <VBox alignment="TOP_LEFT"
+                      spacing="5"
+                      style="-fx-padding: 10;">
+
+                    <Label fx:id="roundCounterLabel"
+                           text="Rounds Left"/>
+
+                    <Label fx:id="phaseLabel"
+                           text="Phase"/>
+
+                    <Label fx:id="potLabel"
+                           text="Pot"/>
+
+                    <Label fx:id="toCallLabel"
+                           text="To Call"/>
+
+                    <Label fx:id="balanceLabel"
+                           text="Balance"/>
+
+                </VBox>
+
+            </StackPane>
+
+        </center>
 
 
+        <right>
+
+            <VBox spacing="10"
+                  prefWidth="220"
+                  style="-fx-padding: 10;">
+
+                <Label text="Coach / Chat Window"/>
+
+                <TextArea prefHeight="300"
+                          editable="false"
+                          wrapText="true"/>
+
+                <TextField promptText="User input"/>
+
+            </VBox>
+
+        </right>
+
+
+        <bottom>
+
+            <VBox spacing="10"
+                  alignment="CENTER"
+                  style="-fx-padding: 15;">
+
+
+                <Slider fx:id="betSlider"
+                        prefWidth="400"
+                        showTickMarks="true"
+                        showTickLabels="true"/>
+
+
+                <HBox spacing="20"
+                      alignment="CENTER">
+
+                    <Button fx:id="toCallButton"
+                            text="Check / Call"
+                            prefWidth="120"
+                            onAction="#handleCall"/>
+
+                    <Button fx:id="betButton"
+                            text="Raise"
+                            prefWidth="120"
+                            onAction="#handleRaise"/>
+
+                    <Button fx:id="foldButton"
+                            text="Fold"
+                            prefWidth="120"
+                            onAction="#handleFold"/>
+
+                    <Button fx:id="allInButton"
+                            text="All In"
+                            prefWidth="120"
+                            onAction="#handleAllIn"
+                    />
+
+                </HBox>
+
+            </VBox>
+
+        </bottom>
+
+    </BorderPane>
+
+    <Button fx:id="startGameButton"
+            text="Start Game"
+            StackPane.alignment="CENTER"
+            prefWidth="120"
+            onAction="#onStartGameButton"
+    />
+
+</StackPane>

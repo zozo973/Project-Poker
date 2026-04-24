@@ -39,7 +39,6 @@ public class PokerApplication extends Application {
         stage.setTitle("App Name");
         stage.setScene(scene);
         stage.show();
-        // createPokerGame();
     }
 
     public void createPokerGame() throws IOException {
@@ -47,7 +46,7 @@ public class PokerApplication extends Application {
 
         // TODO add methods in createPokerGame controller to get all fields required to make an instance of a game
         //      Player user: should be retrieved from database,
-        //      int userBalance: User will interact to choose an amount, if they don't have enough it defaults to 1000,
+        //      int userBalance: User will interact to choose an amount, if they don't have enought it defaults to 1000,
         //      int numPlayers: min 3 max 8 - estimate,
         //      int initBlind: default if 0.03 times the user balance,
         //      int whenInceaseBlinds: how many rounds until blinds increase, default 10,
@@ -55,21 +54,25 @@ public class PokerApplication extends Application {
         //      Difficulty difficulty: HBox of buttons, can only select one, on hover shows display for difficulty
 
         // change to retire user data from database and other vars can be retrieved from user input into ui
-        // Player user = new Player("User",10000); // Hardcoded values
+        FXMLLoader loader = new FXMLLoader(
+                PokerApplication.class.getResource("poker-round-view.fxml"));
+        Parent root = loader.load();
+        Scene scene = new Scene(root, 1025, 450);
+
+        RoundController controller = loader.getController();
+
+        PokerGameUI pokerUI = new PokerGameUI();
+        controller.setUI(pokerUI);
 
         User loggedInUser = SessionManager.getCurrentUser();
         Player user = new Player(loggedInUser.getUsername(), loggedInUser.getCurrentBalance());
-//        int userBuyIn = 1000;
         int userBuyIn = loggedInUser.getCurrentBalance();
+        int blind = safeRoundToInt((userBuyIn * 0.03));
 
-        int blind = safeRoundToInt((userBuyIn*0.03));
-        int numPlayer = 4;
         Game game = new Game(user, loggedInUser, userBuyIn, 4, blind, 10, 40, Difficulty.GAMBLINGADDICT);
 
-        RoundController controller = (RoundController) loadPokerGameView(game);
-
         PlayerStatusChangeHandler playerHandler = new PlayerStatusChangeHandler(controller);
-        RoundStatusChangeHandler roundHandler = new RoundStatusChangeHandler(controller);
+        RoundStatusChangeHandler roundHandler = new RoundStatusChangeHandler(controller, game);
         GameStatusChangeHandler gameHandler = new GameStatusChangeHandler(controller);
 
         game.setRoundHandler(roundHandler);
@@ -77,19 +80,16 @@ public class PokerApplication extends Application {
         game.init();
 
         Round currentRound = game.getRound();
-        controller.setRound(currentRound,user);
+        controller.setGame(game);
+        controller.setRound(currentRound, user);
 
-        ArrayList<AiPlayer> AiPlayers = game.getAiPlayers();
+        ArrayList<AiPlayer> aiPlayers = game.getAiPlayers();
         user.addPropertyChangeListener(playerHandler);
-        for (AiPlayer p : AiPlayers) p.addPropertyChangeListener(playerHandler);
-    }
+        for (AiPlayer p : aiPlayers) p.addPropertyChangeListener(playerHandler);
 
-    private RoundViewUpdater loadPokerGameView(Game game) throws IOException {
-        FXMLLoader loader = new FXMLLoader(PokerApplication.class.getResource("poker-round-view.fxml"));
-        Scene scene = new Scene(loader.load(), 320,240);
-        // TODO load css file ...
-
-        RoundController controller = loader.getController();
-        return controller;
+        Stage gameStage = new Stage();
+        gameStage.setScene(scene);
+        gameStage.setTitle("Poker Game");
+        gameStage.show();
     }
 }

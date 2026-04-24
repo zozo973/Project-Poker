@@ -1,6 +1,7 @@
 package com.example.projectpoker.model.game;
 
 import com.example.projectpoker.database.DatabaseManager;
+import com.example.projectpoker.handler.RoundPlayerListener;
 import com.example.projectpoker.handler.RoundStatusChangeHandler;
 import com.example.projectpoker.model.User;
 import com.example.projectpoker.model.game.enums.Action;
@@ -22,6 +23,7 @@ public class Game {
     //      Round Change
 
     private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
+    private final RoundPlayerListener roundPlayerListener = new RoundPlayerListener();
     private GameStatus gameStatus;
     private ArrayList<Player> players;
     private int numRoundsLeft;
@@ -99,16 +101,23 @@ public class Game {
     }
 
     public void setPlayers(ArrayList<Player> players) {
+        if (!(players.getFirst().getPropertyChangeListener("roundPlayerListener") instanceof RoundPlayerListener[])) {
+            for (Player p : players) {
+                p.addPropertyChangeListener("roundPlayerListener", this.roundPlayerListener);
+            }
+        }
         var oldVal = this.players;
         this.players = players;
         pcs.firePropertyChange("players",oldVal,this.players);
     }
 
     public void createNextRound() {
-        Round round = new Round(players, blindSize, gameSessionId, handsPlayed + 1);
+        // Round round = new Round(players, blindSize, gameSessionId, handsPlayed + 1);
+        Round round = new Round(players, blindSize);
         pcs.firePropertyChange("round",this.round,round);
         round.addPropertyChangeListener(roundHandler);
         setRound(round);
+        roundPlayerListener.setRound(round);
     }
 
     public int getNumRoundsLeft() { return numRoundsLeft; }
@@ -173,23 +182,51 @@ public class Game {
     public void start() {
         // Valid game before starting
         setGameStatus(GameStatus.RUNNING);
-        while (gameStatus == GameStatus.RUNNING) {
-            createNextRound();
-            System.out.println(round.getRoundStatus());
-            this.round.init();
-            System.out.println(round.getRoundStatus());
-            this.round.start();
-            System.out.println(round.getRoundStatus());
-            this.handsPlayed++;
 
-            // Loss Condition
-            if (getUser().getBalance() == 0) { end(); break; }
-            else if (this.numRoundsLeft == 0) { end(); break; }
-            else if (this.players.size() == 1 && !(this.players.getFirst() instanceof AiPlayer)) { end(); break; }
-            checkForfeitedPlayers();
-            this.numRoundsLeft--;
-        }
+        startNextRound();
     }
+
+    public void startNextRound() {
+
+        if (gameStatus != GameStatus.RUNNING)
+            return;
+
+        // Loss conditions
+        if (getUser().getBalance() == 0) {
+            end();
+            return;
+        }
+
+        if (numRoundsLeft == 0) {
+            end();
+            return;
+        }
+
+        if (players.size() == 1 &&
+                !(players.getFirst() instanceof AiPlayer)) {
+            end();
+            return;
+        }
+
+        createNextRound();
+
+        System.out.println(round.getRoundStatus());
+
+        round.init();
+
+        System.out.println(round.getRoundStatus());
+
+        round.start();
+    }
+    public void onRoundEnded() {
+
+        GameLog.add(round.getRoundLog());
+
+        nextRoundInitialisation();
+
+        startNextRound();
+    }
+
 
     public void start(boolean test) {
         if (!test) return;
@@ -207,15 +244,26 @@ public class Game {
             if (getUser().getBalance() == 0) { end(); break; }
             else if (this.numRoundsLeft == 0) { end(); break; }
             else if (this.players.size() == 1 && !(this.players.getFirst() instanceof AiPlayer)) { end(); break; }
-            checkForfeitedPlayers();
             this.GameLog.add(round.getRoundLog());
-            this.numRoundsLeft--;
+            nextRoundInitialisation();
         }
     }
 
     public void end() {
         setGameStatus(GameStatus.ENDED);
         DatabaseManager.finalizeGameSession(gameSessionId, userProfile, this, getUser());
+    }
+
+    private void nextRoundInitialisation() {
+        setPlayers(
+            RoleUtil.delegateRoles(
+                this.players,
+                RoleUtil.stepRoleIndices(
+                    this.players
+                )
+            )
+        );
+        this.numRoundsLeft--;
     }
 
     private ArrayList<Player> initAiPlayers(ArrayList<Player> players, int numPlayers, Difficulty difficulty) {

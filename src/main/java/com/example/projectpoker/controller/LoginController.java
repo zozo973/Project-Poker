@@ -61,7 +61,7 @@ public class LoginController {
                 PokerApplication app = new PokerApplication();
                 app.createPokerGame();
             } catch (IOException e) {
-                messageLabel.setText("Could not start game.");
+                messageLabel.setText("Could not start game: " + e.getMessage());
             }
         }
     }

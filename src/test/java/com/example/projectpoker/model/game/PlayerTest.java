@@ -206,9 +206,9 @@ class PlayerTest {
 
     @Test
     void testGetAndSetRoundInvestment() {
-        assertEquals(0, player.getRoundInvestment());
+        assertEquals(0, player.getTotalInvestment());
         player.setRoundInvestment(100);
-        assertEquals(100, player.getRoundInvestment());
+        assertEquals(100, player.getTotalInvestment());
     }
 
     // Action Tests
@@ -246,6 +246,7 @@ class PlayerTest {
 
     @Test
     void testRoundReset() {
+
         player.addCardToHand(Card.CA);
         player.addCardToHand(Card.DK);
         player.setIsTurn(true);
@@ -259,7 +260,7 @@ class PlayerTest {
         assertFalse(player.getIsTurn());
         assertNull(player.getAction());
         assertEquals(Roles.PLAYER, player.getRole());
-        assertEquals(0, player.getRoundInvestment());
+        assertEquals(0, player.getTotalInvestment());
     }
 
     // Win Tests
@@ -278,34 +279,35 @@ class PlayerTest {
     void testPlaceBetValidBet() {
         int initialBalance = player.getBalance();
         int bet = 100;
+        Pot testPot = new Pot();
 
-        int actualBet = player.placeBet(bet);
+        int actualBet = player.placeBet(bet, testPot);
 
         assertEquals(bet, actualBet);
         assertEquals(initialBalance - bet, player.getBalance());
-        assertEquals(bet, player.getRoundInvestment());
+        assertEquals(bet, player.getRoundInvestment().getTotalInvestment());
     }
 
     @Test
     void testPlaceBetZeroThrows() {
-        assertThrows(IllegalArgumentException.class, () -> player.placeBet(0));
+        assertThrows(IllegalArgumentException.class, () -> player.placeBet(0, new Pot()));
     }
 
     @Test
     void testPlaceBetNegativeThrows() {
-        assertThrows(IllegalArgumentException.class, () -> player.placeBet(-50));
+        assertThrows(IllegalArgumentException.class, () -> player.placeBet(-50, new Pot()));
     }
 
     @Test
     void testPlaceBetExceedsBalanceThrows() {
-        assertThrows(IllegalArgumentException.class, () -> player.placeBet(2000));
+        assertThrows(IllegalArgumentException.class, () -> player.placeBet(2000, new Pot()));
     }
 
     @Test
     void testPlaceBetUpdatesRoundInvestment() {
-        player.placeBet(100);
-        player.placeBet(50);
-        assertEquals(150, player.getRoundInvestment());
+        player.placeBet(100, new Pot());
+        player.placeBet(50, new Pot());
+        assertEquals(150, player.getRoundInvestment().getTotalInvestment());
     }
 
     // Pay Blind Tests
@@ -313,7 +315,7 @@ class PlayerTest {
     @Test
     void testPayBlindAsPlayer() {
         player.setRole(Roles.PLAYER);
-        int result = player.payBlind(100);
+        int result = player.payBlind(100, new Pot());
         assertEquals(0, result);
         assertEquals(1000, player.getBalance());
     }
@@ -321,7 +323,7 @@ class PlayerTest {
     @Test
     void testPayBlindAsDealer() {
         player.setRole(Roles.DEALER);
-        int result = player.payBlind(100);
+        int result = player.payBlind(100, new Pot());
         assertEquals(0, result);
         assertEquals(1000, player.getBalance());
     }
@@ -329,19 +331,19 @@ class PlayerTest {
     @Test
     void testPayBlindAsSmallBlind() {
         player.setRole(Roles.SMALLBLIND);
-        int result = player.payBlind(100);
+        int result = player.payBlind(100, new Pot());
         assertEquals(50, result);
         assertEquals(950, player.getBalance());
-        assertEquals(50, player.getRoundInvestment());
+        assertEquals(50, player.getRoundInvestment().getTotalInvestment());
     }
 
     @Test
     void testPayBlindAsBigBlind() {
         player.setRole(Roles.BIGBLIND);
-        int result = player.payBlind(100);
+        int result = player.payBlind(100, new Pot());
         assertEquals(100, result);
         assertEquals(900, player.getBalance());
-        assertEquals(100, player.getRoundInvestment());
+        assertEquals(100, player.getRoundInvestment().getTotalInvestment());
     }
 
     // All In Tests

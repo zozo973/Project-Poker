@@ -1,7 +1,6 @@
 package com.example.projectpoker.model.game;
 
 import com.example.projectpoker.model.HandEvaluation;
-import com.example.projectpoker.model.HandResult;
 import com.example.projectpoker.model.PlayerResult;
 import com.example.projectpoker.model.game.enums.Action;
 import com.example.projectpoker.model.game.enums.RoundStatus;
@@ -48,7 +47,7 @@ public class Pot {
     }
 
     public Pot(ArrayList<Player> players) {
-        this.players = players;
+        this.players = new ArrayList<>(players);
         this.potSize = 0;
         this.potPriority = 0;
         this.toPlay = 0;
@@ -120,19 +119,6 @@ public class Pot {
         this.potSize += bet;
     }
 
-    public void addBet(Player player) {
-        int bet = player.getActiveBet();
-        player.placeBet(bet, this);
-        int playerPotInvest = player.getTotalPotInvestment(this);
-        if (playerPotInvest>this.toPlay) this.toPlay = playerPotInvest;
-        addBet2Table(player,bet);
-
-   //     if (Action.isRaise(player.getAction()) && player.getRoundInvestment() > this.toPlay) {
-   //        this.toPlay = player.getTotalRoundInvestment();
-   //          }
-        this.potSize += bet;
-    }
-
     // Pay and add small and big blinds to pot
     public void initBlinds(ArrayList<Player> players, ArrayList<Integer> turnOrder, int blindSize) {
         int smallBlind = players.get(turnOrder.get(0)).payBlind(blindSize,this);
@@ -140,27 +126,34 @@ public class Pot {
         addBet2Table(players.get(turnOrder.get(0)),smallBlind);
         addBet2Table(players.get(turnOrder.get(1)),bigBlind);
         this.potSize = smallBlind + bigBlind;
+        this.toPlay = Math.max(smallBlind, bigBlind);
     }
 
     public RoundStatus removeFolded(RoundStatus status) {
         players.removeIf(p -> p.getAction() == Action.FOLD);
         if (players.size() == 1) {
-            players.getFirst().win(potSize);
+            if (status != RoundStatus.SHOWDOWN) {
+                players.getFirst().win(potSize);
+                potSize = 0;
+            }
             return RoundStatus.END;
         }
         return RoundStatus.stepRoundStatus(status);
     }
 
     public void showDown(ArrayList<Card> communityCards) {
-        ArrayList<PlayerResult> gameResults = new ArrayList<>();
+        ArrayList<PlayerResult> gameResults;
         gameResults = HandEvaluation.whoWins(communityCards, this.players);
         int numWinners = gameResults.size();
         for (PlayerResult gameResult : gameResults) {
-            for (Player p : players) { /// break possibly breaks out of both loops, requires testing
-                if (p.matchId(gameResult.getPlayerId())) p.win(potSize / numWinners);
-                break;
+            for (Player p : players) {
+                if (p.matchId(gameResult.getPlayerId())) {
+                    p.win(potSize / numWinners);
+                    break;
+                }
             }
         }
+        potSize = 0;
     }
 
     public void adjustPot(Pot sidePot) {

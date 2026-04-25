@@ -89,6 +89,13 @@
                 <HBox spacing="20"
                       alignment="CENTER">
 
+                    <Button fx:id="startRoundButton"
+                            text="Start Round"
+                            prefWidth="120"
+                            disable="true"
+                            onAction="#onStartRoundButton"
+                    />
+
                     <Button fx:id="toCallButton"
                             text="Check / Call"
                             prefWidth="120"

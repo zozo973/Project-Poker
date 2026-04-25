@@ -1,7 +1,5 @@
 package com.example.projectpoker.model.game;
 
-import com.example.projectpoker.handler.RoundPlayerListener;
-import com.example.projectpoker.handler.RoundStatusChangeHandler;
 import com.example.projectpoker.model.game.enums.Action;
 import com.example.projectpoker.model.game.enums.Difficulty;
 import com.example.projectpoker.model.game.enums.GameStatus;
@@ -19,9 +17,6 @@ public class Game {
     //      blindSize Change
     //      players Change
     //      Round Change
-
-    private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
-    private final RoundPlayerListener roundPlayerListener = new RoundPlayerListener();
     private GameStatus gameStatus;
     private ArrayList<Player> players;
     private int numRoundsLeft;
@@ -32,7 +27,20 @@ public class Game {
     private int numPlayers;
     private Round round;
     private ArrayList<ArrayList<RoundLogEntry>> GameLog;
-    private RoundStatusChangeHandler roundHandler;
+    private boolean roundAdvanceInProgress;
+
+    private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
+    private final PropertyChangeListener playerActionListener = evt -> {
+        if (!"action".equals(evt.getPropertyName())) {
+            return;
+        }
+
+        if (evt.getNewValue() == Action.FORFEIT && round != null) {
+            round.removeForfeited();
+            numPlayers = players.size();
+            pcs.firePropertyChange("players", null, this.players);
+        }
+    };
 
 
     // Constructor called when starting a new game of poker
@@ -85,12 +93,8 @@ public class Game {
     }
 
     public void setPlayers(ArrayList<Player> players) {
-        if (!(players.getFirst().getPropertyChangeListener("roundPlayerListener") instanceof RoundPlayerListener[])) {
-            for (Player p : players) {
-                p.addPropertyChangeListener("roundPlayerListener", this.roundPlayerListener);
-            }
-        }
         var oldVal = this.players;
+        syncPlayerActionListeners(oldVal, players);
         this.players = players;
         pcs.firePropertyChange("players",oldVal,this.players);
     }
@@ -98,9 +102,7 @@ public class Game {
     public void createNextRound() {
         Round round = new Round(players,blindSize);
         pcs.firePropertyChange("round",this.round,round);
-        round.addPropertyChangeListener(roundHandler);
         setRound(round);
-        roundPlayerListener.setRound(round);
     }
 
     public int getNumRoundsLeft() { return numRoundsLeft; }
@@ -126,10 +128,6 @@ public class Game {
         }
         return AiPlayers;
     }
-
-    public void setRoundHandler(RoundStatusChangeHandler roundHandler) { this.roundHandler = roundHandler; }
-
-    public RoundStatusChangeHandler getRoundHandler() { return this.roundHandler; }
 
     public int findUserIndex() {
         int i = 0;
@@ -168,45 +166,65 @@ public class Game {
         startNextRound();
     }
 
-    public void startNextRound() {
+    public synchronized void startNextRound() {
 
-        if (gameStatus != GameStatus.RUNNING)
-            return;
-
-        // Loss conditions
-        if (getUser().getBalance() == 0) {
-            end();
+        // Guarding behaviour so that multiple rounds cant be started simultaneously
+        if (roundAdvanceInProgress) {
             return;
         }
+        roundAdvanceInProgress = true;
 
-        if (numRoundsLeft == 0) {
-            end();
-            return;
+        try {
+            if (gameStatus != GameStatus.RUNNING) {return;}
+
+            clearPlayerHands();
+
+            // Loss conditions
+            if (getUser().getBalance() == 0) {
+                end();
+                return;
+            }
+
+            if (numRoundsLeft == 0) {
+                end();
+                return;
+            }
+
+            if (players.size() == 1 &&
+                    !(players.getFirst() instanceof AiPlayer)) {
+                end();
+                return;
+            }
+            createNextRound();
+            round.init();
+            round.start();
+        } finally {
+            roundAdvanceInProgress = false;
         }
-
-        if (players.size() == 1 &&
-                !(players.getFirst() instanceof AiPlayer)) {
-            end();
-            return;
-        }
-
-        createNextRound();
-
-        System.out.println(round.getRoundStatus());
-
-        round.init();
-
-        System.out.println(round.getRoundStatus());
-
-        round.start();
     }
-    public void onRoundEnded() {
+    public synchronized void onRoundEnded() {
+
+        if (round == null || round.getRoundStatus() != com.example.projectpoker.model.game.enums.RoundStatus.END) {
+            return;
+        }
+
+        clearPlayerHands();
 
         GameLog.add(round.getRoundLog());
 
         nextRoundInitialisation();
 
         startNextRound();
+    }
+
+    private void clearPlayerHands() {
+        if (players == null) {
+            return;
+        }
+
+        for (Player player : players) {
+            player.getPlayerHand().clear();
+        }
     }
 
 
@@ -260,6 +278,23 @@ public class Game {
     public void tryIncreaseBlind() {
         if (gameLength != numRoundsLeft && (gameLength - numRoundsLeft) % whenIncreaseBlinds == 0) {
             setBlindSize(this.blindSize*2);
+        }
+    }
+
+    private void syncPlayerActionListeners(ArrayList<Player> oldPlayers, ArrayList<Player> newPlayers) {
+        if (oldPlayers != null) {
+            for (Player player : oldPlayers) {
+                player.removePropertyChangeListener("action", playerActionListener);
+            }
+        }
+
+        if (newPlayers == null) {
+            return;
+        }
+
+        for (Player player : newPlayers) {
+            player.removePropertyChangeListener("action", playerActionListener);
+            player.addPropertyChangeListener("action", playerActionListener);
         }
     }
 }

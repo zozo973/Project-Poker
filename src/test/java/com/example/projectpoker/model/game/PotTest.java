@@ -162,6 +162,30 @@ class PotTest {
         assertNotNull(pot);
     }
 
+    @Test
+    void testInitBlindsWithShortBigBlindUsesActualPostedAmount() {
+        Player smallBlind = new Player("SB", 1000);
+        smallBlind.setRole(Roles.SMALLBLIND);
+        Player bigBlind = new Player("BB", 60);
+        bigBlind.setRole(Roles.BIGBLIND);
+
+        ArrayList<Player> blindPlayers = new ArrayList<>();
+        blindPlayers.add(smallBlind);
+        blindPlayers.add(bigBlind);
+
+        Pot blindPot = new Pot(blindPlayers);
+        ArrayList<Integer> turnOrder = new ArrayList<>();
+        turnOrder.add(0);
+        turnOrder.add(1);
+
+        blindPot.initBlinds(blindPlayers, turnOrder, 100);
+
+        assertEquals(110, blindPot.getPotSize());
+        assertEquals(60, blindPot.getToPlay());
+        assertEquals(950, smallBlind.getBalance());
+        assertEquals(0, bigBlind.getBalance());
+    }
+
     // Remove Folded Tests
 
     @Test

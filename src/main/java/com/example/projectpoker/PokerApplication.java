@@ -1,13 +1,8 @@
 package com.example.projectpoker;
 
 import com.example.projectpoker.controller.RoundController;
-import com.example.projectpoker.handler.GameStatusChangeHandler;
-import com.example.projectpoker.handler.PlayerStatusChangeHandler;
-import com.example.projectpoker.handler.RoundStatusChangeHandler;
-import com.example.projectpoker.model.game.AiPlayer;
 import com.example.projectpoker.model.game.Game;
 import com.example.projectpoker.model.game.Player;
-import com.example.projectpoker.model.game.Round;
 import com.example.projectpoker.model.game.enums.Difficulty;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -16,7 +11,6 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import java.io.IOException;
-import java.util.ArrayList;
 
 import static com.example.projectpoker.model.statistics.SkewNormalSampler.safeRoundToInt;
 
@@ -33,7 +27,7 @@ public class PokerApplication extends Application {
 
         Parent root = loader.load();
 
-        Scene scene = new Scene(root, 1025, 450);
+        Scene scene = new Scene(root, 1025, 525);
 
         stage.setTitle("App Name");
         stage.setScene(scene);
@@ -64,26 +58,10 @@ public class PokerApplication extends Application {
         int blind = safeRoundToInt((userBuyIn*0.03));
         Game game = new Game(user,userBuyIn,4,blind,10,40, Difficulty.GAMBLINGADDICT);
 
-
-        PlayerStatusChangeHandler playerHandler = new PlayerStatusChangeHandler(controller);
-
-
-        RoundStatusChangeHandler roundHandler = new RoundStatusChangeHandler(controller, game);
-        GameStatusChangeHandler gameHandler = new GameStatusChangeHandler(controller);
-
-        game.setRoundHandler(roundHandler);
-        game.addPropertyChangeListener(gameHandler);
-
-
-        Round currentRound = game.getRound();
         controller.setGame(game);
-        controller.setRound(currentRound,user);
+        controller.setRound(game.getRound(), user);
 
         game.init();
-        //game.start();
-        ArrayList<AiPlayer> AiPlayers = game.getAiPlayers();
-        user.addPropertyChangeListener(playerHandler);
-        for (AiPlayer p : AiPlayers) p.addPropertyChangeListener(playerHandler);
     }
 
 }

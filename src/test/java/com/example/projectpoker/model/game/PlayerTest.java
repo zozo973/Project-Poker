@@ -258,8 +258,8 @@ class PlayerTest {
 
         assertTrue(player.getPlayerHand().getCards().isEmpty());
         assertFalse(player.getIsTurn());
-        assertNull(player.getAction());
-        assertEquals(Roles.PLAYER, player.getRole());
+        assertEquals(Action.UNDECIDED, player.getAction());
+        assertEquals(Roles.BIGBLIND, player.getRole());
         assertEquals(0, player.getTotalInvestment());
     }
 
@@ -344,6 +344,32 @@ class PlayerTest {
         assertEquals(100, result);
         assertEquals(900, player.getBalance());
         assertEquals(100, player.getRoundInvestment().getTotalInvestment());
+    }
+
+    @Test
+    void testPayBlindAsBigBlindWithShortStackPostsAllInBlind() {
+        Player shortStack = new Player("ShortStack", 60);
+        shortStack.setRole(Roles.BIGBLIND);
+
+        int result = shortStack.payBlind(100, new Pot());
+
+        assertEquals(60, result);
+        assertEquals(0, shortStack.getBalance());
+        assertEquals(60, shortStack.getRoundInvestment().getTotalInvestment());
+        assertEquals(Action.ALLIN, shortStack.getAction());
+    }
+
+    @Test
+    void testPayBlindAsBigBlindWithZeroStackPostsNothing() {
+        Player zeroStack = new Player("ZeroStack", 0);
+        zeroStack.setRole(Roles.BIGBLIND);
+
+        int result = zeroStack.payBlind(100, new Pot());
+
+        assertEquals(0, result);
+        assertEquals(0, zeroStack.getBalance());
+        assertEquals(0, zeroStack.getRoundInvestment().getTotalInvestment());
+        assertEquals(Action.UNDECIDED, zeroStack.getAction());
     }
 
     // All In Tests

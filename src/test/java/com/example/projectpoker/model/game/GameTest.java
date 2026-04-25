@@ -174,14 +174,6 @@ class GameTest {
         assertEquals(300, listener.getNewValue());
     }
 
-    // Round Handler Tests
-
-    @Test
-    void testSetRoundHandler() {
-        game.setRoundHandler(null);
-        assertNull(game.getRoundHandler());
-    }
-
     // Round Tests
 
     @Test

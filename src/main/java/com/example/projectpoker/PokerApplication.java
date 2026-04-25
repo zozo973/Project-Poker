@@ -1,10 +1,6 @@
 package com.example.projectpoker;
 
 import com.example.projectpoker.controller.RoundController;
-import com.example.projectpoker.controller.RoundViewUpdater;
-import com.example.projectpoker.handler.GameStatusChangeHandler;
-import com.example.projectpoker.handler.PlayerStatusChangeHandler;
-import com.example.projectpoker.handler.RoundStatusChangeHandler;
 import com.example.projectpoker.model.game.AiPlayer;
 import com.example.projectpoker.model.game.Game;
 import com.example.projectpoker.model.game.Player;
@@ -56,7 +52,6 @@ public class PokerApplication extends Application {
         Scene scene = new Scene(root, 1025, 450);
 
         RoundController controller = loader.getController();
-
         PokerGameUI pokerUI = new PokerGameUI();
         controller.setUI(pokerUI);
 
@@ -66,22 +61,9 @@ public class PokerApplication extends Application {
         int blind = safeRoundToInt((userBuyIn * 0.03));
 
         Game game = new Game(user, loggedInUser, userBuyIn, 4, blind, 10, 40, Difficulty.GAMBLINGADDICT);
-
-        PlayerStatusChangeHandler playerHandler = new PlayerStatusChangeHandler(controller);
-        RoundStatusChangeHandler roundHandler = new RoundStatusChangeHandler(controller, game);
-        GameStatusChangeHandler gameHandler = new GameStatusChangeHandler(controller);
-
-        game.setRoundHandler(roundHandler);
-        game.addPropertyChangeListener(gameHandler);
-        game.init();
-
-        Round currentRound = game.getRound();
         controller.setGame(game);
         controller.setRound(game.getRound(), user);
-        // previously: controller.setRound(currentRound, user);
-        ArrayList<AiPlayer> aiPlayers = game.getAiPlayers();
-        user.addPropertyChangeListener(playerHandler);
-        for (AiPlayer p : aiPlayers) p.addPropertyChangeListener(playerHandler);
+        game.init();
 
         Stage gameStage = new Stage();
         gameStage.setScene(scene);

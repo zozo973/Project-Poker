@@ -40,6 +40,10 @@ public class Round {
     private final int roundNumber;
     private boolean persisted;
 
+    public Round(ArrayList<Player> players, int blindSize) {
+        this(players, blindSize, -1, 0);
+    }
+
     public Round(ArrayList<Player> players, int blindSize, int gameSessionId, int roundNumber) {
         this.roundStatus = RoundStatus.UNINITIALISED;
         this.players = players;

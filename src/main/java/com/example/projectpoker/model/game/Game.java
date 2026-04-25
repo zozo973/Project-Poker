@@ -1,8 +1,6 @@
 package com.example.projectpoker.model.game;
 
 import com.example.projectpoker.database.DatabaseManager;
-import com.example.projectpoker.handler.RoundPlayerListener;
-import com.example.projectpoker.handler.RoundStatusChangeHandler;
 import com.example.projectpoker.model.User;
 import com.example.projectpoker.model.game.enums.Action;
 import com.example.projectpoker.model.game.enums.Difficulty;
@@ -22,8 +20,7 @@ public class Game {
     //      players Change
     //      Round Change
 
-    private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
-    private final RoundPlayerListener roundPlayerListener = new RoundPlayerListener();
+
     private GameStatus gameStatus;
     private ArrayList<Player> players;
     private int numRoundsLeft;
@@ -35,14 +32,12 @@ public class Game {
     private final int userBuyIn;
     private Round round;
     private ArrayList<ArrayList<RoundLogEntry>> GameLog;
+    private boolean roundAdvanceInProgress;
 
-    private RoundStatusChangeHandler roundHandler;
     private final int startingUserBalance;
     private int handsPlayed;
     private final User userProfile;
     private int gameSessionId;
-
-    private boolean roundAdvanceInProgress;
 
     private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
     private final PropertyChangeListener playerActionListener = evt -> {
@@ -116,11 +111,6 @@ public class Game {
     }
 
     public void setPlayers(ArrayList<Player> players) {
-        if (!(players.getFirst().getPropertyChangeListener("roundPlayerListener") instanceof RoundPlayerListener[])) {
-            for (Player p : players) {
-                p.addPropertyChangeListener("roundPlayerListener", this.roundPlayerListener);
-            }
-        }
         var oldVal = this.players;
         syncPlayerActionListeners(oldVal, players);
         this.players = players;
@@ -128,11 +118,9 @@ public class Game {
     }
 
     public void createNextRound() {
-        Round round = new Round(players, blindSize, gameSessionId, handsPlayed + 1);
+        Round round = new Round(players,blindSize);
         pcs.firePropertyChange("round",this.round,round);
-        round.addPropertyChangeListener(roundHandler);
         setRound(round);
-        roundPlayerListener.setRound(round);
     }
 
     public int getNumRoundsLeft() { return numRoundsLeft; }
@@ -158,10 +146,6 @@ public class Game {
         }
         return AiPlayers;
     }
-
-    public void setRoundHandler(RoundStatusChangeHandler roundHandler) { this.roundHandler = roundHandler; }
-
-    public RoundStatusChangeHandler getRoundHandler() { return this.roundHandler; }
 
     public int findUserIndex() {
         int i = 0;

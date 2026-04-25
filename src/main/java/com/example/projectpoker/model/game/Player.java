@@ -107,10 +107,6 @@ public class Player {
         pcs.removePropertyChangeListener(propertyName, listener);
     }
 
-    public PropertyChangeListener[] getPropertyChangeListener(String propertyName) {
-        return pcs.getPropertyChangeListeners(propertyName);
-    }
-
     public String getName() { return name; }
 
     public void setName(String name) { this.name = name; }
@@ -120,10 +116,7 @@ public class Player {
     public void setId(PlayerId id) { this.id = id; }
 
     public boolean matchId(PlayerId id) {
-        if (this.id.getId().compareTo(id.getId()) == 0) {
-            return true;
-        }
-        return false;
+        return this.id.getId().compareTo(id.getId()) == 0;
     }
 
     public Hand getPlayerHand() { return playerHand; }

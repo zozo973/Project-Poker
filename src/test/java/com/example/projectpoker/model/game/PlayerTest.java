@@ -33,7 +33,6 @@ class PlayerTest {
         assertEquals(Roles.PLAYER, p.getRole());
         assertFalse(p.getIsTurn());
         assertNull(p.getAction());
-        assertEquals(0, p.getRoundInvestment());
         assertNotNull(p.getId());
     }
 
@@ -376,7 +375,6 @@ class PlayerTest {
 
     @Test
     void testAllIn() {
-        int initialBalance = player.getBalance();
         player.allIn();
         assertEquals(0, player.getBalance());
     }

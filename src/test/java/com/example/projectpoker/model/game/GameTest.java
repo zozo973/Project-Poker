@@ -1,6 +1,5 @@
 package com.example.projectpoker.model.game;
 
-import com.example.projectpoker.model.game.enums.Action;
 import com.example.projectpoker.model.game.enums.Difficulty;
 import com.example.projectpoker.model.game.enums.GameStatus;
 import org.junit.jupiter.api.BeforeEach;
@@ -111,7 +110,7 @@ class GameTest {
         newPlayers.add(new Player("New2", 500));
         game.setPlayers(newPlayers);
         assertEquals(2, game.getPlayers().size());
-        assertEquals("New1", game.getPlayers().get(0).getName());
+        assertEquals("New1", game.getPlayers().getFirst().getName());
     }
 
     @Test
@@ -141,7 +140,7 @@ class GameTest {
     void testGetAiPlayersContainsOnlyAi() {
         ArrayList<AiPlayer> aiPlayers = game.getAiPlayers();
         for (AiPlayer ai : aiPlayers) {
-            assertTrue(ai instanceof AiPlayer);
+            assertInstanceOf(AiPlayer.class, ai);
         }
     }
 

@@ -41,7 +41,7 @@ class PotTest {
     void testConstructorWithPlayer() {
         Pot singlePot = new Pot(player1);
         assertEquals(1, singlePot.getPlayers().size());
-        assertEquals(player1, singlePot.getPlayers().get(0));
+        assertEquals(player1, singlePot.getPlayers().getFirst());
         assertTrue(singlePot.getIsOpen());
         assertEquals(0, singlePot.getPotPriority());
     }
@@ -70,7 +70,7 @@ class PotTest {
         newPlayers.add(new Player("New1", 500));
         pot.setPlayers(newPlayers);
         assertEquals(1, pot.getPlayers().size());
-        assertEquals("New1", pot.getPlayers().get(0).getName());
+        assertEquals("New1", pot.getPlayers().getFirst().getName());
     }
 
     @Test

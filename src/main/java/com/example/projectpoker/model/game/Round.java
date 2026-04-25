@@ -274,7 +274,7 @@ public class Round {
     }
 
     private void betting() {
-        Player activePlayer = null;
+        Player activePlayer;
         boolean bettingEnded;
         do {
             bettingEnded = false;
@@ -294,7 +294,7 @@ public class Round {
                             activePlayer.setActiveBet(0);
                         }
                         // If player has balance but not enough to call, they automatically go all-in
-                        else if (playerBalance > 0 && requiredToCall > playerBalance) {
+                        else if (requiredToCall > playerBalance) {
                             activePlayer.setAction(Action.ALLIN);
                             activePlayer.setActiveBet(playerBalance);
                         }
@@ -320,7 +320,7 @@ public class Round {
             }
             
             // If we went through all players without asking any to act, check if betting should end
-            if (!anyPlayerAsked && !bettingEnded) {
+            if (!anyPlayerAsked) {
                 // All remaining players have made their decisions, check if betting is complete
                 bettingEnded = checkIfBettingComplete();
             }
@@ -338,17 +338,17 @@ public class Round {
         
         for (Player p : players) {
             if (p.getAction() == Action.ALLIN) {
-                numAllIn += 1;
+                numAllIn++;
             } else if (p.getAction() == Action.CALL) {
-                numCall += 1;
+                numCall++;
             } else if (p.getAction() == Action.RAISE) {
-                numRaise += 1;
+                numRaise++;
             } else if (p.getAction() == Action.FOLD) {
-                numFold += 1;
+                numFold++;
             } else if (p.getAction() == Action.CHECK) {
-                numCheck += 1;
+                numCheck++;
             } else if (p.getAction() == Action.UNDECIDED) {
-                numUndecided += 1;
+                numUndecided++;
             }
         }
         
@@ -358,11 +358,7 @@ public class Round {
         }
         
         // If only one non-folded player remains, betting is complete
-        if ((players.size() - numFold) == 1) {
-            return true;
-        }
-        
-        return false;
+        return (players.size() - numFold) == 1;
     }
 
     private void waitForUserAction(Player activePlayer) {

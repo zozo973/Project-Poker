@@ -158,7 +158,7 @@ class RoundTest {
     @Test
     void testAddPot() {
         assertEquals(1, round.getPots().size());
-        assertTrue(round.getPots().get(0).getIsOpen());
+        assertTrue(round.getPots().getFirst().getIsOpen());
         
         round.addPot(new Pot(players));
         
@@ -213,7 +213,7 @@ class RoundTest {
         cards.add(Card.HJ);
         round.setCommunityCards(cards);
         assertEquals(3, round.getCommunityCards().size());
-        assertEquals(Card.CA, round.getCommunityCards().get(0));
+        assertEquals(Card.CA, round.getCommunityCards().getFirst());
     }
 
     // To Play Tests

@@ -35,12 +35,27 @@ public class Game {
     private final int userBuyIn;
     private Round round;
     private ArrayList<ArrayList<RoundLogEntry>> GameLog;
+
     private RoundStatusChangeHandler roundHandler;
     private final int startingUserBalance;
     private int handsPlayed;
     private final User userProfile;
     private int gameSessionId;
 
+    private boolean roundAdvanceInProgress;
+
+    private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
+    private final PropertyChangeListener playerActionListener = evt -> {
+        if (!"action".equals(evt.getPropertyName())) {
+            return;
+        }
+
+        if (evt.getNewValue() == Action.FORFEIT && round != null) {
+            round.removeForfeited();
+            numPlayers = players.size();
+            pcs.firePropertyChange("players", null, this.players);
+        }
+    };
 
     // Constructor called when starting a new game of poker
     // @Params
@@ -107,6 +122,7 @@ public class Game {
             }
         }
         var oldVal = this.players;
+        syncPlayerActionListeners(oldVal, players);
         this.players = players;
         pcs.firePropertyChange("players",oldVal,this.players);
     }
@@ -185,45 +201,65 @@ public class Game {
         startNextRound();
     }
 
-    public void startNextRound() {
+    public synchronized void startNextRound() {
 
-        if (gameStatus != GameStatus.RUNNING)
-            return;
-
-        // Loss conditions
-        if (getUser().getBalance() == 0) {
-            end();
+        // Guarding behaviour so that multiple rounds cant be started simultaneously
+        if (roundAdvanceInProgress) {
             return;
         }
+        roundAdvanceInProgress = true;
 
-        if (numRoundsLeft == 0) {
-            end();
-            return;
+        try {
+            if (gameStatus != GameStatus.RUNNING) {return;}
+
+            clearPlayerHands();
+
+            // Loss conditions
+            if (getUser().getBalance() == 0) {
+                end();
+                return;
+            }
+
+            if (numRoundsLeft == 0) {
+                end();
+                return;
+            }
+
+            if (players.size() == 1 &&
+                    !(players.getFirst() instanceof AiPlayer)) {
+                end();
+                return;
+            }
+            createNextRound();
+            round.init();
+            round.start();
+        } finally {
+            roundAdvanceInProgress = false;
         }
-
-        if (players.size() == 1 &&
-                !(players.getFirst() instanceof AiPlayer)) {
-            end();
-            return;
-        }
-
-        createNextRound();
-
-        System.out.println(round.getRoundStatus());
-
-        round.init();
-
-        System.out.println(round.getRoundStatus());
-
-        round.start();
     }
-    public void onRoundEnded() {
+    public synchronized void onRoundEnded() {
+
+        if (round == null || round.getRoundStatus() != com.example.projectpoker.model.game.enums.RoundStatus.END) {
+            return;
+        }
+
+        clearPlayerHands();
 
         GameLog.add(round.getRoundLog());
 
         nextRoundInitialisation();
 
         startNextRound();
+    }
+
+    private void clearPlayerHands() {
+        if (players == null) {
+            return;
+        }
+
+        for (Player player : players) {
+            player.getPlayerHand().clear();
+        }
     }
 
 
@@ -278,6 +314,24 @@ public class Game {
             setBlindSize(this.blindSize*2);
         }
     }
+
+    private void syncPlayerActionListeners(ArrayList<Player> oldPlayers, ArrayList<Player> newPlayers) {
+        if (oldPlayers != null) {
+            for (Player player : oldPlayers) {
+                player.removePropertyChangeListener("action", playerActionListener);
+            }
+        }
+
+        if (newPlayers == null) {
+            return;
+        }
+
+        for (Player player : newPlayers) {
+            player.removePropertyChangeListener("action", playerActionListener);
+            player.addPropertyChangeListener("action", playerActionListener);
+        }
+    }
+
 
     // method to check if any players have lost all there money or left the game.
     public void checkForfeitedPlayers() {

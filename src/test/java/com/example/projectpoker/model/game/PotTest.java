@@ -41,7 +41,7 @@ class PotTest {
     void testConstructorWithPlayer() {
         Pot singlePot = new Pot(player1);
         assertEquals(1, singlePot.getPlayers().size());
-        assertEquals(player1, singlePot.getPlayers().get(0));
+        assertEquals(player1, singlePot.getPlayers().getFirst());
         assertTrue(singlePot.getIsOpen());
         assertEquals(0, singlePot.getPotPriority());
     }
@@ -70,7 +70,7 @@ class PotTest {
         newPlayers.add(new Player("New1", 500));
         pot.setPlayers(newPlayers);
         assertEquals(1, pot.getPlayers().size());
-        assertEquals("New1", pot.getPlayers().get(0).getName());
+        assertEquals("New1", pot.getPlayers().getFirst().getName());
     }
 
     @Test
@@ -160,6 +160,30 @@ class PotTest {
         turnOrder.add(1);
         pot.initBlinds(players, turnOrder, 100);
         assertNotNull(pot);
+    }
+
+    @Test
+    void testInitBlindsWithShortBigBlindUsesActualPostedAmount() {
+        Player smallBlind = new Player("SB", 1000);
+        smallBlind.setRole(Roles.SMALLBLIND);
+        Player bigBlind = new Player("BB", 60);
+        bigBlind.setRole(Roles.BIGBLIND);
+
+        ArrayList<Player> blindPlayers = new ArrayList<>();
+        blindPlayers.add(smallBlind);
+        blindPlayers.add(bigBlind);
+
+        Pot blindPot = new Pot(blindPlayers);
+        ArrayList<Integer> turnOrder = new ArrayList<>();
+        turnOrder.add(0);
+        turnOrder.add(1);
+
+        blindPot.initBlinds(blindPlayers, turnOrder, 100);
+
+        assertEquals(110, blindPot.getPotSize());
+        assertEquals(60, blindPot.getToPlay());
+        assertEquals(950, smallBlind.getBalance());
+        assertEquals(0, bigBlind.getBalance());
     }
 
     // Remove Folded Tests

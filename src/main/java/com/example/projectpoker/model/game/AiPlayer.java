@@ -7,7 +7,7 @@ import static java.lang.Math.abs;
 
 public class AiPlayer extends Player {
 
-    private Difficulty difficulty;
+    private final Difficulty difficulty;
 
     public AiPlayer(Difficulty difficulty, int playerBalance) {
         super();
@@ -23,16 +23,6 @@ public class AiPlayer extends Player {
         return skewNormalSampler.sample(playerBalance, omega, alpha);
     }
 
-    private void generatePlayerId() {
-
-
-    }
-
-    @Override
-    public void chooseBetSize() {
-        // get AI Instance to decide on bet size (as int)
-        this.setActiveBet(0);
-    }
 
     @Override
     public void forfeitGame() {

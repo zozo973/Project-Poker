@@ -158,7 +158,7 @@ class RoundTest {
     @Test
     void testAddPot() {
         assertEquals(1, round.getPots().size());
-        assertTrue(round.getPots().get(0).getIsOpen());
+        assertTrue(round.getPots().getFirst().getIsOpen());
         
         round.addPot(new Pot(players));
         
@@ -213,7 +213,7 @@ class RoundTest {
         cards.add(Card.HJ);
         round.setCommunityCards(cards);
         assertEquals(3, round.getCommunityCards().size());
-        assertEquals(Card.CA, round.getCommunityCards().get(0));
+        assertEquals(Card.CA, round.getCommunityCards().getFirst());
     }
 
     // To Play Tests
@@ -360,6 +360,14 @@ class RoundTest {
 
     @Test
     void testRoundInit() {
+        players.get(0).setRole(com.example.projectpoker.model.game.enums.Roles.DEALER);
+        players.get(1).setRole(com.example.projectpoker.model.game.enums.Roles.SMALLBLIND);
+        players.get(2).setRole(com.example.projectpoker.model.game.enums.Roles.BIGBLIND);
 
+        round.init();
+
+        assertEquals(RoundStatus.BLINDS, round.getRoundStatus());
+        assertTrue(round.getMainPot().getPotSize() > 0);
+        assertTrue(round.getToPlay() > 0);
     }
 }

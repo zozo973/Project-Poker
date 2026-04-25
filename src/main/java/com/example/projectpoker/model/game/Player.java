@@ -19,7 +19,7 @@ public class Player {
     //      Action Change
 
     private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
-    private Hand playerHand;
+    private final Hand playerHand;
     private PlayerId id;
     private String name;
     private boolean isTurn;
@@ -107,10 +107,6 @@ public class Player {
         pcs.removePropertyChangeListener(propertyName, listener);
     }
 
-    public PropertyChangeListener[] getPropertyChangeListener(String propertyName) {
-        return pcs.getPropertyChangeListeners(propertyName);
-    }
-
     public String getName() { return name; }
 
     public void setName(String name) { this.name = name; }
@@ -120,10 +116,7 @@ public class Player {
     public void setId(PlayerId id) { this.id = id; }
 
     public boolean matchId(PlayerId id) {
-        if (this.id.getId().compareTo(id.getId()) == 0) {
-            return true;
-        }
-        return false;
+        return this.id.getId().compareTo(id.getId()) == 0;
     }
 
     public Hand getPlayerHand() { return playerHand; }
@@ -144,8 +137,6 @@ public class Player {
         pcs.firePropertyChange("balance",oldVal,this.balance);
     }
 
-    public Bet getLastBet() { return roundInvestment.getLastBet(); }
-
     public RoundInvestment getRoundInvestment() { return roundInvestment; }
 
     public int getTotalInvestment() { return roundInvestment.getTotalInvestment(); }
@@ -159,11 +150,7 @@ public class Player {
         return potInvestment;
     }
 
-    protected void setRoundInvestment(RoundInvestment roundInvestment) { this.roundInvestment = roundInvestment; }
-
     protected void setRoundInvestment(int totalInvested) { this.roundInvestment = new RoundInvestment(totalInvested); }
-
-    protected void setRoundInvestment(int totalInvested, ArrayList<Bet> bets) { this.roundInvestment = new RoundInvestment(totalInvested, bets); }
 
     public Action getAction() { return action; }
 
@@ -181,7 +168,6 @@ public class Player {
         var oldVal = this.isTurn;
         this.isTurn = isTurn;
         pcs.firePropertyChange("isTurn",oldVal,this.isTurn);
-        if (!this.isTurn) this.activeBet = null;
     }
 
     public Roles getRole() { return role; }
@@ -201,22 +187,13 @@ public class Player {
         pcs.firePropertyChange("roundReset",this, new Player(getName(),getBalance()));
         this.playerHand.clear();
         this.isTurn = false;
-        this.action = null;
-        this.role = Roles.PLAYER;
+        this.action = Action.UNDECIDED;
         this.roundInvestment.reset();
         this.activeBet = null;
     }
 
-    public boolean checkAllInCreatesSidePot(int bet, Pot pot) {
-        if (action.equals(Action.ALLIN) && pot.getToPlay() > bet) {
-            return true;
-        }
-        return false;
-    }
-
     public void win(int potSize) {
         this.balance += potSize;
-        //
     }
 
     public int placeBet(int betSize, Pot pot) {
@@ -225,29 +202,11 @@ public class Player {
         if (betSize <= 0) {
             throw new IllegalArgumentException("Bet must be positive.");
         }
-        if (betSize > b) {
 
-            // TODO implement method that lets user know they don't have that much
-            // If a slider is used to get user input for betting size this should be redundant
-
-            throw new IllegalArgumentException("Bet exceeds player balance.");
-
-        } else if (betSize == b) {
-            // TODO add method that queries if player wants to go all in
-            // If player accepts to all in then
-            // throw new IllegalArgumentException("Bet exceeds player balance.");
-            System.out.println("Would you like to go all in?");
-            // wait for user response
-            boolean response = false; // allIn();
+        else if (betSize == b) {
             setBalance(0);
-            if (response) {
-                betSize = b;
-                allIn();
-                // calculate the main pot this player can win
-            } else {
-                // if responds is to fold
-                this.action = Action.FOLD;
-                betSize = -1;
+            if (this.action != Action.ALLIN) {
+                this.action = Action.ALLIN;
             }
         } else {
             setBalance((b - betSize));
@@ -259,8 +218,15 @@ public class Player {
 
     public int payBlind(int blindSize, Pot pot) {
         if (this.role == Roles.PLAYER || this.role == Roles.DEALER) return 0;
+
         int blind = safeRoundToInt(role.getBlindMultiplier() * blindSize);
-        return placeBet(blind,pot);
+        int balance = getBalance();
+        if (balance <= 0) {
+            return 0;
+        }
+
+        int blindToPay = Math.min(blind, balance);
+        return placeBet(blindToPay,pot);
     }
 
     public void allIn() {
@@ -268,11 +234,6 @@ public class Player {
         if (betAmount > 0) {
             subtractBalance(betAmount);
         }
-    }
-
-    public void chooseBetSize() {
-        // return rounded slider value from the view
-        this.activeBet = 0; //  TODO implement method.
     }
 
     public void forfeitGame() {

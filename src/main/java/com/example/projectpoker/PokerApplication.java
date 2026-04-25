@@ -32,10 +32,6 @@ public class PokerApplication extends Application {
         FXMLLoader fxmlLoader = new FXMLLoader(PokerApplication.class.getResource("/com/example/projectpoker/Account & Profile UI/login.fxml"));
         Scene scene = new Scene(fxmlLoader.load(), 350, 400);
 
-        // TODO implement stylesheet for welcome to app screen
-        // String stylesheet = HelloApplication.class.getResource("welcome-stylesheet.css").toExternalForm();
-        // scene.getStylesheets().add(stylesheet);
-
         stage.setTitle("App Name");
         stage.setScene(scene);
         stage.show();
@@ -81,8 +77,8 @@ public class PokerApplication extends Application {
 
         Round currentRound = game.getRound();
         controller.setGame(game);
-        controller.setRound(currentRound, user);
-
+        controller.setRound(game.getRound(), user);
+        // previously: controller.setRound(currentRound, user);
         ArrayList<AiPlayer> aiPlayers = game.getAiPlayers();
         user.addPropertyChangeListener(playerHandler);
         for (AiPlayer p : aiPlayers) p.addPropertyChangeListener(playerHandler);

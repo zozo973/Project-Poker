@@ -83,7 +83,8 @@ public final class PotUtil {
     }
 
     public static ArrayList<Pot> payMultipleSidePots(ArrayList<Pot> pots, Player p) {
-        int bet = p.getActiveBet();
+        Integer activeBet = p.getActiveBet();
+        int bet = activeBet != null ? activeBet : 0;
         ArrayList<Pot> paidPots = new ArrayList<>();
         int totalPotToPlay = 0;
         for (Pot pot : pots) {
@@ -111,7 +112,8 @@ public final class PotUtil {
     }
 
     public static ArrayList<Pot> payOpenPot(ArrayList<Pot> pots, Player p) {
-        int bet = p.getActiveBet();
+        Integer activeBet = p.getActiveBet();
+        int bet = activeBet != null ? activeBet : 0;
         int i = getOpenPotIndex(pots);
         if (i == -1) throw new IllegalStateException("There is no active Pot");
         pots.get(i).addBet(p,bet);

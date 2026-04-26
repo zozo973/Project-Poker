@@ -2,11 +2,14 @@ package com.example.projectpoker;
 
 import com.example.projectpoker.model.game.Card;
 import com.example.projectpoker.model.game.TablePosition;
+import com.example.projectpoker.model.game.enums.Roles;
+import javafx.animation.FadeTransition;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.control.Label;
 import javafx.scene.layout.Pane;
+import javafx.util.Duration;
 
 import java.util.HashMap;
 import java.util.List;
@@ -17,9 +20,12 @@ import static com.example.projectpoker.model.game.TablePosition.*;
 public class PokerGameUI {
 
     private static final double CARD_WIDTH = 50;
+    private static final String GREY_NAMEPLATE_STYLE = "-fx-background-color: grey; -fx-text-fill: black; -fx-border-color: black; -fx-border-radius: 4; -fx-background-radius: 4; -fx-padding: 4 8 4 8; -fx-font-size: 11;";
+    private static final String YELLOW_NAMEPLATE_STYLE = "-fx-background-color: yellow; -fx-text-fill: black; -fx-border-color: black; -fx-border-radius: 4; -fx-background-radius: 4; -fx-padding: 4 8 4 8; -fx-font-size: 11;";
 
     private Pane tablePane;
     private final Map<TablePosition, Label> nameplates = new HashMap<>();
+    private final Map<TablePosition, FadeTransition> activeNameplateAnimations = new HashMap<>();
 
     public void setTablePane(Pane tablePane) {
         this.tablePane = tablePane;
@@ -50,13 +56,19 @@ public class PokerGameUI {
 
     public void clearNameplates() {
         if (tablePane == null) return;
+
+        for (FadeTransition pulse : activeNameplateAnimations.values()) {
+            pulse.stop();
+        }
+        activeNameplateAnimations.clear();
+
         for (Label label : nameplates.values()) {
             tablePane.getChildren().remove(label);
         }
         nameplates.clear();
     }
 
-    public void displayNameplate(String playerName, TablePosition position, boolean isActiveTurn) {
+    public void displayNameplate(String playerName, Roles role, TablePosition position, boolean isActiveTurn) {
         if (tablePane == null || position == null) return;
 
         //Rewrite if already exists
@@ -64,37 +76,52 @@ public class PokerGameUI {
         if (existing != null) {
             tablePane.getChildren().remove(existing);
         }
+
+        FadeTransition existingAnimation = activeNameplateAnimations.remove(position);
+        if (existingAnimation != null) {
+            existingAnimation.stop();
+        }
+
         // Set non-existent players names to "Player"
-        Label label = new Label(playerName == null || playerName.isBlank() ? "Player" : playerName);
+        String baseName = playerName == null || playerName.isBlank() ? "Player" : playerName;
+        Label label = new Label(baseName + roleBadge(role));
 
         //Change label colour to show active players turn
-        label.setStyle(isActiveTurn
-                ? "-fx-background-color: yellow; -fx-text-fill: black; -fx-border-color: black; -fx-border-radius: 4; -fx-background-radius: 4; -fx-padding: 4 8 4 8; -fx-font-size: 11;"
-                : "-fx-background-color: grey; -fx-text-fill: black; -fx-border-color: black; -fx-border-radius: 4; -fx-background-radius: 4; -fx-padding: 4 8 4 8; -fx-font-size: 11;");
+        label.setStyle(isActiveTurn ? YELLOW_NAMEPLATE_STYLE : GREY_NAMEPLATE_STYLE);
 
-        // Get coordinates
-        double[] xy = getNameplateCoordinates(position);
-        label.setLayoutX(xy[0]);
-        label.setLayoutY(xy[1]);
+        label.setLayoutX(position.x + position.nameplateOffsetX);
+        label.setLayoutY(position.y + position.nameplateOffsetY);
         label.toFront();
+
+        if (isActiveTurn) {
+            FadeTransition pulse = new FadeTransition(Duration.millis(450), label);
+            pulse.setFromValue(1.0);
+            pulse.setToValue(0.6);
+            pulse.setCycleCount(FadeTransition.INDEFINITE);
+            pulse.setAutoReverse(true);
+            pulse.play();
+            activeNameplateAnimations.put(position, pulse);
+        }
 
         //Render nameplate
         tablePane.getChildren().add(label);
         nameplates.put(position, label);
     }
 
-    private double[] getNameplateCoordinates(TablePosition position) {
-        if (position == PlayerPos) {
-            return new double[]{position.x - 55, position.y - 10};
+    private String roleBadge(Roles role) {
+        if (role == null) {
+            return "";
         }
-        if (position == LeftPos) {
-            return new double[]{position.x + 20, position.y + 60};
+        switch (role) {
+            case DEALER:
+                return " [D]";
+            case SMALLBLIND:
+                return " [SB]";
+            case BIGBLIND:
+                return " [BB]";
+            default:
+                return "";
         }
-        if (position == RightPos) {
-            return new double[]{position.x - 15, position.y + 40};
-        }
-        // Top seats
-        return new double[]{position.x - 70, position.y + 5};
     }
 
     private void displayTable() {

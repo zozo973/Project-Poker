@@ -298,7 +298,7 @@ public class RoundController implements RoundViewUpdater {
         }
 
         pokerUI.clearNameplates();
-        pokerUI.displayNameplate(userPlayer.getName(), TablePosition.PlayerPos, userPlayer == activeTurnPlayer);
+        pokerUI.displayNameplate(userPlayer.getName(), userPlayer.getRole(), TablePosition.PlayerPos, userPlayer == activeTurnPlayer);
 
         int seatIndex = 1;
         for (Player player : game.getPlayers()) {
@@ -314,6 +314,7 @@ public class RoundController implements RoundViewUpdater {
 
             pokerUI.displayNameplate(
                     player.getName(),
+                    player.getRole(),
                     TablePosition.PosList.get(seatIndex),
                     player == activeTurnPlayer
             );
@@ -323,14 +324,7 @@ public class RoundController implements RoundViewUpdater {
 
     @Override
     public void onPlayerRoleUpdate(Roles role) {
-        // Each Role should have some differentiable visual and textual feature to differentiate them in the ui.
-        switch(role) {
-            case PLAYER:
-            case DEALER:
-            case SMALLBLIND:
-            case BIGBLIND:
-                break;
-        }
+        runOnFxThread(this::renderNameplatesNow);
     }
 
     public void reset() {

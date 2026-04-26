@@ -56,18 +56,27 @@
 
         <right>
 
-            <VBox spacing="10"
-                  prefWidth="220"
-                  style="-fx-padding: 10;">
+            <!--Window box of AI Coaching -->
+            <VBox spacing="10" prefWidth="240" style="-fx-padding: 10;" VBox.vgrow="ALWAYS">
+                <Label text="AI Coach"/>
 
-                <Label text="Coach / Chat Window"/>
+                <HBox spacing="4">
+                    <ToggleButton fx:id="btnSafe" text="SAFE" onAction="#handleAiMode"/>
+                    <ToggleButton fx:id="btnNormal" text="NORMAL" onAction="#handleAiMode" selected="true"/>
+                    <ToggleButton fx:id="btnRisky" text="RISKY" onAction="#handleAiMode"/>
+                </HBox>
 
-                <TextArea prefHeight="300"
-                          editable="false"
-                          wrapText="true"/>
+                <Button fx:id="btnGenerate" text="Get AI Advice" maxWidth="Infinity" onAction="#handleAiGenerate"/>
+                <Label text="Result:"/>
 
-                <TextField promptText="User input"/>
+                <VBox spacing="6" prefHeight="220" VBox.vgrow="ALWAYS" style="-fx-border-color: grey; -fx-border-width: 1; -fx-padding: 8;">
+                    <Label fx:id="aiActionLabel" text="Action: -" style="-fx-font-weight: bold; -fx-font-size: 18;"/>
+                    <Label fx:id="aiReasonLabel" text="Reason: -" wrapText="true" style="-fx-font-size: 18;"/>
+                    <Label fx:id="aiStatusLabel" text="Press the button to get advice." style="-fx-text-fill: grey; -fx-font-size: 14;" wrapText="true"/>
+                    <Separator/>
 
+                    <Label text="⚠ AI advice is for reference only. Use your own judgement." wrapText="true" style="-fx-text-fill: grey; -fx-font-size: 12; -fx-font-style: italic;"/>
+                </VBox>
             </VBox>
 
         </right>

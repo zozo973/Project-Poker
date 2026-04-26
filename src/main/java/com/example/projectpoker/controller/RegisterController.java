@@ -64,12 +64,18 @@ public class RegisterController {
             messageLabel.setText("Please make sure passwords match.");
             return;
         }
-
-        // check if username meets criteria
-        boolean hasIllegalUsername = ILLEGAL_CHARS.matcher(username).find();
-        if (username.length() < 3 || hasIllegalUsername) {
+        // check if username contains 3 or more characters
+        if (username.length() < 3) {
             usernameField.setText("");
-            messageLabel.setText("Username must be 3 or more characters and contain no special characters/spaces.");
+            messageLabel.setText("Username must be 3 or more characters.");
+            return;
+        }
+        // variable for checking illegal characters
+        boolean hasIllegalUsername = ILLEGAL_CHARS.matcher(username).find();
+        // check if username contains no illegal characters
+        if (hasIllegalUsername) {
+            usernameField.setText("");
+            messageLabel.setText("Username must contain no illegal characters/spaces.");
             return;
         }
 
@@ -80,15 +86,29 @@ public class RegisterController {
             return;
         }
 
-        // check if password meets criteria for a strong password
-            // variable for checking illegal characters
-        boolean hasIllegalPassword = ILLEGAL_CHARS.matcher(password).find();
-            // variable for checking lack of a number or special character
-        boolean isWeakPassword = !password.matches(".*[0-9!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>\\/?].*");
-        if ( (password.length() < 8 ) || isWeakPassword || hasIllegalPassword ){
+        // check if password is correct length of 8 characters
+        if ( password.length() < 8 ){
             passwordField.setText("");
             confirmPasswordField.setText("");
-            messageLabel.setText("Please make sure password meets criteria: \n - contains 8 or more characters \n - contains a number or special character \n - doesn't contain illegal characters");
+            messageLabel.setText("Please make sure password contains 8 or more characters.");
+            return;
+        }
+        // variable for checking lack of a number or special character
+        boolean isWeakPassword = !password.matches(".*[0-9!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>\\/?].*");
+        // check if password contains numbers or special characters
+        if (isWeakPassword){
+            passwordField.setText("");
+            confirmPasswordField.setText("");
+            messageLabel.setText("Please make sure password contains a number or special character.");
+            return;
+        }
+        // variable for checking illegal characters
+        boolean hasIllegalPassword = ILLEGAL_CHARS.matcher(password).find();
+        // check if password contains illegal characters
+        if ( hasIllegalPassword ){
+            passwordField.setText("");
+            confirmPasswordField.setText("");
+            messageLabel.setText("Please make sure password contains 8 or more characters.");
             return;
         }
 

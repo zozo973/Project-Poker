@@ -1,6 +1,5 @@
 package com.example.projectpoker.model.game;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class TablePosition {
@@ -33,9 +32,9 @@ public class TablePosition {
     public static TablePosition PlayerPos = new TablePosition(300,300,15,0,0);
     public static TablePosition BoardPos =  new TablePosition(250,123,54,0,0, 1);
 
-    public static TablePosition TopLeftPos   = new TablePosition(180, 0, -15, 0, 180);
-    public static TablePosition TopMidPos    = new TablePosition(330, 0, -15, 0, 180);
-    public static TablePosition TopRightPos  = new TablePosition(500, 0, -15, 0, 180);
+    public static TablePosition TopLeftPos   = new TablePosition(220, 0, -15, 0, 180);
+    public static TablePosition TopMidPos    = new TablePosition(380, 0, -15, 0, 180);
+    public static TablePosition TopRightPos  = new TablePosition(580, 0, -15, 0, 180);
 
     public static TablePosition LeftPos      = new TablePosition(-15, 140, 0, 15, 90);
     public static TablePosition RightPos     = new TablePosition(765, 140, 0, -15, -90);

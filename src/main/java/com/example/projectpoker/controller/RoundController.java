@@ -55,6 +55,7 @@ public class RoundController implements RoundViewUpdater {
     private Game game;
     private Round round;
     private Player userPlayer;
+    private Player activeTurnPlayer;
     private volatile boolean roundTransitionInProgress;
     private final ArrayList<Player> observedPlayers = new ArrayList<>();
     private final PropertyChangeListener gameListener = this::handleGameEvent;
@@ -96,7 +97,7 @@ public class RoundController implements RoundViewUpdater {
         }
 
         if (clearBeforeRender) {
-            pokerUI.clearCards();
+            pokerUI.initialiseTable();
         }
 
         ArrayList<Player> players = game.getPlayers();
@@ -114,6 +115,8 @@ public class RoundController implements RoundViewUpdater {
             pokerUI.displayCards(player.getPlayerHand().getCards(), TablePosition.PosList.get(seatIndex), revealOpponents);
             seatIndex++;
         }
+
+        renderNameplatesNow();
     }
     public void setRound(Round round, Player userPlayer) {
         if (this.round != null) {
@@ -130,7 +133,10 @@ public class RoundController implements RoundViewUpdater {
 
     @Override
     public void onRoundStarted() {
-        Platform.runLater(() -> pokerUI.clearCards());
+        Platform.runLater(() -> {
+            pokerUI.initialiseTable();
+            renderNameplatesNow();
+        });
         disableActionButtons();
         roundTransitionInProgress = false;
         setStartRoundButtonEnabled(false);
@@ -277,13 +283,42 @@ public class RoundController implements RoundViewUpdater {
 
         runOnFxThread(() -> {
             boolean revealOpponents = round.getRoundStatus() == RoundStatus.SHOWDOWN;
-            pokerUI.clearCards();
+            pokerUI.initialiseTable();
 
             if (round.getCommunityCards() != null && !round.getCommunityCards().isEmpty()) {
                 pokerUI.displayCards(round.getCommunityCards(), TablePosition.BoardPos, true);
             }
             renderHoleCardsNow(revealOpponents, false);
         });
+    }
+
+    private void renderNameplatesNow() {
+        if (game == null || pokerUI == null || userPlayer == null) {
+            return;
+        }
+
+        pokerUI.clearNameplates();
+        pokerUI.displayNameplate(userPlayer.getName(), TablePosition.PlayerPos, userPlayer == activeTurnPlayer);
+
+        int seatIndex = 1;
+        for (Player player : game.getPlayers()) {
+            if (player == userPlayer) {
+                continue;
+            }
+            if (player.getAction() == Action.FOLD) {
+                continue;
+            }
+            if (seatIndex >= TablePosition.PosList.size()) {
+                break;
+            }
+
+            pokerUI.displayNameplate(
+                    player.getName(),
+                    TablePosition.PosList.get(seatIndex),
+                    player == activeTurnPlayer
+            );
+            seatIndex++;
+        }
     }
 
     @Override
@@ -317,6 +352,7 @@ public class RoundController implements RoundViewUpdater {
             potLabel.setText("Pot: " + getTotalPotSize());
             phaseLabel.setText("Phase: " + round.getRoundStatus());
         }
+        renderNameplatesNow();
         updateCallDisplay();
         updateRoundCounterLabel();
         updateBetSlider();
@@ -534,14 +570,25 @@ public class RoundController implements RoundViewUpdater {
 
     private void handleTurnChange(PropertyChangeEvent evt) {
         boolean isTurn = (boolean) evt.getNewValue();
-        if (!isTurn) {
+        if (!(evt.getSource() instanceof Player turnPlayer)) {
             return;
         }
 
-        if (evt.getSource() instanceof AiPlayer) {
-            onAiTurnStarted();
-        } else if (evt.getSource() instanceof Player) {
-            onUserTurnStarted();
+        if (isTurn) {
+            activeTurnPlayer = turnPlayer;
+            runOnFxThread(this::renderNameplatesNow);
+
+            if (turnPlayer instanceof AiPlayer) {
+                onAiTurnStarted();
+            } else {
+                onUserTurnStarted();
+            }
+            return;
+        }
+
+        if (turnPlayer == activeTurnPlayer) {
+            activeTurnPlayer = null;
+            runOnFxThread(this::renderNameplatesNow);
         }
     }
 

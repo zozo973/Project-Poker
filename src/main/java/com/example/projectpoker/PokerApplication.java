@@ -49,7 +49,7 @@ public class PokerApplication extends Application {
         FXMLLoader loader = new FXMLLoader(
                 PokerApplication.class.getResource("poker-round-view.fxml"));
         Parent root = loader.load();
-        Scene scene = new Scene(root, 1025, 525);
+        Scene scene = new Scene(root, 1050, 550);
 
         RoundController controller = loader.getController();
         PokerGameUI pokerUI = new PokerGameUI();

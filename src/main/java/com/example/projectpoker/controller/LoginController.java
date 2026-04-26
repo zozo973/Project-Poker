@@ -48,7 +48,6 @@ public class LoginController {
             }
 
             boolean verifiedPassword = PasswordHasher.verify(password, user.getPassword());
-
             // check if password is correct
             if (!verifiedPassword) {
                 messageLabel.setText("Incorrect password.");

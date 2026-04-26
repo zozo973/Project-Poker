@@ -1,5 +1,8 @@
 package com.example.projectpoker.controller;
 
+import com.example.projectpoker.AiCoaching;
+import com.example.projectpoker.model.game.enums.AiAdviceMode;
+
 import com.example.projectpoker.PokerGameUI;
 import com.example.projectpoker.model.game.*;
 import com.example.projectpoker.model.game.TablePosition;
@@ -7,11 +10,13 @@ import com.example.projectpoker.model.game.enums.Action;
 import com.example.projectpoker.model.game.enums.GameStatus;
 import com.example.projectpoker.model.game.enums.Roles;
 import com.example.projectpoker.model.game.enums.RoundStatus;
+import javafx.concurrent.Task;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
+
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -34,6 +39,18 @@ public class RoundController implements RoundViewUpdater {
     @FXML private Button foldButton;
     @FXML private Button startGameButton;
     @FXML private Pane tablePane;
+
+    // For Ai Coaching
+    @FXML private ToggleButton btnSafe;
+    @FXML private ToggleButton btnNormal;
+    @FXML private ToggleButton btnRisky;
+    @FXML private Button btnGenerate;
+    @FXML private Label aiActionLabel;
+    @FXML private Label aiReasonLabel;
+    @FXML private Label aiStatusLabel;
+
+    private final AiCoaching aiCoaching = new AiCoaching();
+    private AiAdviceMode currentAiMode = AiAdviceMode.NORMAL;
     private PokerGameUI pokerUI;
     private Game game;
     private Round round;
@@ -600,4 +617,48 @@ public class RoundController implements RoundViewUpdater {
         return value == null ? null : (ArrayList<Card>) value;
     }
 
+@FXML
+private void handleAiMode() {
+    if (btnSafe.isSelected())       currentAiMode = AiAdviceMode.SAFE;
+    else if (btnRisky.isSelected()) currentAiMode = AiAdviceMode.RISKY;
+    else                            currentAiMode = AiAdviceMode.NORMAL;
 }
+
+@FXML
+private void handleAiGenerate() {
+    btnGenerate.setDisable(true);
+    aiStatusLabel.setText("Asking AI...");
+    aiActionLabel.setText("Action: -");
+    aiReasonLabel.setText("Reason: -");
+
+    Card[] hand  = userPlayer.getPlayerHand().getCards().toArray(new Card[0]);
+    Card[] board = round.getCommunityCards().toArray(new Card[0]);
+    RoundStatus status = round.getRoundStatus();
+
+
+    Task<AiCoaching.AiAdvice> task = new Task<>() {
+        @Override protected AiCoaching.AiAdvice call() {
+            return aiCoaching.getAdvice(hand, board, status, currentAiMode);
+        }
+    };
+    task.setOnSucceeded(e -> Platform.runLater(() -> {
+        AiCoaching.AiAdvice advice = task.getValue();
+        if (advice.errormsg != null) {
+            aiActionLabel.setText("Action: -");
+            aiReasonLabel.setText("Reason: -");
+            aiStatusLabel.setText("Error: " + advice.errormsg);
+        } else {
+            aiActionLabel.setText("Action: " + advice.action + " (" + advice.confidence + "%)");
+            aiReasonLabel.setText("Reason: " + advice.reason);
+            aiStatusLabel.setText("Done.");
+        }
+        btnGenerate.setDisable(false);
+    }));
+    task.setOnFailed(e -> Platform.runLater(() -> {
+        aiStatusLabel.setText("Error: Connection failed.");
+        btnGenerate.setDisable(false);
+    }));
+    new Thread(task, "AiCoach-Thread").start();
+}
+}
+

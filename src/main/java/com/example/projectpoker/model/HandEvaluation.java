@@ -1,13 +1,10 @@
 package com.example.projectpoker.model;
-
 import com.example.projectpoker.model.game.Card;
-
 import com.example.projectpoker.model.game.Player;
-import com.example.projectpoker.model.game.enums.*;
-
+import com.example.projectpoker.model.game.enums.Suit;
+import com.example.projectpoker.model.game.enums.PokerHand;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -79,7 +76,7 @@ public class HandEvaluation {
         return 0; // tie
     }
 
-    public static HandResult evaluateHand(ArrayList<Card> cards) {
+    private static HandResult evaluateHand(ArrayList<Card> cards) {
         HandResult testEvaluation;
 
         testEvaluation = isStraightFlush(cards);
@@ -367,11 +364,11 @@ public class HandEvaluation {
 
         int tripleValue = triples.get(0);
 
-        int pairValue = 0;
+        int pairValue;
 
         // Case 1: another pair exists
         if (!pairs.isEmpty()) {
-            pairValue = pairs.get(0);
+            pairValue = pairs.getFirst();
         }
         // Case 2: second triple becomes the pair
         else if (triples.size() > 1) {
@@ -433,25 +430,5 @@ public class HandEvaluation {
 
         return new HandResult(PokerHand.STRAIGHTFLUSH.getValue(), bestHighCard); // Straight Flush
     }
-
-    private static ArrayList<Integer> getRanks(ArrayList<Card> cards) {
-        ArrayList<Integer> returnList = new ArrayList<>();
-
-        for (Card card : cards) {
-            returnList.add(card.getValue());
-        }
-
-        return returnList;
-    }
-    private static ArrayList<Suit> getSuits(ArrayList<Card> cards) {
-        ArrayList<Suit> returnList = new ArrayList<>();
-
-        for (Card card : cards) {
-            returnList.add(card.getSuit());
-        }
-
-        return returnList;
-    }
-
 
 }

@@ -630,10 +630,11 @@ private void handleAiGenerate() {
     aiStatusLabel.setText("Asking AI...");
     aiActionLabel.setText("Action: -");
     aiReasonLabel.setText("Reason: -");
-    // link to the game (Do this later)
-    Card[] hand  = new Card[0];
-    Card[] board = new Card[0];
-    RoundStatus status = RoundStatus.BETTING1;
+
+    Card[] hand  = userPlayer.getPlayerHand().getCards().toArray(new Card[0]);
+    Card[] board = round.getCommunityCards().toArray(new Card[0]);
+    RoundStatus status = round.getRoundStatus();
+
 
     Task<AiCoaching.AiAdvice> task = new Task<>() {
         @Override protected AiCoaching.AiAdvice call() {

@@ -25,10 +25,10 @@ public class RegisterController {
     @FXML private Label messageLabel;
 
     // for making sure usernames and passwords don't contain illegal characters
-    private static final Pattern ILLEGAL_CHARS =
+    public static final Pattern ILLEGAL_CHARS =
             Pattern.compile("[\\s\\\\\"'<>\\u0000-\\u001F;:,/| \\[\\]]");
     // for making sure emails don't contain illegal characters
-    private static final Pattern EMAIL_PATTERN =
+    public static final Pattern EMAIL_PATTERN =
             Pattern.compile("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$");
 
     // Common illegal characters for usernames and passwords (from google search)
@@ -39,6 +39,8 @@ public class RegisterController {
     //      Control Characters: Any non-printable characters (ASCII 0-31).
     //      Other Special Characters: Semicolon (;), colon (:), comma (,), slash (/), pipe (|), and brackets ([, ])
 
+    // TODO: Fix tight coupling with handleRegister() doing everything
+    //      if im using test cases, the database connection shouldn't be triggering, etc.
     @FXML
     private void handleRegister() {
         String username = usernameField.getText();
@@ -85,7 +87,6 @@ public class RegisterController {
             messageLabel.setText("Please enter a valid email address.");
             return;
         }
-
         // check if password is correct length of 8 characters
         if ( password.length() < 8 ){
             passwordField.setText("");

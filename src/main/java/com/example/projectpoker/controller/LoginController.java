@@ -20,6 +20,8 @@ public class LoginController {
     @FXML private PasswordField passwordField;
     @FXML private Label messageLabel;
 
+    // TODO: Fix tight coupling with handlelogin() doing everything
+    //      if im using test cases, the database connection shouldn't be triggering, etc.
     @FXML
     private void handleLogin() {
         String username = usernameField.getText();
@@ -77,5 +79,19 @@ public class LoginController {
         } catch (IOException e) {
             messageLabel.setText("Could not load register screen.");
         }
+    }
+    // temp method that is used for unit tests
+    String getLoginValidationMessage(User user, String username, String password) {
+        if (username.isBlank() || password.isBlank()) {
+            return "Invalid Username or Password! Please fill all fields.";
+        }
+        if (user == null) {
+            return "Username not found.";
+        }
+        boolean verifiedPassword = PasswordHasher.verify(password, user.getPassword());
+        if (!verifiedPassword) {
+            return "Incorrect password.";
+        }
+        return "SUCCESS";
     }
 }

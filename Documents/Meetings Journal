@@ -61,3 +61,23 @@ Dylan setting up notion management tool
 Jacob Continue on Game UI
 Bobby finish coaching branch
 Ben Troubleshoot imports
+
+Meeting 26/4/26
+Present Basilis, Ben, Bobby, Jacob, Mitch
+
+Progress is good heading into week 9 checkpoint. We have a working database, game UI, Login page, game logic and AI coaching and are making good progress on the UI. We will continue to work on integrating each new component. We will also start writing tests to ensure reliability and maintainability.
+
+Ben-
+Finished main structure of database system, awaiting further developments in features to continue implementing more functions. Will discuss with Hugo further.
+Basilis-
+Added a bunch of validation for username, email and password. I fixed the registercontroller initializing the database everytime. Also added checking for Existing Users in case someone tries to input a username that's already existing in the database.
+Mitchel
+Add AI features that can both take actions and react to changes with different personalities and integrate with the UI to print response and action.
+Bobby-
+Finished AI Coaching. It can be run in game.
+Jacob-
+Got the game working, integrated the game UI with game logic and fixed many bugs. To do: add more UI elements to the game window and write tests for HandEvaluation and PokerGameUI classes.
+
+To complete by checkpoint: User stories, Test cases for all sections, AI behaviour.
+Next meeting Wednesday after lecture.
+

@@ -34,7 +34,6 @@ public class LoginController {
             usernameField.setText("");
             passwordField.setText("");
             messageLabel.setText("Invalid Username or Password! Please fill all fields.");
-            return;
         }
 
         else {
@@ -58,8 +57,9 @@ public class LoginController {
 
             SessionManager.setCurrentUser(user);
             try {
+                Stage stage = (Stage) usernameField.getScene().getWindow();
                 PokerApplication app = new PokerApplication();
-                app.createPokerGame();
+                app.createPokerGame(stage);
             } catch (IOException e) {
                 messageLabel.setText("Could not start game: " + e.getMessage());
             }

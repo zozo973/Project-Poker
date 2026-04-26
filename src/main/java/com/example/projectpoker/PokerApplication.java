@@ -30,14 +30,18 @@ public class PokerApplication extends Application {
     }
 
     public void createPokerGame() throws IOException {
+        createPokerGame(new Stage());
+    }
+
+    public void createPokerGame(Stage gameStage) throws IOException {
         //  Call this method to create a new poker game.
 
         // TODO add methods in createPokerGame controller to get all fields required to make an instance of a game
         //      Player user: should be retrieved from database,
-        //      int userBalance: User will interact to choose an amount, if they don't have enought it defaults to 1000,
+        //      int userBalance: User will interact to choose an amount, if they don't have enough it defaults to 1000,
         //      int numPlayers: min 3 max 8 - estimate,
         //      int initBlind: default if 0.03 times the user balance,
-        //      int whenInceaseBlinds: how many rounds until blinds increase, default 10,
+        //      int whenIncreaseBlinds: how many rounds until blinds increase, default 10,
         //      int gameLength: num of rounds game goes for, default 30,
         //      Difficulty difficulty: HBox of buttons, can only select one, on hover shows display for difficulty
 
@@ -61,7 +65,6 @@ public class PokerApplication extends Application {
         controller.setRound(game.getRound(), user);
         game.init();
 
-        Stage gameStage = new Stage();
         gameStage.setScene(scene);
         gameStage.setTitle("Poker Game");
         gameStage.show();

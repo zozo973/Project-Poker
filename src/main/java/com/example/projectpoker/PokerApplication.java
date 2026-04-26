@@ -1,12 +1,9 @@
 package com.example.projectpoker;
 
 import com.example.projectpoker.controller.RoundController;
-import com.example.projectpoker.model.game.AiPlayer;
 import com.example.projectpoker.model.game.Game;
 import com.example.projectpoker.model.game.Player;
-import com.example.projectpoker.model.game.Round;
 import com.example.projectpoker.model.game.enums.Difficulty;
-import com.example.projectpoker.model.game.enums.GameStatus;
 import com.example.projectpoker.database.DatabaseManager;
 import com.example.projectpoker.model.User;
 import com.example.projectpoker.service.SessionManager;
@@ -17,7 +14,6 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import java.io.IOException;
-import java.util.ArrayList;
 
 import static com.example.projectpoker.model.statistics.SkewNormalSampler.safeRoundToInt;
 
@@ -49,7 +45,7 @@ public class PokerApplication extends Application {
         FXMLLoader loader = new FXMLLoader(
                 PokerApplication.class.getResource("poker-round-view.fxml"));
         Parent root = loader.load();
-        Scene scene = new Scene(root, 1025, 450);
+        Scene scene = new Scene(root, 1025, 525);
 
         RoundController controller = loader.getController();
         PokerGameUI pokerUI = new PokerGameUI();
@@ -60,7 +56,7 @@ public class PokerApplication extends Application {
         int userBuyIn = loggedInUser.getCurrentBalance();
         int blind = safeRoundToInt((userBuyIn * 0.03));
 
-        Game game = new Game(user, loggedInUser, userBuyIn, 4, blind, 10, 40, Difficulty.GAMBLINGADDICT);
+        Game game = new Game(user, loggedInUser, userBuyIn, 6, blind, 10, 40, Difficulty.GAMBLINGADDICT);
         controller.setGame(game);
         controller.setRound(game.getRound(), user);
         game.init();

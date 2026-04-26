@@ -149,6 +149,7 @@ public class RoundController implements RoundViewUpdater {
         Platform.runLater(() -> {
             if (player == userPlayer) {
                 balanceLabel.setText("Balance: " + newBalance);
+                updateCallDisplay();
                 updateBetSlider();
 
                 if (newBalance > oldBalance) {
@@ -166,7 +167,10 @@ public class RoundController implements RoundViewUpdater {
 
     @Override
     public void onPotChanged(int newPot) {
-        Platform.runLater(() -> potLabel.setText("Pot: " + newPot));
+        Platform.runLater(() -> {
+            potLabel.setText("Pot: " + newPot);
+            updateCallDisplay();
+        });
     }
 
     @Override
@@ -186,11 +190,7 @@ public class RoundController implements RoundViewUpdater {
 
     @Override
     public void onToPlayChange(int toPlay) {
-        Platform.runLater(() -> {
-            int amountToCall = getAmountToCall();
-            toCallLabel.setText(amountToCall + " to call");
-            toCallButton.setText(amountToCall > 0 ? "Call" : "Check");
-        });
+        Platform.runLater(this::updateCallDisplay);
     }
 
     @Override
@@ -283,7 +283,7 @@ public class RoundController implements RoundViewUpdater {
 
     public void reset() {
         runOnFxThread(() -> {
-            toCallLabel.setText(round.getToPlay() + "to play");
+            updateCallDisplay();
             phaseLabel.setText("Status" + RoundStatus.UNINITIALISED);
             potLabel.setText("Pot: " + getTotalPotSize());
             balanceLabel.setText("User Balance:" + userPlayer.getBalance());
@@ -300,8 +300,15 @@ public class RoundController implements RoundViewUpdater {
             potLabel.setText("Pot: " + getTotalPotSize());
             phaseLabel.setText("Phase: " + round.getRoundStatus());
         }
+        updateCallDisplay();
         updateRoundCounterLabel();
         updateBetSlider();
+    }
+
+    private void updateCallDisplay() {
+        int amountToCall = getAmountToCall();
+        toCallLabel.setText(amountToCall + " to call");
+        toCallButton.setText(amountToCall > 0 ? "Call" : "Check");
     }
 
     private int getTotalPotSize() {

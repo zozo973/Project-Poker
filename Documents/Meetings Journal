@@ -1,10 +1,11 @@
-6/3 Tutorial. Formed group brainstormed some ideas. Started a Discord channel for further communication.
+6/3 Tutorial 2 hour. Formed group brainstormed some ideas. Started a Discord channel for further communication.
 Named group Team Gaslight.
+- Minutes: 2 hours
 
-13/3 Tutorial. Present Ben, Basillus, Jacob, Mitch, Hugo(phone).
+13/3 Tutorial 2 hour. Present Ben, Basillis, Jacob, Mitch, Hugo(phone).
 Decided that we would do a simple banking app with the potential add-on of an investing platform.
 
-18/3 Meeting 1hour. Present Ben, Basillus, Bobby, Dylan, Hugo, Jacob
+18/3 Meeting 1 hour. Present Ben, Basillis, Bobby, Dylan, Hugo, Jacob
 
 After the project theme "Living, working, growing with AI" was released we decided that the existing project wasnt going to be sufficient to meet the criteria.
 We held a Discord call to decide on a new project idea. These were the suggestions.
@@ -19,17 +20,17 @@ PC helper- accesses screen and helps with problems you are having
 Restaurant inventory management
 Restaurant booking and management software.
 
-20/3 Tutorial Meeting
+20/3 Tutorial 2 hour Meeting
 All members present. Jacob brought in a MCDMM sheet to help us decide what the new project should be going forward.
 We had some debate over the the logistics and feasibility of some of the ideas.
 
-23/3 Drew up some simple user stories for the app. Hugo has made the repository on Github
+23/3 Meeting 30 mins. Drew up some simple user stories for the app. Hugo has made the repository on Github
 
-2/4 Meeting about Game-Logic branch
+2/4 Meeting 1 hour about Game-Logic branch
 Hugo and Jacob had a talk about the game logic structure, explained design choices and went over the process of merging respective branches into master. Set a goal for everyone to have their work ready for merging by the next meeting some time after Easter break.
 
 
-7/4 General progress meeting
+7/4 General progress meeting 1 hour
 Present- everyone
 Talked about progress
 Mitch- Started watching tutorials and testing API calls with open source models.
@@ -44,7 +45,7 @@ Outcome - Mitch and Bobby to work together on integrating AI models
 	- Dylan and Jacob work on UI
 	- Aim is to have more substantial progress by Friday (10/4)
 
-Meeting 12/4
+Meeting 30 mins 12/4
 Present Basilis, Ben, Bobby, Dylan, Jacob
 Discussed progress
 Basilis done register controller, working on login controller, almost done with login page
@@ -62,12 +63,12 @@ Jacob Continue on Game UI
 Bobby finish coaching branch
 Ben Troubleshoot imports
 
-Meeting 24/4/26
+Meeting 1 hour 20 minutes 24/4/26
 Present Basilis, Hugo, Bobby
 
 General discussion around the video assignment including asking the teacher questions & integrating authentication and gameplay together effectively
 
-Meeting 26/4/26
+Meeting 30 minutes 26/4/26
 Present Basilis, Ben, Bobby, Jacob, Mitch
 
 Progress is good heading into week 9 checkpoint. We have a working database, game UI, Login page, game logic and AI coaching and are making good progress on the UI. We will continue to work on integrating each new component. We will also start writing tests to ensure reliability and maintainability.

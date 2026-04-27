@@ -12,6 +12,7 @@ import javafx.scene.layout.Pane;
 import javafx.util.Duration;
 
 import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -20,12 +21,14 @@ import static com.example.projectpoker.model.game.TablePosition.*;
 public class PokerGameUI {
 
     private static final double CARD_WIDTH = 50;
+    private static final double CHIP_WIDTH = 40;
     private static final String GREY_NAMEPLATE_STYLE = "-fx-background-color: grey; -fx-text-fill: black; -fx-border-color: black; -fx-border-radius: 4; -fx-background-radius: 4; -fx-padding: 4 8 4 8; -fx-font-size: 11;";
     private static final String YELLOW_NAMEPLATE_STYLE = "-fx-background-color: yellow; -fx-text-fill: black; -fx-border-color: black; -fx-border-radius: 4; -fx-background-radius: 4; -fx-padding: 4 8 4 8; -fx-font-size: 11;";
 
     private Pane tablePane;
     private final Map<TablePosition, Label> nameplates = new HashMap<>();
     private final Map<TablePosition, FadeTransition> activeNameplateAnimations = new HashMap<>();
+    private final List<ImageView> chipViews = new ArrayList<>();
 
     public void setTablePane(Pane tablePane) {
         this.tablePane = tablePane;
@@ -47,11 +50,20 @@ public class PokerGameUI {
 
         if (tablePane == null) return;
 
+        clearChips();
         tablePane.getChildren().clear();
         nameplates.clear();
 
         displayTable();
         displayDeck(DeckPos);
+    }
+
+    public void clearChips() {
+        if (tablePane == null) return;
+        for (ImageView chip : chipViews) {
+            tablePane.getChildren().remove(chip);
+        }
+        chipViews.clear();
     }
 
     public void clearNameplates() {
@@ -197,4 +209,31 @@ public class PokerGameUI {
             tablePane.getChildren().add(view);
         }
     }
+
+    public void displayChips(int size, TablePosition position){
+
+        if (size>4 || size <0){throw new RuntimeException("Invalid chip size");}
+        // Nothing needs to be rendered
+        if (size == 0){return;}
+
+        Image img = loadImage("/com/example/projectpoker/Images/Chips"+ size + ".png");
+        ImageView view = new ImageView(img);
+        double width = img.getWidth();
+        double height = img.getHeight();
+
+        view.setViewport(new Rectangle2D(0,0,width,height));
+        view.setFitWidth(position.vScale);
+        view.setPreserveRatio(true);
+        view.setLayoutX(position.x);
+        view.setLayoutY(position.y);
+
+        //Preserve the option to rotate the chips because you never know
+        view.setRotate(position.rotation);
+        view.toFront();
+
+        tablePane.getChildren().add(view);
+        chipViews.add(view);
+
+    }
+
 }

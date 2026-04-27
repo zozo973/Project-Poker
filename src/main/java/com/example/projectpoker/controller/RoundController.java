@@ -6,6 +6,7 @@ import com.example.projectpoker.model.game.enums.AiAdviceMode;
 import com.example.projectpoker.PokerGameUI;
 import com.example.projectpoker.model.game.*;
 import com.example.projectpoker.model.game.TablePosition;
+import static com.example.projectpoker.model.game.TablePosition.*;
 import com.example.projectpoker.model.game.enums.Action;
 import com.example.projectpoker.model.game.enums.GameStatus;
 import com.example.projectpoker.model.game.enums.Roles;
@@ -22,6 +23,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
+
 
 public class RoundController implements RoundViewUpdater {
 
@@ -129,17 +131,6 @@ public class RoundController implements RoundViewUpdater {
             round.addPropertyChangeListener(roundListener);
         }
         runOnFxThread(this::refreshAll);
-    }
-
-    @Override
-    public void onRoundStarted() {
-        Platform.runLater(() -> {
-            pokerUI.initialiseTable();
-            renderNameplatesNow();
-        });
-        disableActionButtons();
-        roundTransitionInProgress = false;
-        setStartRoundButtonEnabled(false);
     }
 
     private void updateRoundCounterLabel() {
@@ -490,6 +481,8 @@ public class RoundController implements RoundViewUpdater {
 
         System.out.println("Action submitted: " + action + " amount=" + amount
         );
+        // Testing chip image generation with this, but obviously it should be elsewhere. Dont @me
+        pokerUI.displayChips(4, PotPos);
 
         // Release the betting loop
         userPlayer.setIsTurn(false);
@@ -602,7 +595,6 @@ public class RoundController implements RoundViewUpdater {
         setStartRoundButtonEnabled(status == RoundStatus.END);
         switch (status) {
             case UNINITIALISED:
-                onRoundStarted();
                 break;
             case DEAL:
                 onDealCards();

@@ -6,7 +6,6 @@ import com.example.projectpoker.model.game.enums.AiAdviceMode;
 import com.example.projectpoker.PokerGameUI;
 import com.example.projectpoker.model.game.*;
 import com.example.projectpoker.model.game.TablePosition;
-import static com.example.projectpoker.model.game.TablePosition.*;
 import com.example.projectpoker.model.game.enums.Action;
 import com.example.projectpoker.model.game.enums.GameStatus;
 import com.example.projectpoker.model.game.enums.Roles;
@@ -110,15 +109,17 @@ public class RoundController implements RoundViewUpdater {
         int seatIndex = 1;
         for (Player player : players) {
             if (player == userPlayer) {continue;}
-            if (player.getAction() == Action.FOLD) {continue;}
             if (seatIndex >= TablePosition.PosList.size()) {break;}
 
-            // At showdown this draws face-up cards over previously drawn card backs.
-            pokerUI.displayCards(player.getPlayerHand().getCards(), TablePosition.PosList.get(seatIndex), revealOpponents);
+            if (player.getAction() != Action.FOLD) {
+                // At showdown this draws face-up cards over previously drawn card backs.
+                pokerUI.displayCards(player.getPlayerHand().getCards(), TablePosition.PosList.get(seatIndex), revealOpponents);
+            }
             seatIndex++;
         }
 
         renderNameplatesNow();
+        renderChipStacksNow();
     }
     public void setRound(Round round, Player userPlayer) {
         if (this.round != null) {
@@ -161,6 +162,7 @@ public class RoundController implements RoundViewUpdater {
     @Override
     public void onBalanceChanged(Player player, int oldBalance, int newBalance) {
         Platform.runLater(() -> {
+            renderChipStacksNow();
             if (player == userPlayer) {
                 balanceLabel.setText("Balance: " + newBalance);
                 updateCallDisplay();
@@ -183,6 +185,7 @@ public class RoundController implements RoundViewUpdater {
     public void onPotChanged(int newPot) {
         Platform.runLater(() -> {
             potLabel.setText("Pot: " + newPot);
+                pokerUI.displayPotChipStack(newPot);
             updateCallDisplay();
         });
     }
@@ -258,6 +261,10 @@ public class RoundController implements RoundViewUpdater {
     @Override
     public void onPlayerChange(ArrayList<Player> newPlayers, ArrayList<Player> oldPlayers) {
         registerPlayerListeners(newPlayers);
+        runOnFxThread(() -> {
+            renderNameplatesNow();
+            renderChipStacksNow();
+        });
     }
 
     @Override
@@ -296,9 +303,6 @@ public class RoundController implements RoundViewUpdater {
             if (player == userPlayer) {
                 continue;
             }
-            if (player.getAction() == Action.FOLD) {
-                continue;
-            }
             if (seatIndex >= TablePosition.PosList.size()) {
                 break;
             }
@@ -313,9 +317,34 @@ public class RoundController implements RoundViewUpdater {
         }
     }
 
+    private void renderChipStacksNow() {
+        if (game == null || pokerUI == null || userPlayer == null) {
+            return;
+        }
+
+        pokerUI.clearPlayerChipStacks();
+        pokerUI.displayPlayerChipStack(userPlayer.getBalance(), TablePosition.PlayerPos);
+
+        int seatIndex = 1;
+        for (Player player : game.getPlayers()) {
+            if (player == userPlayer) {
+                continue;
+            }
+            if (seatIndex >= TablePosition.PosList.size()) {
+                break;
+            }
+
+            pokerUI.displayPlayerChipStack(player.getBalance(), TablePosition.PosList.get(seatIndex));
+            seatIndex++;
+        }
+    }
+
     @Override
     public void onPlayerRoleUpdate(Roles role) {
-        runOnFxThread(this::renderNameplatesNow);
+        runOnFxThread(() -> {
+            renderNameplatesNow();
+            renderChipStacksNow();
+        });
     }
 
     public void reset() {
@@ -335,9 +364,12 @@ public class RoundController implements RoundViewUpdater {
         }
         if (round != null) {
             potLabel.setText("Pot: " + getTotalPotSize());
+            pokerUI.displayPotChipStack(getTotalPotSize());
+
             phaseLabel.setText("Phase: " + round.getRoundStatus());
         }
         renderNameplatesNow();
+        renderChipStacksNow();
         updateCallDisplay();
         updateRoundCounterLabel();
         updateBetSlider();
@@ -481,8 +513,7 @@ public class RoundController implements RoundViewUpdater {
 
         System.out.println("Action submitted: " + action + " amount=" + amount
         );
-        // Testing chip image generation with this, but obviously it should be elsewhere. Dont @me
-        pokerUI.displayChips(4, PotPos);
+
 
         // Release the betting loop
         userPlayer.setIsTurn(false);
@@ -563,7 +594,10 @@ public class RoundController implements RoundViewUpdater {
 
         if (isTurn) {
             activeTurnPlayer = turnPlayer;
-            runOnFxThread(this::renderNameplatesNow);
+            runOnFxThread(() -> {
+                renderNameplatesNow();
+                renderChipStacksNow();
+            });
 
             if (turnPlayer instanceof AiPlayer) {
                 onAiTurnStarted();
@@ -575,12 +609,15 @@ public class RoundController implements RoundViewUpdater {
 
         if (turnPlayer == activeTurnPlayer) {
             activeTurnPlayer = null;
-            runOnFxThread(this::renderNameplatesNow);
+            runOnFxThread(() -> {
+                renderNameplatesNow();
+                renderChipStacksNow();
+            });
         }
     }
 
     private void handleBalanceChange(PropertyChangeEvent evt) {
-        if (!(evt.getSource() instanceof Player player) || evt.getSource() instanceof AiPlayer) {
+        if (!(evt.getSource() instanceof Player player)) {
             return;
         }
 

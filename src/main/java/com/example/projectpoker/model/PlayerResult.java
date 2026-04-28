@@ -5,9 +5,9 @@ import com.example.projectpoker.model.game.PlayerId;
 import java.util.List;
 
 public class PlayerResult {
-    private List<Card> hand;
-    private HandResult result;
-    private PlayerId playerId;
+    private final List<Card> hand;
+    private final HandResult result;
+    private final PlayerId playerId;
 
     public PlayerResult(List<Card> hand, HandResult result, PlayerId id) {
         this.hand = hand;

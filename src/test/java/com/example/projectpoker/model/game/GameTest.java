@@ -206,7 +206,7 @@ class GameTest {
         ArrayList<Player> singlePlayer = new ArrayList<>();
         singlePlayer.add(user);
         game.setPlayers(singlePlayer);
-        game.start(true);
+        game.start();
         assertEquals(1,game.getPlayers().size());
         assertEquals(GameStatus.ENDED,game.getGameStatus());
     }
@@ -219,7 +219,7 @@ class GameTest {
         int userIndex = game.findUserIndex();
         players.get(userIndex).setBalance(0);
         game.setPlayers(players);
-        game.start(true);
+        game.start();
         assertEquals(0,game.getUser().getBalance());
         assertEquals(GameStatus.ENDED,game.getGameStatus());
     }
@@ -229,7 +229,7 @@ class GameTest {
         // Test when number of rounds left is 0;
         game.init();
         game.setNumRoundsLeft(1);
-        game.start(true);
+        game.start();
         assertEquals(0,game.getNumRoundsLeft());
         assertEquals(GameStatus.ENDED,game.getGameStatus());
     }

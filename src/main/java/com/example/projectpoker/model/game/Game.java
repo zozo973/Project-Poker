@@ -242,27 +242,6 @@ public class Game {
         }
     }
 
-    public void start(boolean test) {
-        if (!test) return;
-        // Valid game before starting
-        setGameStatus(GameStatus.RUNNING);
-        while (gameStatus == GameStatus.RUNNING) {
-            // createNextRound();
-            // System.out.println(round.getRoundStatus());
-            // this.round.init();
-            // System.out.println(round.getRoundStatus());
-            //  this.round.start();
-            // System.out.println(round.getRoundStatus());
-
-            // Loss Condition
-            if (getUser().getBalance() == 0) { end(); break; }
-            else if (this.numRoundsLeft == 0) { end(); break; }
-            else if (this.players.size() == 1 && !(this.players.getFirst() instanceof AiPlayer)) { end(); break; }
-            this.GameLog.add(round.getRoundLog());
-            nextRoundInitialisation();
-        }
-    }
-
     public void end() {
         setGameStatus(GameStatus.ENDED);
         DatabaseManager.finalizeGameSession(gameSessionId, userProfile, this, getUser());

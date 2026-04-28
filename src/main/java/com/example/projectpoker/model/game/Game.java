@@ -31,11 +31,11 @@ public class Game {
     private int numPlayers;
     private final int userBuyIn;
     private Round round;
-    private ArrayList<ArrayList<RoundLogEntry>> GameLog;
+    private final ArrayList<ArrayList<RoundLogEntry>> GameLog;
     private boolean roundAdvanceInProgress;
 
     private final int startingUserBalance;
-    private int handsPlayed;
+    private final int handsPlayed;
     private final User userProfile;
     private int gameSessionId;
 
@@ -91,10 +91,6 @@ public class Game {
     public void removePropertyChangeListener(PropertyChangeListener listener) {
         pcs.removePropertyChangeListener(listener);
     }
-
-    public ArrayList<ArrayList<RoundLogEntry>> getGameLog() { return GameLog; }
-
-    public void setGameLog(ArrayList<ArrayList<RoundLogEntry>> gameLog) { GameLog = gameLog; }
 
     public GameStatus getGameStatus() {
         return gameStatus;
@@ -185,7 +181,7 @@ public class Game {
         startNextRound();
     }
 
-    public synchronized void startNextRound() {
+    private synchronized void startNextRound() {
 
         // Guarding behaviour so that multiple rounds cant be started simultaneously
         if (roundAdvanceInProgress) {
@@ -245,7 +241,6 @@ public class Game {
             player.getPlayerHand().clear();
         }
     }
-
 
     public void start(boolean test) {
         if (!test) return;

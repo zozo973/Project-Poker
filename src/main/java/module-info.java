@@ -14,7 +14,6 @@ module com.example.projectpoker {
     requires java.desktop;
     requires com.google.api.client;
     requires com.google.api.client.json.gson;
-    requires kotlin.stdlib.jdk8;
     requires com.google.gson;
     requires java.net.http;
 

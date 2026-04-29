@@ -130,6 +130,43 @@ public class AIActions {
         }
         return sb.toString();
     }
-}
 
-\
+
+void main() {
+}
+ // For Test API connection ----------------------------------------------------------------------------------------
+ public static void main(String[] args) {
+     System.out.println("--- Starting AIActions Harness Tests ---\n");
+     AIActions coach = new AIActions();
+
+     // Setup test data
+     Card[] hand = {
+             new Card(com.example.projectpoker.model.Suit.SPADES, com.example.projectpoker.model.Rank.ACE),
+             new Card(com.example.projectpoker.model.Suit.HEARTS, com.example.projectpoker.model.Rank.ACE)
+     };
+     Card[] board = {
+             new Card(com.example.projectpoker.model.Suit.CLUBS, com.example.projectpoker.model.Rank.TWO),
+             new Card(com.example.projectpoker.model.Suit.DIAMONDS, com.example.projectpoker.model.Rank.FIVE)
+     };
+
+     // Test each personality
+     for (AiPersonality p : AiPersonality.values()) {
+         System.out.println("Testing Personality: " + p);
+         PokerAIResponse response = coach.getChoice(hand, board, Stage.allIn, p);
+         printResult(response);
+     }
+     System.out.println("--- Harness Tests Finished ---");
+ }
+
+private static void printResult(PokerAIResponse response) {
+    if (response.errormsg != null) {
+        System.err.println("  -> Error: " + response.errormsg);
+    } else {
+        System.out.println("  -> Action: " + response.action);
+        System.out.println("  -> Amount: " + response.amount);
+        System.out.println("  -> Confidence: " + response.confidence + "%");
+        System.out.println("  -> Reaction: " + response.reaction);
+    }
+    System.out.println("-------------------------------------------------");
+}
+}

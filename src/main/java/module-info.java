@@ -15,6 +15,8 @@ module com.example.projectpoker {
     requires com.google.api.client;
     requires com.google.api.client.json.gson;
     requires kotlin.stdlib.jdk8;
+    requires com.google.gson;
+    requires java.net.http;
 
 
     opens com.example.projectpoker to javafx.fxml;

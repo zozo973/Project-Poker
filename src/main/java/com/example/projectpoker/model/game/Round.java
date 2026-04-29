@@ -1,6 +1,4 @@
 package com.example.projectpoker.model.game;
-
-import com.example.projectpoker.database.DatabaseManager;
 import com.example.projectpoker.model.HandEvaluation;
 import com.example.projectpoker.model.PlayerResult;
 import com.example.projectpoker.model.game.enums.Action;
@@ -38,7 +36,7 @@ public class Round {
 
     private final int gameSessionId;
     private final int roundNumber;
-    private boolean persisted;
+    private final boolean persisted;
 
     public Round(ArrayList<Player> players, int blindSize) {
         this(players, blindSize, -1, 0);
@@ -74,7 +72,7 @@ public class Round {
     }
 
     public void setRoundStatus(RoundStatus roundStatus) {
-        var oldVal = this.roundStatus;
+        RoundStatus oldVal = this.roundStatus;
         this.roundStatus = roundStatus;
         pcs.firePropertyChange("state", oldVal, this.roundStatus);
     }
@@ -86,7 +84,7 @@ public class Round {
     public ArrayList<RoundLogEntry> getRoundLog() { return roundLog; }
 
     public void setBetType(BetType betType) {
-        var oldVal = this.betType;
+        BetType oldVal = this.betType;
         this.betType = betType;
         pcs.firePropertyChange("betType", oldVal, this.betType);
         if (betType.equals(BetType.ENDROUND)) end();
@@ -96,7 +94,6 @@ public class Round {
     public ArrayList<Pot> getPots() { return pots; }
 
     public void setPots(ArrayList<Pot> pots) {
-        var oldVal = this.pots;
         this.pots = pots;
         // Pot internals mutate in place, so always emit to keep UI pot label in sync.
         pcs.firePropertyChange("pots", null, this.pots);
@@ -122,7 +119,7 @@ public class Round {
     }
 
     public void setCommunityCards(ArrayList<Card> communityCards) {
-        var oldVal = this.communityCards;
+        ArrayList<Card> oldVal = this.communityCards;
         this.communityCards = communityCards;
         pcs.firePropertyChange("communityCards", oldVal, this.communityCards);
     }
@@ -132,7 +129,7 @@ public class Round {
     }
 
     public void setToPlay(int toPlay) {
-        var oldVal = this.toPlay;
+        int oldVal = this.toPlay;
         this.toPlay = toPlay;
         pcs.firePropertyChange("toPlay", oldVal, this.toPlay);
     }
@@ -378,7 +375,7 @@ public class Round {
         while (activePlayer.getIsTurn() && activePlayer.getAction() == Action.UNDECIDED) {
             try {
                 // need to pause to wait for the active player's action.
-                Thread.sleep(25);
+                Thread.sleep(1);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 throw new IllegalStateException("Interrupted while waiting for user input", e);
@@ -483,7 +480,7 @@ public class Round {
     }
 
     private void betIntoSidePots(Player activePlayer) {
-        var paidPots = tryPayMultiplePots(this.pots,activePlayer);
+        ArrayList<Pot> paidPots = tryPayMultiplePots(this.pots,activePlayer);
         if (paidPots != null ) {
             setPots(new ArrayList<>(paidPots));
         } else {
@@ -614,7 +611,6 @@ public class Round {
                 advanceRound();
                 return;
             default:
-                return;
         }
     }
 

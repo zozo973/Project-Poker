@@ -97,7 +97,7 @@ public class Game {
     }
 
     public void setGameStatus (GameStatus gameStatus) {
-        var oldVal = this.gameStatus;
+        GameStatus oldVal = this.gameStatus;
         this.gameStatus = gameStatus;
         pcs.firePropertyChange("state",oldVal,this.gameStatus);
     }
@@ -130,7 +130,7 @@ public class Game {
     public int getBlindSize() { return blindSize; }
 
     public void setBlindSize(int blindSize) {
-        var oldVal = this.blindSize;
+        int oldVal = this.blindSize;
         this.blindSize = blindSize;
         pcs.firePropertyChange("blindSize",oldVal,this.blindSize);
     }

@@ -18,7 +18,7 @@
     <Label text="Options Menu" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
 
     <!-- Message label for errors/success -->
-    <Label fx:id="messageLabel" text=""/>
+    <Label fx:id="messageLabel"/>
 
     <!-- Link to main menu -->
     <Button text="Back" onAction="#goToMain"/>

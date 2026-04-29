@@ -428,6 +428,20 @@ public class Round {
         // UI raises are interpreted as "raise to" total for this pot.
         // Convert to an incremental contribution so repeat raises do not overcharge the player.
         int betContribution = activeBet == null ? 0 : activeBet;
+
+        // CALL always means paying exactly the current required amount.
+        // If nothing is required, normalize to CHECK.
+        if (action == Action.CALL) {
+            if (requiredToCall <= 0) {
+                action = Action.CHECK;
+                activePlayer.setAction(action);
+                betContribution = 0;
+            } else {
+                betContribution = requiredToCall;
+                activePlayer.setActiveBet(betContribution);
+            }
+        }
+
         if (action == Action.RAISE) {
             if (activeBet == null || activeBet <= this.toPlay) {
                 action = requiredToCall > 0 ? Action.CALL : Action.CHECK;
@@ -441,7 +455,7 @@ public class Round {
         }
 
         // Allow players to act again on raises
-        if (Action.isRaise(action) && activeBet != null && activeBet > this.toPlay) {
+        if (action == Action.RAISE  && activeBet > this.toPlay) {
             setToPlay(activeBet);
             resetOtherPlayerActions(activePlayer);
         }
@@ -647,6 +661,12 @@ public class Round {
             deal2Table();
         }
         setRoundStatus(RoundStatus.SHOWDOWN);
+
+        // Remove folded players from pots before showdown evaluation
+        for (Pot p : pots) {
+            p.removeFolded(roundStatus);
+        }
+
         announceShowdownResults();
         for (Pot p : pots) {
             p.showDown(this.communityCards);

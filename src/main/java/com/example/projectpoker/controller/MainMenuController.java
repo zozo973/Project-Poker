@@ -1,29 +1,21 @@
 package com.example.projectpoker.controller;
 
-import com.example.projectpoker.service.SessionManager;
 import com.example.projectpoker.PokerApplication;
 import javafx.application.Platform;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import java.io.IOException;
-
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.stage.Stage;
 import javafx.scene.control.Label;
 
 public class MainMenuController {
 
     @FXML private Label messageLabel;
-    @FXML private Button startGameButton;
-    @FXML private Button profileMenuButton;
-    @FXML private Button optionsMenuButton;
 
     @FXML
-    private void goToGame(ActionEvent event) {
+    private void goToGame() {
         try {
             Stage stage = new Stage();
             PokerApplication app = new PokerApplication();
@@ -34,7 +26,7 @@ public class MainMenuController {
     }
 
     @FXML
-    private void goToProfile(ActionEvent event) {
+    private void goToProfile() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(
                     "/com/example/projectpoker/Account & Profile UI/profile.fxml"));
@@ -50,7 +42,7 @@ public class MainMenuController {
     }
 
     @FXML
-    private void goToOptions(ActionEvent event) {
+    private void goToOptions() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(
                     "/com/example/projectpoker/OptionsMenu.fxml"));
@@ -65,7 +57,7 @@ public class MainMenuController {
     }
 
     @FXML
-    private void exitGame(ActionEvent event) {
+    private void exitGame() {
         Platform.exit();
         System.exit(0);
     }

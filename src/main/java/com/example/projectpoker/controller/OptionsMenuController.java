@@ -14,7 +14,7 @@ public class OptionsMenuController {
     @FXML private Label messageLabel;
 
     @FXML
-    private void goToMain(ActionEvent event) {
+    private void goToMain() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(
                     "/com/example/projectpoker/MainMenu.fxml"));

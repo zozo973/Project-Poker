@@ -4,7 +4,6 @@ import com.example.projectpoker.service.PasswordHasher;
 import com.example.projectpoker.model.User;
 import com.example.projectpoker.database.UserDAO;
 import com.example.projectpoker.service.SessionManager;
-import com.example.projectpoker.PokerApplication;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import java.io.IOException;

@@ -6,6 +6,7 @@ module com.example.projectpoker {
     requires java.desktop;
     requires java.sql;
     requires bcrypt;
+    requires javafx.graphics;
 
     opens com.example.projectpoker to javafx.fxml;
     exports com.example.projectpoker;

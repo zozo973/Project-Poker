@@ -56,11 +56,14 @@ public class LoginController {
 
             SessionManager.setCurrentUser(user);
             try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource(
+                        "/com/example/projectpoker/MainMenu.fxml"));
+                Parent root = loader.load();
                 Stage stage = (Stage) usernameField.getScene().getWindow();
-                PokerApplication app = new PokerApplication();
-                app.createPokerGame(stage);
+                stage.setScene(new Scene(root));
+                stage.show();
             } catch (IOException e) {
-                messageLabel.setText("Could not start game: " + e.getMessage());
+                messageLabel.setText("Could not load Main.");
             }
         }
     }

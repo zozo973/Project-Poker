@@ -37,6 +37,9 @@
     <!-- Message label for errors/success -->
     <Label fx:id="messageLabel" text=""/>
 
+    <!-- Button for going back to the main menu -->
+    <Button text="Back" onAction="#goToMain"/>
+
     <!-- Button for logging out -->
     <Button text="Log Out" onAction="#logOut"/>
 

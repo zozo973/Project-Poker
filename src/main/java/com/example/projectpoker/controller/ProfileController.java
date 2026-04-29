@@ -33,6 +33,21 @@ public class ProfileController {
     }
 
     @FXML
+    private void goToMain() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(
+                    "/com/example/projectpoker/MainMenu.fxml"));
+            Parent root = loader.load();
+            Stage stage = (Stage) (messageLabel).getScene().getWindow();
+            Scene optionsScene = new Scene(root);
+            stage.setScene(optionsScene);
+            stage.show();
+        } catch (IOException e) {
+            messageLabel.setText("Could not load Options Menu.");
+        }
+    }
+
+    @FXML
     private void logOut() {
         SessionManager.logout();
         try {

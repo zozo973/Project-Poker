@@ -87,3 +87,12 @@ Got the game working, integrated the game UI with game logic and fixed many bugs
 To complete by checkpoint: User stories, Test cases for all sections, AI behaviour.
 Next meeting Wednesday after lecture.
 
+
+Meeting 30 minutes 29/4/26
+Present Basilis, Ben, Bobby, Jacob, Mitch
+
+Basilis- Edited meeting notes and fixed some of the issues and poor implementation for register controllers
+Ben- Clarified bug with UserBalance, started testing DB persistence, began writing script for video. To do: fix UserBalance bug.
+Bobby- Going to stitch together the video.
+Jacob- Finished UI elements. Cleaned up unused and unnecessary methods and across important files like Game and RoundController. Wrote Unit tests for HandEvaluation and PokerGameUI. ToDo: Menu UI assuming Dylan cant do it. Video section.
+Mitch- Got clarification on the required implementation of the AI actions, additionally provided timeline for completion. Aiming to have feature finished by end of day.

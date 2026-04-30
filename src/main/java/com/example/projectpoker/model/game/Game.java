@@ -35,9 +35,10 @@ public class Game {
     private boolean roundAdvanceInProgress;
 
     private final int startingUserBalance;
-    private final int handsPlayed;
+    private int handsPlayed;
     private final User userProfile;
     private int gameSessionId;
+    private boolean sessionFinalized;
 
     private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
     private final PropertyChangeListener playerActionListener = evt -> {
@@ -82,6 +83,7 @@ public class Game {
         this.handsPlayed = 0;
         this.userProfile = userProfile;
         this.gameSessionId = -1;
+        this.sessionFinalized = false;
     }
 
     public void addPropertyChangeListener(PropertyChangeListener listener) {
@@ -226,6 +228,9 @@ public class Game {
         clearPlayerHands();
 
         GameLog.add(round.getRoundLog());
+        handsPlayed++;
+        // Persist the user's updated balance after each completed round, not just at full game over.
+        DatabaseManager.saveUserProgress(userProfile, getUser());
 
         nextRoundInitialisation();
 
@@ -243,6 +248,20 @@ public class Game {
     }
 
     public void end() {
+        finishSession();
+    }
+
+    public synchronized void closeSession() {
+        finishSession();
+    }
+
+    private synchronized void finishSession() {
+        if (sessionFinalized) {
+            return;
+        }
+
+        // Guard against double-saving if the game ends normally and the window also closes.
+        sessionFinalized = true;
         setGameStatus(GameStatus.ENDED);
         DatabaseManager.finalizeGameSession(gameSessionId, userProfile, this, getUser());
     }

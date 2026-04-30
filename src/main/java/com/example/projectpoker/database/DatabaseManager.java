@@ -41,6 +41,17 @@ public class DatabaseManager {
         new RoundLogDAO().insertRound(round, gameSessionId);
     }
 
+    public static void saveUserProgress(User user, Player player) {
+        if (user == null || player == null) {
+            return;
+        }
+
+        initializeDatabase();
+        // Save the current chip count before the full game ends so partial progress is not lost.
+        user.setCurrentBalance(player.getBalance());
+        new UserDAO().update(user);
+    }
+
     public static void finalizeGameSession(int gameSessionId, User user, Game game, Player player) {
         if (user == null) {
             return;

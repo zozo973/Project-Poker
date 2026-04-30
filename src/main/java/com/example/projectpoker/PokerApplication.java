@@ -62,6 +62,8 @@ public class PokerApplication extends Application {
         controller.setRound(game.getRound(), user);
         game.init();
 
+        // Closing the stage should still flush the latest balance and finish the session record.
+        gameStage.setOnCloseRequest(event -> game.closeSession());
         gameStage.setTitle("Poker Game");
         gameStage.getScene().setRoot(root);
     }

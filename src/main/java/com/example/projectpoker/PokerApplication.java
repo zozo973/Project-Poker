@@ -13,7 +13,6 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.stage.Screen;
-
 import java.io.IOException;
 
 import static com.example.projectpoker.model.statistics.SkewNormalSampler.safeRoundToInt;

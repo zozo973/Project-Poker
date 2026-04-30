@@ -84,9 +84,7 @@ public class LoginController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(
                     "/com/example/projectpoker/Account & Profile UI/register.fxml"));
             Parent root = loader.load();
-            Stage stage = (Stage) usernameField.getScene().getWindow();
-            stage.setScene(new Scene(root));
-            stage.show();
+            usernameField.getScene().setRoot(root);
         } catch (IOException e) {
             messageLabel.setText("Could not load register screen.");
         }

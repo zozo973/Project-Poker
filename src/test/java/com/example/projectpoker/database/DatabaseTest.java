@@ -22,14 +22,16 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class DatabaseTest {
     private static final String DB_PATH_PROPERTY = "projectpoker.db.path";
+    private static final Path DEMO_DATABASE_PATH = Path.of("demo-database-test.db");
 
     private Path testDatabasePath;
 
     @BeforeEach
     void setUp() throws IOException {
         DatabaseConnection.closeConnection();
-        // Each test gets its own temporary SQLite file so database state never leaks between tests.
-        testDatabasePath = Files.createTempFile("projectpoker-db-test-", ".db");
+        // Use a fixed SQLite file
+        testDatabasePath = DEMO_DATABASE_PATH;
+        Files.deleteIfExists(testDatabasePath);
         System.setProperty(DB_PATH_PROPERTY, testDatabasePath.toString());
         DatabaseManager.initializeDatabase();
     }
@@ -38,7 +40,7 @@ class DatabaseTest {
     void tearDown() throws IOException {
         DatabaseConnection.closeConnection();
         System.clearProperty(DB_PATH_PROPERTY);
-        Files.deleteIfExists(testDatabasePath);
+        // Keep the demo database on disk so its tables and rows can be inspected visually.
     }
 
     @Test

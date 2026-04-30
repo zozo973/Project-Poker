@@ -40,10 +40,13 @@ class DatabaseTest {
     void tearDown() throws IOException {
         DatabaseConnection.closeConnection();
         System.clearProperty(DB_PATH_PROPERTY);
-        // Keep the demo database on disk so its tables and rows can be inspected visually.
+        // Keeps the demo database on disk so its tables and rows can be inspected visually.
     }
 
     @Test
+    // first test checks that when the application initializes the database,
+    // the required tables are actually created. That verifies the schema setup for users,
+    // game_sessions, round_logs, and round_actions.
     void initializeDatabaseCreatesAllRequiredTables() throws SQLException {
         try (Connection connection = DatabaseConnection.getInstance();
              Statement statement = connection.createStatement()) {
@@ -63,6 +66,8 @@ class DatabaseTest {
     }
 
     @Test
+    //second test checks that when a user is inserted into the database, that user can be loaded back correctly.
+        // This proves registration data is being persisted.
     void insertAndLoadUserPersistsRegisteredUserData() {
         UserDAO userDAO = new UserDAO();
         User user = new User("db_user", "hashed-password", "db_user@test.com");
@@ -79,6 +84,8 @@ class DatabaseTest {
     }
 
     @Test
+    //third test checks that when a user’s balance and statistics are updated, the database stores the new values correctly.
+        // This verifies update behaviour for returning users.
     void updateUserPersistsBalanceAndStatsChanges() {
         UserDAO userDAO = new UserDAO();
         User user = new User("balance_user", "hashed-password", "balance@test.com");
@@ -99,6 +106,8 @@ class DatabaseTest {
     }
 
     @Test
+    // fourth test checks that user progress can be saved during a session, before the whole game ends.
+        // important because it addresses the balance persistence issue we had.
     void saveUserProgressPersistsMidSessionBalance() {
         UserDAO userDAO = new UserDAO();
         User user = new User("progress_user", "hashed-password", "progress@test.com");
@@ -117,6 +126,8 @@ class DatabaseTest {
     }
 
     @Test
+        // fifth test checks that when a game ends, the user’s final balance is saved and the game session record is
+        // finalized with an ending balance, status, and end timestamp.
     void endGameFinalizesSessionAndPersistsUserBalance() throws SQLException {
         UserDAO userDAO = new UserDAO();
         User user = new User("session_user", "hashed-password", "session@test.com");

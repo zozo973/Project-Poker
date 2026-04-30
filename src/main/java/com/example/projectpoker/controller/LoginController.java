@@ -60,12 +60,12 @@ public class LoginController {
                 usernameField.setText("");
                 return;
             }
-
+            // hashing password then verifying password was hashed currently
             boolean verifiedPassword = PasswordHasher.verify(password, user.getPassword());
             // check if password is correct
             if (!verifiedPassword) {
-                messageLabel.setText("Incorrect password.");
                 passwordField.setText("");
+                messageLabel.setText("Incorrect password.");
                 return;
             }
             SessionManager.setCurrentUser(user);
@@ -78,7 +78,6 @@ public class LoginController {
             }
         }
     }
-
     @FXML
     private void goToRegister() {
         try {

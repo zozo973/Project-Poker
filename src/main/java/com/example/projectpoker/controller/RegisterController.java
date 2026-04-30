@@ -99,10 +99,18 @@ public class RegisterController {
         userDAO.insert(newUser);
 
         // set user as logged in
+//        SessionManager.setCurrentUser(newUser);
+//        try {
+//            PokerApplication app = new PokerApplication();
+//            app.createPokerGame();
+//        } catch (IOException e) {
+//            messageLabel.setText("Could not start game: " + e.getMessage());
+//        }
         SessionManager.setCurrentUser(newUser);
         try {
+            Stage stage = (Stage) usernameField.getScene().getWindow();
             PokerApplication app = new PokerApplication();
-            app.createPokerGame();
+            app.createPokerGame(stage);
         } catch (IOException e) {
             messageLabel.setText("Could not start game: " + e.getMessage());
         }

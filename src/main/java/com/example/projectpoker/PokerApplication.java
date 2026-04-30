@@ -12,6 +12,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import javafx.stage.Screen;
 
 import java.io.IOException;
 
@@ -22,17 +23,15 @@ public class PokerApplication extends Application {
     public void start(Stage stage) throws IOException {
         DatabaseManager.initializeDatabase();
         FXMLLoader fxmlLoader = new FXMLLoader(PokerApplication.class.getResource("/com/example/projectpoker/Account & Profile UI/login.fxml"));
-        Scene scene = new Scene(fxmlLoader.load(), 350, 400);
-
-        stage.setTitle("App Name");
+        // Get the screen dimensions
+        double screenWidth = Screen.getPrimary().getVisualBounds().getWidth();
+        double screenHeight = Screen.getPrimary().getVisualBounds().getHeight();
+        Scene scene = new Scene(fxmlLoader.load(), screenWidth, screenHeight);
+        stage.setTitle("Login & Register");
         stage.setScene(scene);
+        stage.setMaximized(true);
         stage.show();
     }
-
-    public void createPokerGame() throws IOException {
-        createPokerGame(new Stage());
-    }
-
     public void createPokerGame(Stage gameStage) throws IOException {
         //  Call this method to create a new poker game.
 
@@ -46,10 +45,8 @@ public class PokerApplication extends Application {
         //      Difficulty difficulty: HBox of buttons, can only select one, on hover shows display for difficulty
 
         // change to retire user data from database and other vars can be retrieved from user input into ui
-        FXMLLoader loader = new FXMLLoader(
-                PokerApplication.class.getResource("poker-round-view.fxml"));
+        FXMLLoader loader = new FXMLLoader(PokerApplication.class.getResource("poker-round-view.fxml"));
         Parent root = loader.load();
-        Scene scene = new Scene(root, 1050, 550);
 
         RoundController controller = loader.getController();
         PokerGameUI pokerUI = new PokerGameUI();
@@ -65,8 +62,7 @@ public class PokerApplication extends Application {
         controller.setRound(game.getRound(), user);
         game.init();
 
-        gameStage.setScene(scene);
         gameStage.setTitle("Poker Game");
-        gameStage.show();
+        gameStage.getScene().setRoot(root);
     }
 }

@@ -1,10 +1,14 @@
 package com.example.projectpoker.controller;
 
 import com.example.projectpoker.PokerApplication;
-import com.example.projectpoker.service.PasswordHasher;
 import com.example.projectpoker.model.User;
 import com.example.projectpoker.database.UserDAO;
 import com.example.projectpoker.service.SessionManager;
+import com.example.projectpoker.service.UsernameValidation;
+import com.example.projectpoker.service.EmailValidation;
+import com.example.projectpoker.service.PasswordValidation;
+import com.example.projectpoker.service.ValidationResult;
+import com.example.projectpoker.service.PasswordHasher;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import java.io.IOException;
@@ -14,6 +18,7 @@ import javafx.stage.Stage;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import java.util.List;
 import java.util.regex.Pattern;
 
 public class RegisterController {
@@ -24,13 +29,6 @@ public class RegisterController {
     @FXML private PasswordField confirmPasswordField;
     @FXML private Label messageLabel;
 
-    // for making sure usernames and passwords don't contain illegal characters
-    public static final Pattern ILLEGAL_CHARS =
-            Pattern.compile("[\\s\\\\\"'<>\\u0000-\\u001F;:,/| \\[\\]]");
-    // for making sure emails don't contain illegal characters
-    public static final Pattern EMAIL_PATTERN =
-            Pattern.compile("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$");
-
     // Common illegal characters for usernames and passwords (from google search)
     //      Spaces: Often forbidden, especially in usernames, as they can break systems that parse input.
     //      Backs lash (\): Frequently disallowed in passwords because it acts as an escape character.
@@ -39,8 +37,10 @@ public class RegisterController {
     //      Control Characters: Any non-printable characters (ASCII 0-31).
     //      Other Special Characters: Semicolon (;), colon (:), comma (,), slash (/), pipe (|), and brackets ([, ])
 
-    // TODO: Fix tight coupling with handleRegister() doing everything
-    //      if im using test cases, the database connection shouldn't be triggering, etc.
+    public static final Pattern WEAK_CHARS = Pattern.compile(".*[0-9!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>\\/?].*");
+    public static final Pattern ILLEGAL_CHARS = Pattern.compile("[\\s\\\\\"'<>\\u0000-\\u001F;:,/| \\[\\]]");
+    public static final Pattern EMAIL_CHARS = Pattern.compile("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$");
+
     @FXML
     private void handleRegister() {
         String username = usernameField.getText();
@@ -48,68 +48,33 @@ public class RegisterController {
         String password = passwordField.getText();
         String confirmPassword = confirmPasswordField.getText();
 
-        // if statements to check if a user has inputted something correctly in the fields
+        List<ValidationResult> checkedResults = List.of(
+                UsernameValidation.checkUsernameBlank(username),
+                UsernameValidation.checkUsernameLength(username),
+                UsernameValidation.checkUsernameIllegal(username),
+                EmailValidation.checkEmailBlank(email),
+                EmailValidation.checkIllegalEmail(email),
+                PasswordValidation.checkPasswordBlank(password, confirmPassword),
+                PasswordValidation.checkPasswordConfirm(password, confirmPassword),
+                PasswordValidation.checkPasswordLength(password),
+                PasswordValidation.checkIllegalPassword(password),
+                PasswordValidation.checkWeakPassword(password)
+        );
 
-        //  check if the user has inputted something in the fields
-        if ( username.isBlank() || email.isBlank() || password.isBlank() || confirmPassword.isBlank() ) {
-            usernameField.setText("");
-            emailField.setText("");
-            passwordField.setText("");
-            confirmPasswordField.setText("");
-            messageLabel.setText("Invalid Username, Email or Password! Please fill all fields.");
-            return;
+        ValidationResult failure = null;
+        for (ValidationResult result : checkedResults) {
+            if (!result.isValid()) {
+                failure = result;
+                break;
+            }
         }
-        // check if password and confirm password match
-        if (!password.equals(confirmPassword)) {
-            passwordField.setText("");
-            confirmPasswordField.setText("");
-            messageLabel.setText("Please make sure passwords match.");
-            return;
-        }
-        // check if username contains 3 or more characters
-        if (username.length() < 3) {
-            usernameField.setText("");
-            messageLabel.setText("Username must be 3 or more characters.");
-            return;
-        }
-        // variable for checking illegal characters
-        boolean hasIllegalUsername = ILLEGAL_CHARS.matcher(username).find();
-        // check if username contains no illegal characters
-        if (hasIllegalUsername) {
-            usernameField.setText("");
-            messageLabel.setText("Username must contain no illegal characters/spaces.");
-            return;
-        }
-
-        // check if email meets criteria
-        if (!EMAIL_PATTERN.matcher(email).matches()) {
-            emailField.setText("");
-            messageLabel.setText("Please enter a valid email address.");
-            return;
-        }
-        // check if password is correct length of 8 characters
-        if ( password.length() < 8 ){
-            passwordField.setText("");
-            confirmPasswordField.setText("");
-            messageLabel.setText("Please make sure password contains 8 or more characters.");
-            return;
-        }
-        // variable for checking lack of a number or special character
-        boolean isWeakPassword = !password.matches(".*[0-9!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>\\/?].*");
-        // check if password contains numbers or special characters
-        if (isWeakPassword){
-            passwordField.setText("");
-            confirmPasswordField.setText("");
-            messageLabel.setText("Please make sure password contains a number or special character.");
-            return;
-        }
-        // variable for checking illegal characters
-        boolean hasIllegalPassword = ILLEGAL_CHARS.matcher(password).find();
-        // check if password contains illegal characters
-        if ( hasIllegalPassword ){
-            passwordField.setText("");
-            confirmPasswordField.setText("");
-            messageLabel.setText("Please make sure password contains 8 or more characters.");
+        if (failure != null) {
+            switch (failure.getFieldToClear()) {
+                case "clearUsername" -> usernameField.setText("");
+                case "clearPassword" -> { passwordField.setText(""); confirmPasswordField.setText(""); }
+                case "clearEmail"    -> emailField.setText("");
+            }
+            messageLabel.setText(failure.getMessage());
             return;
         }
 
@@ -128,6 +93,7 @@ public class RegisterController {
         UserDAO userDAO = new UserDAO();
         if (userDAO.getByUsername(username) != null) {
             messageLabel.setText("Username already taken!");
+            usernameField.setText("");
             return;
         }
         userDAO.insert(newUser);

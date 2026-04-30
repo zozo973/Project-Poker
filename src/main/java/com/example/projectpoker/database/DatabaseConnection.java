@@ -5,12 +5,13 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class DatabaseConnection {
+    // Tests override this property so they can run against an isolated SQLite file.
+    private static final String DB_PATH_PROPERTY = "projectpoker.db.path";
     private static Connection instance = null;
-    private static final String URL = "jdbc:sqlite:projectpoker.db";
 
     private DatabaseConnection() {
         try {
-            instance = DriverManager.getConnection(URL);
+            instance = DriverManager.getConnection(getUrl());
         } catch (SQLException sqlEx) {
             throw new IllegalStateException("Failed to connect to SQLite database.", sqlEx);
         }
@@ -43,8 +44,18 @@ public class DatabaseConnection {
 
     public static String getUrl() {
         if (instance == null) {
-            new DatabaseConnection();
+            // Default to the real app database unless a test provides its own path.
+            String databasePath = System.getProperty(DB_PATH_PROPERTY, "projectpoker.db");
+            return "jdbc:sqlite:" + databasePath;
         }
-        return URL;
+        return getUrlFromConnection();
+    }
+
+    private static String getUrlFromConnection() {
+        try {
+            return instance.getMetaData().getURL();
+        } catch (SQLException sqlEx) {
+            throw new IllegalStateException("Failed to read SQLite database URL.", sqlEx);
+        }
     }
 }

@@ -28,6 +28,7 @@ class DatabaseTest {
     @BeforeEach
     void setUp() throws IOException {
         DatabaseConnection.closeConnection();
+        // Each test gets its own temporary SQLite file so database state never leaks between tests.
         testDatabasePath = Files.createTempFile("projectpoker-db-test-", ".db");
         System.setProperty(DB_PATH_PROPERTY, testDatabasePath.toString());
         DatabaseManager.initializeDatabase();
@@ -44,6 +45,7 @@ class DatabaseTest {
     void initializeDatabaseCreatesAllRequiredTables() throws SQLException {
         try (Connection connection = DatabaseConnection.getInstance();
              Statement statement = connection.createStatement()) {
+            // This verifies the persistence layer creates the schema the application depends on.
             ResultSet resultSet = statement.executeQuery(
                     "SELECT name FROM sqlite_master WHERE type = 'table' AND name IN "
                             + "('users', 'game_sessions', 'round_logs', 'round_actions')"
@@ -63,6 +65,7 @@ class DatabaseTest {
         UserDAO userDAO = new UserDAO();
         User user = new User("db_user", "hashed-password", "db_user@test.com");
 
+        // Saving and reloading a user proves registration data is written to the database correctly.
         userDAO.insert(user);
         User loadedUser = userDAO.getByUsername("db_user");
 
@@ -79,6 +82,7 @@ class DatabaseTest {
         User user = new User("balance_user", "hashed-password", "balance@test.com");
         userDAO.insert(user);
 
+        // This covers the expected behaviour when a returning player's profile is updated.
         user.setCurrentBalance(1450);
         user.setTotalHandsPlayed(8);
         user.setTotalWins(3);
@@ -101,6 +105,7 @@ class DatabaseTest {
         TestPlayer player = new TestPlayer(user.getUsername(), user.getCurrentBalance());
         player.forceBalance(1325);
 
+        // The balance bug fix depends on saving progress before the whole game session is finalized.
         DatabaseManager.saveUserProgress(user, player);
 
         User loadedUser = userDAO.getByUsername("progress_user");
@@ -120,6 +125,7 @@ class DatabaseTest {
         game.init();
         player.forceBalance(1600);
 
+        // Ending a game should update both the user's saved balance and the session audit record.
         game.end();
 
         User loadedUser = userDAO.getByUsername("session_user");
@@ -144,6 +150,7 @@ class DatabaseTest {
             super(name, balance);
         }
 
+        // Exposes the protected balance setter for database persistence tests only.
         void forceBalance(int balance) {
             setBalance(balance);
         }

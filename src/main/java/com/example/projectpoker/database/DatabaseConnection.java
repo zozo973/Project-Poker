@@ -5,6 +5,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class DatabaseConnection {
+    // Tests override this property so they can run against an isolated SQLite file.
     private static final String DB_PATH_PROPERTY = "projectpoker.db.path";
     private static Connection instance = null;
 
@@ -43,6 +44,7 @@ public class DatabaseConnection {
 
     public static String getUrl() {
         if (instance == null) {
+            // Default to the real app database unless a test provides its own path.
             String databasePath = System.getProperty(DB_PATH_PROPERTY, "projectpoker.db");
             return "jdbc:sqlite:" + databasePath;
         }

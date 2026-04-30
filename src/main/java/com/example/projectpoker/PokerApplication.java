@@ -23,13 +23,13 @@ public class PokerApplication extends Application {
         DatabaseManager.initializeDatabase();
         FXMLLoader fxmlLoader = new FXMLLoader(PokerApplication.class.getResource("/com/example/projectpoker/Account & Profile UI/login.fxml"));
         // Get the screen dimensions
-        double screenWidth = Screen.getPrimary().getVisualBounds().getWidth();
-        double screenHeight = Screen.getPrimary().getVisualBounds().getHeight();
-        Scene scene = new Scene(fxmlLoader.load(), screenWidth, screenHeight);
+        //double screenWidth = Screen.getPrimary().getVisualBounds().getWidth();
+        //double screenHeight = Screen.getPrimary().getVisualBounds().getHeight();
+        Scene scene = new Scene(fxmlLoader.load());
 
         stage.setTitle("The Gaslight Gambit");
         stage.setScene(scene);
-        stage.setMaximized(true);
+        //stage.setMaximized(true);
         stage.show();
     }
     public void createPokerGame(Stage gameStage) throws IOException {

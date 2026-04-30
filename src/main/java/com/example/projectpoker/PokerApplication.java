@@ -27,7 +27,7 @@ public class PokerApplication extends Application {
         double screenHeight = Screen.getPrimary().getVisualBounds().getHeight();
         Scene scene = new Scene(fxmlLoader.load(), screenWidth, screenHeight);
 
-        stage.setTitle("Login & Register");
+        stage.setTitle("The Gaslight Gambit");
         stage.setScene(scene);
         stage.setMaximized(true);
         stage.show();

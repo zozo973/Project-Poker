@@ -3,10 +3,19 @@ package com.example.projectpoker.service;
 import com.example.projectpoker.controller.RegisterController;
 
 public class PasswordValidation {
-    // check if password is blank
-    public static ValidationResult checkPasswordBlank(String password, String confirmPassword) {
+    // check if both passwords is blank for Register
+    public static ValidationResult checkBothPasswordBlank(String password, String confirmPassword) {
         if (password.isBlank() || confirmPassword.isBlank()) {
-            return ValidationResult.fail("Passwords can't be empty", "clearPassword");
+            return ValidationResult.fail("Passwords can't be empty.", "clearPassword");
+        }
+        else {
+            return ValidationResult.ok();
+        }
+    }
+    // check if password for login is blank
+    public static ValidationResult checkPasswordBlank(String password) {
+        if (password.isBlank()) {
+            return ValidationResult.fail("Password can't be empty.", "clearPassword");
         }
         else {
             return ValidationResult.ok();

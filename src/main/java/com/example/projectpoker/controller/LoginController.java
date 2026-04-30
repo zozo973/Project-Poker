@@ -1,13 +1,14 @@
 package com.example.projectpoker.controller;
 
-import com.example.projectpoker.service.PasswordHasher;
+import com.example.projectpoker.service.*;
 import com.example.projectpoker.model.User;
 import com.example.projectpoker.database.UserDAO;
-import com.example.projectpoker.service.SessionManager;
 import com.example.projectpoker.PokerApplication;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import java.io.IOException;
+import java.util.List;
+
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -27,15 +28,25 @@ public class LoginController {
         String username = usernameField.getText();
         String password = passwordField.getText();
 
-        // variables to check if the user has inputted something in the fields
-        boolean checkedUsername = username.isBlank();
-        boolean checkedPassword = password.isBlank();
+        List<ValidationResult> checkedLoginResults = List.of(
+                UsernameValidation.checkUsernameBlank(username),
+                PasswordValidation.checkPasswordBlank(password)
+        );
 
-        // if statement to check if a user has inputted something correctly in the fields
-        if (checkedUsername || checkedPassword) {
-            usernameField.setText("");
-            passwordField.setText("");
-            messageLabel.setText("Invalid Username or Password! Please fill all fields.");
+        ValidationResult failure = null;
+        for (ValidationResult result : checkedLoginResults) {
+            if (!result.isValid()) {
+                failure = result;
+                break;
+            }
+        }
+        if (failure != null) {
+            switch (failure.getFieldToClear()) {
+                case "clearUsername" -> usernameField.setText("");
+                case "clearPassword" -> passwordField.setText("");
+            }
+            messageLabel.setText(failure.getMessage());
+            return;
         }
 
         else {
@@ -46,6 +57,7 @@ public class LoginController {
             // check if username is correct
             if (user == null) {
                 messageLabel.setText("Username not found.");
+                usernameField.setText("");
                 return;
             }
 
@@ -53,9 +65,9 @@ public class LoginController {
             // check if password is correct
             if (!verifiedPassword) {
                 messageLabel.setText("Incorrect password.");
+                passwordField.setText("");
                 return;
             }
-
             SessionManager.setCurrentUser(user);
             try {
                 Stage stage = (Stage) usernameField.getScene().getWindow();

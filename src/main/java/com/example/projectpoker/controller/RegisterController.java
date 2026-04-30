@@ -48,13 +48,13 @@ public class RegisterController {
         String password = passwordField.getText();
         String confirmPassword = confirmPasswordField.getText();
 
-        List<ValidationResult> checkedResults = List.of(
+        List<ValidationResult> checkedRegisterResults = List.of(
                 UsernameValidation.checkUsernameBlank(username),
                 UsernameValidation.checkUsernameLength(username),
                 UsernameValidation.checkUsernameIllegal(username),
                 EmailValidation.checkEmailBlank(email),
                 EmailValidation.checkIllegalEmail(email),
-                PasswordValidation.checkPasswordBlank(password, confirmPassword),
+                PasswordValidation.checkBothPasswordBlank(password, confirmPassword),
                 PasswordValidation.checkPasswordConfirm(password, confirmPassword),
                 PasswordValidation.checkPasswordLength(password),
                 PasswordValidation.checkIllegalPassword(password),
@@ -62,7 +62,7 @@ public class RegisterController {
         );
 
         ValidationResult failure = null;
-        for (ValidationResult result : checkedResults) {
+        for (ValidationResult result : checkedRegisterResults) {
             if (!result.isValid()) {
                 failure = result;
                 break;

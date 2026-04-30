@@ -17,7 +17,7 @@ public class MainMenuController {
     @FXML
     private void goToGame() {
         try {
-            Stage stage = new Stage();
+            Stage stage = (Stage) messageLabel.getScene().getWindow();
             PokerApplication app = new PokerApplication();
             app.createPokerGame(stage);
         } catch (IOException e) {

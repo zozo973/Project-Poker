@@ -27,6 +27,7 @@ public class PokerApplication extends Application {
         double screenWidth = Screen.getPrimary().getVisualBounds().getWidth();
         double screenHeight = Screen.getPrimary().getVisualBounds().getHeight();
         Scene scene = new Scene(fxmlLoader.load(), screenWidth, screenHeight);
+
         stage.setTitle("Login & Register");
         stage.setScene(scene);
         stage.setMaximized(true);

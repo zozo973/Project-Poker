@@ -1,6 +1,5 @@
 package com.example.projectpoker.controller;
 
-import com.example.projectpoker.PokerApplication;
 import com.example.projectpoker.model.User;
 import com.example.projectpoker.database.UserDAO;
 import com.example.projectpoker.service.SessionManager;

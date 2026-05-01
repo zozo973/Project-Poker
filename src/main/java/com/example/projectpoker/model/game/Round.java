@@ -11,6 +11,10 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
+import com.example.projectpoker.AIActions;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static com.example.projectpoker.model.game.PotUtil.*;
 
@@ -35,6 +39,7 @@ public class Round {
     private final ArrayList<Player> players;
     private final ArrayList<Integer> turnOrder;
     private boolean holeCardsDealt;
+    private Map<Player, AIActions.AiPlayerResponse> aiDecisions = new HashMap<>();
 
     private final int gameSessionId;
     private final int roundNumber;
@@ -45,6 +50,7 @@ public class Round {
     }
 
     public Round(ArrayList<Player> players, int blindSize, int gameSessionId, int roundNumber) {
+
         this.roundStatus = RoundStatus.UNINITIALISED;
         this.players = players;
         this.toPlay = blindSize;
@@ -287,6 +293,32 @@ public class Round {
     }
 
     private void betting() {
+
+        // Try to use Gemini first
+        aiDecisions = new HashMap<>();
+        List<AiPlayer> aiPlayerList = new ArrayList<>();
+        List<Card[]> aiHands = new ArrayList<>();
+        for (Integer i : turnOrder) {
+            Player p = players.get(i);
+            if (p instanceof AiPlayer && !Action.hasFolded(p.getAction())) {
+                aiPlayerList.add((AiPlayer) p);
+                aiHands.add(p.getPlayerHand().getCards().toArray(new Card[0]));
+            }
+        }
+        if (!aiPlayerList.isEmpty()) {
+            try {
+                Card[] board = communityCards.toArray(new Card[0]);
+                List<AIActions.AiPlayerResponse> responses =
+                        new AIActions().getAllChoices(aiHands, board, roundStatus);
+                for (int i = 0; i < aiPlayerList.size(); i++) {
+                    aiDecisions.put(aiPlayerList.get(i), responses.get(i));
+                }
+            } catch (Exception e) {
+                // If fail, go back
+                System.err.println("Gemini API failed, using fallback: " + e.getMessage());
+            }
+        }
+
         Player activePlayer;
         boolean bettingEnded;
         do {
@@ -388,6 +420,59 @@ public class Round {
 
     // Temporary AI behaviour AI always checks or calls raises if it can.
     private void chooseAiAction(Player activePlayer) {
+        // For Gemini use
+        AIActions.AiPlayerResponse response = aiDecisions.get(activePlayer);
+        if (response != null && response.errormsg == null) {
+            int requiredToCall = getRequiredToCall(activePlayer);
+            switch (response.action) {
+                case CALL:
+                    int callAmount = Math.min(requiredToCall, activePlayer.getBalance());
+                    if (callAmount <= 0) {
+                        activePlayer.setAction(Action.CHECK);
+                        activePlayer.setActiveBet(0);
+                    } else {
+                        activePlayer.setAction(Action.CALL);
+                        activePlayer.setActiveBet(callAmount);
+                    }
+                    break;
+                case RAISE:
+                    int alreadyInvested = activePlayer.getTotalPotInvestment(getOpenPot());
+                    int minRaise = Math.max(toPlay * 2, alreadyInvested + 1);
+                    int raiseAmount = Math.max(response.amount, minRaise);
+                    raiseAmount = Math.min(raiseAmount, alreadyInvested + activePlayer.getBalance());
+                    if (raiseAmount <= alreadyInvested) {
+                        int callAmt = Math.min(requiredToCall, activePlayer.getBalance());
+                        if (callAmt <= 0) {
+                            activePlayer.setAction(Action.CHECK);
+                            activePlayer.setActiveBet(0);
+                        } else {
+                            activePlayer.setAction(Action.CALL);
+                            activePlayer.setActiveBet(callAmt);
+                        }
+                    } else {
+                        activePlayer.setAction(Action.RAISE);
+                        activePlayer.setActiveBet(raiseAmount);
+                    }
+                    break;
+
+                case ALLIN:
+                    activePlayer.setAction(Action.ALLIN);
+                    activePlayer.setActiveBet(activePlayer.getBalance());
+                    break;
+                case FOLD:
+                    activePlayer.setAction(Action.FOLD);
+                    activePlayer.setActiveBet(0);
+                    break;
+                case CHECK:
+                default:
+                    activePlayer.setAction(Action.CHECK);
+                    activePlayer.setActiveBet(0);
+                    break;
+            }
+            return;
+        }
+
+        // For the roles. In case Gemini API not work
         int requiredToCall = getRequiredToCall(activePlayer);
 
         // If player is all-in (balance = 0), they can only check

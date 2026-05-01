@@ -198,42 +198,6 @@ class GameTest {
 
     // Start Game Tests
 
-        // Start Game End Condition Tests
-    @Test
-    void testStartGameNumPlayersEndCondition() {
-        // Test when user is the only player left in players
-        game.init();
-        ArrayList<Player> singlePlayer = new ArrayList<>();
-        singlePlayer.add(user);
-        game.setPlayers(singlePlayer);
-        game.start(true);
-        assertEquals(1,game.getPlayers().size());
-        assertEquals(GameStatus.ENDED,game.getGameStatus());
-    }
-
-    @Test
-    void testStartGameUserbalanceEndCondition() {
-        // Test Player balance = 0
-        game.init();
-        ArrayList<Player> players = game.getPlayers();
-        int userIndex = game.findUserIndex();
-        players.get(userIndex).setBalance(0);
-        game.setPlayers(players);
-        game.start(true);
-        assertEquals(0,game.getUser().getBalance());
-        assertEquals(GameStatus.ENDED,game.getGameStatus());
-    }
-
-    @Test
-    void testStartGameNumRoundEndCondition() {
-        // Test when number of rounds left is 0;
-        game.init();
-        game.setNumRoundsLeft(1);
-        game.start(true);
-        assertEquals(0,game.getNumRoundsLeft());
-        assertEquals(GameStatus.ENDED,game.getGameStatus());
-    }
-
     @Test
     void testStartSetsGameStatusToRunning() {
         game.start();

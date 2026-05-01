@@ -1,10 +1,11 @@
 package com.example.projectpoker.model.game;
 
-import com.example.projectpoker.database.DatabaseManager;
+import java.util.Random;
 import com.example.projectpoker.model.HandEvaluation;
 import com.example.projectpoker.model.PlayerResult;
 import com.example.projectpoker.model.game.enums.Action;
 import com.example.projectpoker.model.game.enums.BetType;
+import com.example.projectpoker.model.game.enums.Roles;
 import com.example.projectpoker.model.game.enums.RoundStatus;
 
 import java.beans.PropertyChangeListener;
@@ -32,6 +33,7 @@ public class Round {
     private ArrayList<Pot> pots;
     private ArrayList<Card> communityCards;
     private ArrayList<RoundLogEntry> roundLog;
+    private RoundLog finalLog;
     private final ArrayList<Player> players;
     private final ArrayList<Integer> turnOrder;
     private boolean holeCardsDealt;
@@ -68,7 +70,7 @@ public class Round {
         this.gameSessionId = gameSessionId;
         this.roundNumber = roundNumber;
         this.persisted = false;
-        this.roundStatus = RoundStatus.UNINITIALISED; // Possibly change
+        setRoundStatus(RoundStatus.UNINITIALISED); // Possibly change
     }
 
     public void addPropertyChangeListener(PropertyChangeListener listener) {
@@ -87,9 +89,8 @@ public class Round {
         this.roundStatus = roundStatus;
         switch (roundStatus) {
             case BETTING1, BETTING2, BETTING3, BETTING4 -> checkBetType();
-            case RIVER, TURN, FLOP -> deal2Table();
+            case RIVER, TURN, FLOP, SHOWDOWN -> deal2Table();
             case DEAL -> dealCards();
-            case SHOWDOWN -> playShowdown();
             case END -> end();
             case UNINITIALISED -> init();
             case BLINDS -> payBlinds();
@@ -101,6 +102,8 @@ public class Round {
     }
 
     public ArrayList<RoundLogEntry> getRoundLog() { return roundLog; }
+
+    public RoundLog getFinalLog() { return this.finalLog; }
 
     public void setBetType(BetType betType) {
         var oldVal = this.betType;
@@ -186,17 +189,13 @@ public class Round {
     }
 
     public void end() {
-
-        for (Pot p : pots) {
-            RoundStatus statusAfterFoldCheck = p.removeFolded(roundStatus);
-            if (roundStatus != RoundStatus.SHOWDOWN && statusAfterFoldCheck != RoundStatus.END) {
-                p.showDown(this.communityCards);
-            }
-        }
-
-        // TODO send RoundLog to database exit round
-        // DAO.add(getRoundLog());
-        setRoundStatus(RoundStatus.END);
+        this.finalLog = new RoundLog(
+                this.roundLog,
+                this.players,
+                this.communityCards,
+                this.pots,
+                this.roundNumber
+        );
     }
 
     private void createTurnOrder(int[] roleIndices) {
@@ -245,7 +244,9 @@ public class Round {
         int betSize = activeBetValue != null ? activeBetValue : 0;
         Action action = player.getAction();
         if (Action.isBet(action)) {
-            this.roundLog.add(new RoundLogEntry(player, toPlay - player.getTotalInvestment(), betSize, action, getOpenPot()));
+            this.roundLog.add(new RoundLogEntry(player, toPlay , betSize, action, getOpenPot()));
+        } else if (Action.hasFolded(player.getAction())) {
+            this.roundLog.add(new RoundLogEntry(player,player.getName() + " has decided to fold."));
         } else {
             this.roundLog.add(new RoundLogEntry(player, betSize));
         }
@@ -273,30 +274,52 @@ public class Round {
         if (betType.equals(BetType.SKIP2SHOWDOWN)) {
             switch (communityCards.size()) {
                 case 0:
+                    // Flop
                     deck.burnCard();
                     this.communityCards.add(deck.draw());
                     this.communityCards.add(deck.draw());
                     this.communityCards.add(deck.draw());
+                    // Turn
+                    deck.burnCard();
+                    this.communityCards.add(deck.draw());
+                    // River
+                    deck.burnCard();
+                    this.communityCards.add(deck.draw());
+                    this.roundStatus = RoundStatus.SHOWDOWN;
                 case 3:
+                    // Turn
                     deck.burnCard();
                     this.communityCards.add(deck.draw());
+                    // River
+                    deck.burnCard();
+                    this.communityCards.add(deck.draw());
+                    this.roundStatus = RoundStatus.SHOWDOWN;
                 case 4:
+                    // River
                     deck.burnCard();
                     this.communityCards.add(deck.draw());
+                    this.roundStatus = RoundStatus.SHOWDOWN;
                 case 5:
-                    throw new IllegalStateException("RoundStatus must be showdown, to have 5 community cards.");
+                    this.roundStatus = RoundStatus.SHOWDOWN;
                 default:
                     throw new IllegalStateException("community cards has illegal amount of cards");
             }
+
         }
+        if (roundStatus.equals(RoundStatus.SHOWDOWN)) {
+            playShowdown();
+            return;
+        }
+
         deck.burnCard();
-        if (roundStatus == RoundStatus.FLOP) {
+        if (roundStatus.equals(RoundStatus.FLOP)) {
             this.communityCards.add(deck.draw());
             this.communityCards.add(deck.draw());
             this.communityCards.add(deck.draw());
         } else {
             this.communityCards.add(deck.draw());
         }
+        setRoundStatus(RoundStatus.stepRoundStatus(this.roundStatus));
     }
 
     private void createSidePot(Player potCreator) {
@@ -318,41 +341,21 @@ public class Round {
                     setToPlay(getToCall(this.pots,activePlayer));
                     activePlayer.setIsTurn(true);
                     while (activePlayer.getIsTurn()) {
-                        int requiredToCall = getRequiredToCall(activePlayer);
-                        int playerBalance = activePlayer.getBalance();
+                        processActivePlayer(activePlayer);
 
-                        // If player is all-in (balance <= 0), they automatically check
-                        if (playerBalance <= 0) {
-                            activePlayer.setAction(Action.CHECK);
-                            activePlayer.setActiveBet(0);
-                        }
-                        // If player has balance but not enough to call, they automatically go all-in
-                        else if (requiredToCall > playerBalance) {
-                            // TODO: Ask all in or fold
-                            activePlayer.setAction(Action.ALLIN);
-                            activePlayer.setActiveBet(playerBalance);
-                        }
-                        else if (activePlayer instanceof AiPlayer) {
-                            chooseAiAction(activePlayer);
-                        } else {
-                            waitForUserAction(activePlayer);
-                        }
-
-                        processPlayerAction(activePlayer);
-                        if (endBetting(activePlayer)) {
-                            bettingEnded = true;
-                            break;
-                        }
                         if (!activePlayer.getAction().equals(Action.UNDECIDED)) {
                             activePlayer.setIsTurn(false);
                         }
                     }
                 }
-                if (bettingEnded) {
+                recordPlayerAction(activePlayer);
+
+                checkIfPlayerRaised(activePlayer);
+
+                if (endBetting(activePlayer)) {
+                    bettingEnded = true;
                     break;
                 }
-                // need to reset action to undecided after they play if they haven't folded
-                if (!Action.hasFolded(activePlayer.getAction())) activePlayer.setAction(Action.UNDECIDED);
             }
             // If we went through all players without asking any to act, check if betting should end
             if (!anyPlayerAsked) {
@@ -361,6 +364,19 @@ public class Round {
             }
         } while (!bettingEnded);
         postBetting();
+    }
+
+    private void checkIfPlayerRaised(Player activePlayer) {
+        // need to reset action of other users if active player raises unless
+        // a player has folded or are all-in.
+
+        if (Action.isRaise(activePlayer.getAction()) && activePlayer.getActiveBet() > this.toPlay) {
+            for (Player p : this.players) {
+                if (!(p.equals(activePlayer)) || Action.hasFolded(p.getAction()) || p.getAction().equals(Action.ALLIN) ) {
+                    p.setAction(Action.UNDECIDED);
+                }
+            }
+        }
     }
 
     private boolean checkIfBettingComplete() {
@@ -386,6 +402,7 @@ public class Round {
                 numUndecided++;
             }
         }
+        if (numUndecided > 0) return false;
 
         // If all non-folded players are all-in, betting is complete
         if (numUndecided == 0 && (players.size() - numFold) <= numAllIn + 1) {
@@ -396,14 +413,25 @@ public class Round {
         return (players.size() - numFold) == 1;
     }
 
-    private void waitForUserAction(Player activePlayer) {
-        while (activePlayer.getIsTurn() && activePlayer.getAction() == Action.UNDECIDED) {
+    private void waitForPlayerDecision(Player activePlayer) {
+        if (activePlayer instanceof AiPlayer) {
+            Random random = new Random();
+            int thinkTime = random.nextInt((4000-500)+1) + 500;
             try {
-                // need to pause to wait for the active player's action.
-                Thread.sleep(25);
+                Thread.sleep(thinkTime);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
-                throw new IllegalStateException("Interrupted while waiting for user input", e);
+                throw new IllegalStateException("Interrupted while Ai Player is thinking", e);
+            }
+        } else {
+            while (activePlayer.getIsTurn() && activePlayer.getAction() == Action.UNDECIDED) {
+                try {
+                    // need to pause to wait for the active player's action.
+                    Thread.sleep(25);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    throw new IllegalStateException("Interrupted while waiting for user input", e);
+                }
             }
         }
     }
@@ -415,136 +443,26 @@ public class Round {
         if (playerBalance <= 0) {
             activePlayer.setAction(Action.CHECK);
             activePlayer.setActiveBet(0);
+            return;
         }
+
         // If player has balance but not enough to call, they automatically go all-in
         else if (this.toPlay > playerBalance) {
             // TODO: Ask all in or fold
             activePlayer.setAction(Action.ALLIN);
             activePlayer.setActiveBet(playerBalance);
-
-            if (!(activePlayer instanceof AiPlayer)) waitForUserAction(activePlayer);
-
-            setPots(activePlayer.play(this.pots, this.toPlay));
-            recordPlayerAction(activePlayer);
-        }
-        else {
-            if (!(activePlayer instanceof AiPlayer)) waitForUserAction(activePlayer);
-
-            setPots(activePlayer.play(this.pots, this.toPlay));
-            recordPlayerAction(activePlayer);
-        }
-    }
-
-
-    // Temporary AI behaviour AI always checks or calls raises if it can.
-    private void chooseAiAction(Player activePlayer) {
-        int requiredToCall = getRequiredToCall(activePlayer);
-
-        // If player is all-in (balance = 0), they can only check
-        if (activePlayer.getBalance() <= 0) {
-            activePlayer.setAction(Action.CHECK);
-            activePlayer.setActiveBet(0);
-            return;
         }
 
-        if (requiredToCall == 0) {
-            activePlayer.setAction(Action.CHECK);
-            activePlayer.setActiveBet(0);
-            return;
-        }
-
-        int betAmount = Math.min(requiredToCall, activePlayer.getBalance());
-        if (betAmount < requiredToCall) {
-            activePlayer.setAction(Action.ALLIN);
-        } else {
-            activePlayer.setAction(Action.CALL);
-        }
-        activePlayer.setActiveBet(betAmount);
-    }
-
-    private int getRequiredToCall(Player player) {
-        int openPotIndex = getOpenPotIndex(this.pots);
-        if (openPotIndex < 0) {
-            return Math.max(0, toPlay - player.getTotalInvestment());
-        }
-
-        Pot openPot = this.pots.get(openPotIndex);
-        int investedInOpenPot = player.getTotalPotInvestment(openPot);
-        return Math.max(0, toPlay - investedInOpenPot);
-    }
-
-    private void processPlayerAction(Player activePlayer) {
-        Action action = activePlayer.getAction();
-        Integer activeBet = activePlayer.getActiveBet();
-        int requiredToCall = getRequiredToCall(activePlayer);
-
-        // UI raises are interpreted as "raise to" total for this pot.
-        // Convert to an incremental contribution so repeat raises do not overcharge the player.
-        int betContribution = activeBet == null ? 0 : activeBet;
-        if (action == Action.RAISE) {
-            if (activeBet == null || activeBet <= this.toPlay) {
-                action = requiredToCall > 0 ? Action.CALL : Action.CHECK;
-                activePlayer.setAction(action);
-                betContribution = requiredToCall;
-            } else {
-                Pot openPot = getOpenPot();
-                int alreadyInvestedInOpenPot = activePlayer.getTotalPotInvestment(openPot);
-                betContribution = Math.max(0, activeBet - alreadyInvestedInOpenPot);
-            }
-        }
-
-        // Allow players to act again on raises
-        if (Action.isRaise(action) && activeBet != null && activeBet > this.toPlay) {
-            setToPlay(activeBet);
-            resetOtherPlayerActions(activePlayer);
-        }
-
-        if (Action.isBet(action)) {
-            activeBet = betContribution;
-            if (activeBet <= 0) {
-                throw new IllegalStateException("Bet action requires a positive active bet.");
-            }
-
-            activePlayer.setActiveBet(betContribution);
-
-            if (this.betType.equals(BetType.SIDEPOT)) {
-                betIntoSidePots(activePlayer);
-            } else {
-                setPots(new ArrayList<>(handlePlayerBet(this.pots, activePlayer)));
-            }
-        }
-
-        recordPlayerAction(activePlayer);
-        // Notify listeners after each completed action (check/call/raise/fold/all-in).
-        setPots(new ArrayList<>(this.pots));
-    }
-
-    // Allows players to act again in the same round after a raise
-    private void resetOtherPlayerActions(Player aggressor) {
-        for (Player player : players) {
-            if (player == aggressor) {
-                continue;
-            }
-            if (Action.hasFolded(player.getAction()) || player.getAction() == Action.ALLIN) {
-                continue;
-            }
-            player.setAction(Action.UNDECIDED);
-        }
-    }
-
-    private void betIntoSidePots(Player activePlayer) {
-        var paidPots = handlePlayerBet(this.pots,activePlayer);
-        if (paidPots != null ) {
-            setPots(new ArrayList<>(paidPots));
-        } else {
-            setPots(new ArrayList<>(handlePlayerBet(this.pots,activePlayer)));
-        }
+        waitForPlayerDecision(activePlayer);
+        activePlayer.play(this.pots);
+        setPots(handlePlayerBet(this.pots,activePlayer));
     }
 
     private void postBetting() {
         updateTurnOrder();
         for (Player p : players) {
-            if (!Action.hasFolded(p.getAction()) && !p.getAction().equals(Action.FORFEIT)) {
+            if (!Action.hasFolded(p.getAction()) && !p.getAction().equals(Action.FORFEIT)
+                    && !p.getAction().equals(Action.ALLIN)) {
                 p.setAction(Action.UNDECIDED);
             }
             p.setIsTurn(false);
@@ -556,8 +474,8 @@ public class Round {
                 pots.get(i).removeFolded(roundStatus);
             }
         }
-        this.roundStatus = pots.getLast().removeFolded(this.roundStatus);
         setToPlay(0);
+        setRoundStatus(this.pots.getLast().removeFolded(this.roundStatus));
     }
 
     public boolean endBetting(Player activePlayer) {
@@ -568,22 +486,25 @@ public class Round {
         int numRaise = 0;
         int numFold = 0;
         int numCheck = 0;
+        int numUndecided = 0;
         Player recentAllIn = new Player();
         for (Player p : players) {
-            if (p.getAction() == Action.ALLIN) {
-                numAllIn += 1;
-                recentAllIn = p;
-            } else if (p.getAction() == Action.CALL) {
-                numCall += 1;
-            } else if (p.getAction() == Action.RAISE) {
-                numRaise += 1;
-            } else if (p.getAction() == Action.FOLD) {
-                numFold += 1;
-            } else if (p.getAction() == Action.CHECK) {
-                numCheck += 1;
+            switch (p.getAction()) {
+                case Action.ALLIN:
+                    numAllIn++;
+                    recentAllIn = p;
+                case Action.CALL:
+                    numCall++;
+                case Action.RAISE:
+                    numRaise++;
+                case Action.FOLD:
+                    numFold++;
+                case Action.CHECK:
+                    numCheck++;
+                case Action.UNDECIDED:
+                    numUndecided++;
             }
         }
-
         // TODO Test and check betting end conditions possible add more.
         // end betting condition 1 (Normal or All In):
         //      One player action is Raise or All In,
@@ -629,7 +550,10 @@ public class Round {
             createSidePot(activePlayer);
             setBetType(BetType.SIDEPOT);
             return false;
-        } else if(cond3) {
+        } else if (numUndecided > 0) {
+            return false;
+        }
+        else if(cond3) {
             setBetType(BetType.ENDROUND);
             return  true;
         } else if(cond4) {
@@ -639,11 +563,11 @@ public class Round {
             return true;
         } else if(cond1) {
             if (numAllIn > 0) setBetType(BetType.SKIP2SHOWDOWN);
-            else setBetType(BetType.NORMAL);
+//            else setBetType(BetType.NORMAL);
             return true;
         } else if(cond2) {
             if (numFold == players.size()-1) setBetType(BetType.SKIP2SHOWDOWN);
-            else setBetType(BetType.NORMAL);
+//            else setBetType(BetType.NORMAL);
             return true;
         }
         return false;
@@ -657,73 +581,36 @@ public class Round {
             case ENDROUND:
                 end();
             case SKIP2SHOWDOWN:
-                playShowdown();
-            case SIDEPOT:
-            case NORMAL:
-                advanceRound();
+                setRoundStatus(RoundStatus.SHOWDOWN);
+            case NORMAL, SIDEPOT:
+                betting();
         }
     }
 
-    private void advanceRound() {
-        switch (roundStatus) {
-            case BETTING1:
-                setRoundStatus(RoundStatus.FLOP);
-                deal2Table();
-                setRoundStatus(RoundStatus.BETTING2);
-                checkBetType();
-                break;
-            case BETTING2:
-                setRoundStatus(RoundStatus.TURN);
-                deal2Table();
-                setRoundStatus(RoundStatus.BETTING3);
-                checkBetType();
-                break;
-            case BETTING3:
-                setRoundStatus(RoundStatus.RIVER);
-                deal2Table();
-                setRoundStatus(RoundStatus.BETTING4);
-                checkBetType();
-                break;
-            case BETTING4:
-                playShowdown();
-                break;
-            default:
-                break;
-        }
-    }
-
-//    private void advanceRound() {
-//        switch (roundStatus) {
-//            case BETTING1:
-//                setRoundStatus(RoundStatus.FLOP);
-//                setRoundStatus(RoundStatus.BETTING2);
-//                break;
-//            case BETTING2:
-//                setRoundStatus(RoundStatus.TURN);
-//                setRoundStatus(RoundStatus.BETTING3);
-//                break;
-//            case BETTING3:
-//                setRoundStatus(RoundStatus.RIVER);
-//                setRoundStatus(RoundStatus.BETTING4);
-//                break;
-//            case BETTING4:
-//                playShowdown();
-//                break;
-//            default:
-//                break;
-//        }
-//    }
 
     private void playShowdown() {
         while (communityCards.size() < 5) {
             deal2Table();
         }
-        setRoundStatus(RoundStatus.SHOWDOWN);
-        announceShowdownResults();
-        for (Pot p : pots) {
-            p.showDown(this.communityCards);
+        // TODO: Reveal players Hands to the user
+
+        for (Pot pot : this.pots) {
+            RoundStatus statusAfterFoldCheck = pot.removeFolded(this.roundStatus);
+            if (statusAfterFoldCheck == RoundStatus.SHOWDOWN) {
+                int numWinners = pot.showDown(this.communityCards);
+
+                for (Player p : this.players) {
+                    if (p.getRole().equals(Roles.WINNER)) {
+                        String proNoun = "you";
+                        if (p instanceof AiPlayer) proNoun = "they";
+                        this.roundLog.add(new RoundLogEntry(p,p.getName() + " is a winner, "
+                                + proNoun + " won " + Math.floor((double) pot.getPotSize()/numWinners) + "."));
+                    }
+                }
+            }
         }
-        end();
+        announceShowdownResults();
+        setRoundStatus(RoundStatus.END);
     }
 
     private void announceShowdownResults() {

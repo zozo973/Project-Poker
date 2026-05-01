@@ -14,13 +14,6 @@ import java.util.Collections;
 
 public class Game {
 
-    // Game Events
-    //      gameStatus Change
-    //      blindSize Change
-    //      players Change
-    //      Round Change
-
-
     private GameStatus gameStatus;
     private ArrayList<Player> players;
     private int numRoundsLeft;
@@ -31,9 +24,8 @@ public class Game {
     private int numPlayers;
     private final int userBuyIn;
     private Round round;
-    private ArrayList<ArrayList<RoundLogEntry>> GameLog;
+    private ArrayList<RoundLog> GameLog;
     private boolean roundAdvanceInProgress;
-
     private final int startingUserBalance;
     private int handsPlayed;
     private final User userProfile;
@@ -93,9 +85,7 @@ public class Game {
         pcs.removePropertyChangeListener(listener);
     }
 
-    public ArrayList<ArrayList<RoundLogEntry>> getGameLog() { return GameLog; }
-
-    public void setGameLog(ArrayList<ArrayList<RoundLogEntry>> gameLog) { GameLog = gameLog; }
+    public ArrayList<RoundLog> getGameLog() { return GameLog; }
 
     public GameStatus getGameStatus() {
         return gameStatus;
@@ -119,6 +109,7 @@ public class Game {
     }
 
     public void createNextRound() {
+        for (Player p : this.players) p.setMinBet((int) Math.round (this.blindSize*0.5));
         Round round = new Round(players,blindSize);
         pcs.firePropertyChange("round",this.round,round);
         setRound(round);
@@ -221,6 +212,7 @@ public class Game {
             roundAdvanceInProgress = false;
         }
     }
+
     public synchronized void onRoundEnded() {
 
         if (round == null || round.getRoundStatus() != com.example.projectpoker.model.game.enums.RoundStatus.END) {
@@ -229,7 +221,7 @@ public class Game {
 
         clearPlayerHands();
 
-        GameLog.add(round.getRoundLog());
+        GameLog.add(round.getFinalLog());
 
         nextRoundInitialisation();
 
@@ -243,28 +235,6 @@ public class Game {
 
         for (Player player : players) {
             player.getPlayerHand().clear();
-        }
-    }
-
-
-    public void start(boolean test) {
-        if (!test) return;
-        // Valid game before starting
-        setGameStatus(GameStatus.RUNNING);
-        while (gameStatus == GameStatus.RUNNING) {
-            // createNextRound();
-            // System.out.println(round.getRoundStatus());
-            // this.round.init();
-            // System.out.println(round.getRoundStatus());
-            //  this.round.start();
-            // System.out.println(round.getRoundStatus());
-
-            // Loss Condition
-            if (getUser().getBalance() == 0) { end(); break; }
-            else if (this.numRoundsLeft == 0) { end(); break; }
-            else if (this.players.size() == 1 && !(this.players.getFirst() instanceof AiPlayer)) { end(); break; }
-            this.GameLog.add(round.getRoundLog());
-            nextRoundInitialisation();
         }
     }
 

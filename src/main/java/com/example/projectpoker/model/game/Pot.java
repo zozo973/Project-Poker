@@ -3,6 +3,7 @@ package com.example.projectpoker.model.game;
 import com.example.projectpoker.model.HandEvaluation;
 import com.example.projectpoker.model.PlayerResult;
 import com.example.projectpoker.model.game.enums.Action;
+import com.example.projectpoker.model.game.enums.Roles;
 import com.example.projectpoker.model.game.enums.RoundStatus;
 
 import java.util.ArrayList;
@@ -144,14 +145,14 @@ public class Pot {
 
     public RoundStatus removeFolded(RoundStatus status) {
         players.removeIf(p -> p.getAction() == Action.FOLD);
-        if (players.size() == 1) {
+        if (players.size() == 1 || status.equals(RoundStatus.END)) {
             players.getFirst().win(potSize);
             return RoundStatus.END;
         }
         return RoundStatus.stepRoundStatus(status);
     }
 
-    public void showDown(ArrayList<Card> communityCards) {
+    public int showDown(ArrayList<Card> communityCards) {
         ArrayList<PlayerResult> gameResults;
         gameResults = HandEvaluation.whoWins(communityCards, this.players);
         int numWinners = gameResults.size();
@@ -159,11 +160,12 @@ public class Pot {
             for (Player p : players) {
                 if (p.matchId(gameResult.getPlayerId())) {
                     p.win(potSize / numWinners);
+                    p.setRole(Roles.WINNER);
                     break;
                 }
             }
         }
-        potSize = 0;
+        return numWinners;
     }
 
     public void adjustPot(Pot sidePot) {

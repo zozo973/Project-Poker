@@ -26,6 +26,7 @@ public class Player {
     private String name;
     private boolean isTurn;
     private int balance;
+    private int minBet;
     private RoundInvestment roundInvestment;
     private Action action;
     private Roles role;
@@ -40,6 +41,7 @@ public class Player {
         this.isTurn = false;
         this.action = Action.UNDECIDED;
         this.balance = 1000;
+        this.minBet = 15;
         this.role = Roles.PLAYER;
         this.roundInvestment = new RoundInvestment();
         this.activeBet = null;
@@ -52,6 +54,7 @@ public class Player {
         this.isTurn = false;
         this.action = Action.UNDECIDED;
         this.balance = 1000;
+        this.minBet = 15;
         this.role = Roles.PLAYER;
         this.roundInvestment = new RoundInvestment();
         this.activeBet = null;
@@ -63,6 +66,7 @@ public class Player {
         this.playerHand = new Hand();
         this.isTurn = false;
         this.balance = 1000;
+        this.minBet = 15;
         this.action = Action.UNDECIDED;
         this.role = role;
         this.roundInvestment = new RoundInvestment();
@@ -75,18 +79,20 @@ public class Player {
         this.playerHand = new Hand();
         this.isTurn = false;
         this.balance = balance;
+        this.minBet = 15;
         this.action = Action.UNDECIDED;
         this.role = Roles.PLAYER;
         this.roundInvestment = new RoundInvestment();
         this.activeBet = null;
     }
 
-    public Player(String name, int balance, String id) throws IOException {
+    public Player(String name, int balance, String id, int blindSize) throws IOException {
         this.name = name;
         this.id = new PlayerId(id);
         this.playerHand = new Hand();
         this.isTurn = false;
         this.balance = balance;
+        this.minBet = blindSize;
         this.action = Action.UNDECIDED;
         this.role = Roles.PLAYER;
         this.roundInvestment = new RoundInvestment();
@@ -138,6 +144,10 @@ public class Player {
         this.balance = balance;
         pcs.firePropertyChange("balance",oldVal,this.balance);
     }
+
+    public int getMinBet() { return minBet; }
+
+    public void setMinBet(int minBet) { this.minBet = minBet; }
 
     public RoundInvestment getRoundInvestment() { return roundInvestment; }
 
@@ -249,29 +259,19 @@ public class Player {
 
     }
 
-    public ArrayList<Pot> play(ArrayList<Pot> pots, int toPlay) {
+    public void play(ArrayList<Pot> pots) {
 
-        int requiredToCall = PotUtil.getRequiredToCall(pots, this, toPlay);
+        int toCall = PotUtil.getToCall(pots, this);
 
         // UI raises are interpreted as "raise to" total for this pot.
         // Convert to an incremental contribution so repeat raises do not overcharge the player.
         int betContribution = activeBet == null ? 0 : activeBet;
 
         if (this.action == Action.RAISE) {
-            if (this.activeBet == null || this.activeBet <= toPlay) {
-                this.action = requiredToCall > 0 ? Action.CALL : Action.CHECK;
-                betContribution = requiredToCall;
-            } else {
-                Pot openPot = getOpenPot();
-                int alreadyInvestedInOpenPot = activePlayer.getTotalPotInvestment(openPot);
-                betContribution = Math.max(0, this.activeBet - alreadyInvestedInOpenPot);
+            if (this.activeBet == null || this.activeBet <= toCall) {
+                this.action = toCall > 0 ? Action.CALL : Action.CHECK;
+                betContribution = toCall;
             }
-        }
-
-        // Allow players to act again on raises
-        if (Action.isRaise(action) && activeBet != null && activeBet > this.toPlay) {
-            setToPlay(this.activeBet);
-            resetOtherPlayerActions(activePlayer);
         }
 
         if (Action.isBet(action)) {
@@ -281,11 +281,5 @@ public class Player {
             }
             this.activeBet = betContribution;
         }
-        return handlePlayerBet(pots, this);
-
-        // Notify listeners after each completed action (check/call/raise/fold/all-in).
-
     }
-
-
 }

@@ -15,6 +15,9 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 
 public class LoginController {
+    private static final int WINDOW_WIDTH = 350;
+    private static final int WINDOW_HEIGHT = 400;
+
     @FXML private TextField usernameField;
     @FXML private PasswordField passwordField;
     @FXML private Label messageLabel;
@@ -61,7 +64,9 @@ public class LoginController {
                         "/com/example/projectpoker/MainMenu.fxml"));
                 Parent root = loader.load();
                 Stage stage = (Stage) usernameField.getScene().getWindow();
-                stage.setScene(new Scene(root));
+                stage.setScene(new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT));
+                stage.setTitle("PokerPro+");
+                stage.setMaximized(false);
                 stage.show();
             } catch (IOException e) {
                 messageLabel.setText("Could not load Main.");
@@ -76,7 +81,9 @@ public class LoginController {
                     "/com/example/projectpoker/Account & Profile UI/register.fxml"));
             Parent root = loader.load();
             Stage stage = (Stage) usernameField.getScene().getWindow();
-            stage.setScene(new Scene(root));
+            stage.setScene(new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT));
+            stage.setTitle("PokerPro+");
+            stage.setMaximized(false);
             stage.show();
         } catch (IOException e) {
             messageLabel.setText("Could not load register screen.");

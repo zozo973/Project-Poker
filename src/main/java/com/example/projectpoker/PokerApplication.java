@@ -12,24 +12,25 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import javafx.stage.Screen;
 import java.io.IOException;
 
 import static com.example.projectpoker.model.statistics.SkewNormalSampler.safeRoundToInt;
 
 public class PokerApplication extends Application {
+    private static final int AUTH_WIDTH = 350;
+    private static final int AUTH_HEIGHT = 400;
+    private static final int GAME_WIDTH = 1050;
+    private static final int GAME_HEIGHT = 525;
+
     @Override
     public void start(Stage stage) throws IOException {
         DatabaseManager.initializeDatabase();
         FXMLLoader fxmlLoader = new FXMLLoader(PokerApplication.class.getResource("/com/example/projectpoker/Account & Profile UI/login.fxml"));
-        // Get the screen dimensions
-        double screenWidth = Screen.getPrimary().getVisualBounds().getWidth();
-        double screenHeight = Screen.getPrimary().getVisualBounds().getHeight();
-        Scene scene = new Scene(fxmlLoader.load(), screenWidth, screenHeight);
+        Scene scene = new Scene(fxmlLoader.load(), AUTH_WIDTH, AUTH_HEIGHT);
 
-        stage.setTitle("Login & Register");
+        stage.setTitle("PokerPro+");
         stage.setScene(scene);
-        stage.setMaximized(true);
+        stage.setMaximized(false);
         stage.show();
     }
     public void createPokerGame(Stage gameStage) throws IOException {
@@ -64,7 +65,10 @@ public class PokerApplication extends Application {
 
         // Closing the stage should still flush the latest balance and finish the session record.
         gameStage.setOnCloseRequest(event -> game.closeSession());
-        gameStage.setTitle("Poker Game");
-        gameStage.getScene().setRoot(root);
+        gameStage.setTitle("PokerPro+");
+        gameStage.setMaximized(false);
+
+        gameStage.setScene(new Scene(root, GAME_WIDTH, GAME_HEIGHT));
+        gameStage.show();
     }
 }

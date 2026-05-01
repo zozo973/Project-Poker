@@ -11,6 +11,9 @@ import javafx.stage.Stage;
 import javafx.scene.control.Label;
 
 public class ProfileController {
+    private static final int WINDOW_WIDTH = 350;
+    private static final int WINDOW_HEIGHT = 400;
+
     @FXML private Label usernameLabel;
     @FXML private Label totalHandsLabel;
     @FXML private Label totalWinsLabel;
@@ -39,8 +42,10 @@ public class ProfileController {
                     "/com/example/projectpoker/MainMenu.fxml"));
             Parent root = loader.load();
             Stage stage = (Stage) (messageLabel).getScene().getWindow();
-            Scene optionsScene = new Scene(root);
+            Scene optionsScene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT);
             stage.setScene(optionsScene);
+            stage.setTitle("PokerPro+");
+            stage.setMaximized(false);
             stage.show();
         } catch (IOException e) {
             messageLabel.setText("Could not load Options Menu.");
@@ -55,7 +60,9 @@ public class ProfileController {
                     "/com/example/projectpoker/Account & Profile UI/login.fxml"));
             Parent root = loader.load();
             Stage stage = (Stage) usernameLabel.getScene().getWindow();
-            stage.setScene(new Scene(root));
+            stage.setScene(new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT));
+            stage.setTitle("PokerPro+");
+            stage.setMaximized(false);
             stage.show();
         } catch (IOException e) {
             messageLabel.setText("Could not load login screen.");

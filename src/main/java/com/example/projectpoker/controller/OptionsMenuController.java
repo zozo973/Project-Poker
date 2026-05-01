@@ -10,6 +10,9 @@ import javafx.scene.control.Label;
 
 
 public class OptionsMenuController {
+    private static final int WINDOW_WIDTH = 350;
+    private static final int WINDOW_HEIGHT = 400;
+
     @FXML private Label messageLabel;
 
     @FXML
@@ -19,8 +22,10 @@ public class OptionsMenuController {
                     "/com/example/projectpoker/MainMenu.fxml"));
             Parent root = loader.load();
             Stage stage = (Stage) (messageLabel).getScene().getWindow();
-            Scene optionsScene = new Scene(root);
+            Scene optionsScene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT);
             stage.setScene(optionsScene);
+            stage.setTitle("PokerPro+");
+            stage.setMaximized(false);
             stage.show();
         } catch (IOException e) {
             messageLabel.setText("Could not load Options Menu.");

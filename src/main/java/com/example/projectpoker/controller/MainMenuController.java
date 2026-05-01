@@ -11,13 +11,15 @@ import javafx.stage.Stage;
 import javafx.scene.control.Label;
 
 public class MainMenuController {
+    private static final int WINDOW_WIDTH = 350;
+    private static final int WINDOW_HEIGHT = 400;
 
     @FXML private Label messageLabel;
 
     @FXML
     private void goToGame() {
         try {
-            Stage stage = new Stage();
+            Stage stage = (Stage) messageLabel.getScene().getWindow();
             PokerApplication app = new PokerApplication();
             app.createPokerGame(stage);
         } catch (IOException e) {
@@ -32,8 +34,10 @@ public class MainMenuController {
                     "/com/example/projectpoker/Account & Profile UI/profile.fxml"));
             Parent root = loader.load();
             Stage stage = (Stage) messageLabel.getScene().getWindow();
-            Scene ProfileScene = new Scene(root);
+            Scene ProfileScene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT);
             stage.setScene(ProfileScene);
+            stage.setTitle("PokerPro+");
+            stage.setMaximized(false);
             stage.show();
 
         } catch (IOException e) {
@@ -48,8 +52,10 @@ public class MainMenuController {
                     "/com/example/projectpoker/OptionsMenu.fxml"));
             Parent root = loader.load();
             Stage stage = (Stage) (messageLabel).getScene().getWindow();
-            Scene optionsScene = new Scene(root);
+            Scene optionsScene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT);
             stage.setScene(optionsScene);
+            stage.setTitle("PokerPro+");
+            stage.setMaximized(false);
             stage.show();
         } catch (IOException e) {
             messageLabel.setText("Could not load Options Menu.");

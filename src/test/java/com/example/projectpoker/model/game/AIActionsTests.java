@@ -1,5 +1,7 @@
 
-package com.example.projectpoker;
+package com.example.projectpoker.model.game;
+
+import com.example.projectpoker.AIActions;
 import com.example.projectpoker.AIActions.AiPersonality;
 import com.example.projectpoker.AIActions.AiPlayerResponse;
 import com.example.projectpoker.model.game.Card;

@@ -65,6 +65,9 @@ public class AIActions {
 
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
+            System.out.println("[AIActions] HTTP status: " + response.statusCode());
+            System.out.println("[AIActions] Raw body: " + response.body());
+
             JsonObject jsonResponse = gson.fromJson(response.body(), JsonObject.class);
             String generatedText = jsonResponse.getAsJsonArray("candidates")
                     .get(0).getAsJsonObject()

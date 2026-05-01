@@ -35,7 +35,7 @@ public class AIActions {
     }
 
     // Gemini API configuration
-    private static final String GEMINI_API_KEY = "API";
+    private static final String GEMINI_API_KEY = "";
     private static final String API_URL =
             "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key="
                     + GEMINI_API_KEY;

@@ -231,7 +231,7 @@ public class RoundController implements RoundViewUpdater {
                         .equals(RoundStatus.UNINITIALISED)) {
 
                     throw new IllegalArgumentException(
-                            "Round must be unInitialised when game is uninitialised"
+                            "Round must be uninitialised when game is uninitialised"
                     );
                 }
 

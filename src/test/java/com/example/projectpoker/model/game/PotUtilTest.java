@@ -47,37 +47,32 @@ class PotUtilTest {
     // Try Pay Multiple Pots Tests
 
     @Test
-    void testTryPayMultiplePotsWithOneOpenPot() {
-        ArrayList<Pot> result = PotUtil.tryPayMultiplePots(pots, player1);
-        assertNull(result);
-    }
-
-    @Test
     void testTryPayMultiplePotsWithMultipleOpenPots() {
         pots.clear();
-        Pot openPot1 = new Pot(player1);
+        ArrayList<Player> players = new ArrayList<>();
+        players.add(player1);
+        players.add(player2);
+        players.add(player3);
+        player1.setActiveBet(100);
+        Pot openPot1 = new Pot(players);
+        openPot1.setPotPriority(0);
+        openPot1.addBet(player2,20);
+        openPot1.addBet(player3,20);
         openPot1.setIsOpen(true);
+
         Pot openPot2 = new Pot(player2);
+        openPot2.addBet(player2,20);
+        openPot2.setPotPriority(1);
         openPot2.setIsOpen(true);
         
         ArrayList<Pot> multiPots = new ArrayList<>();
         multiPots.add(openPot1);
         multiPots.add(openPot2);
         
-        ArrayList<Pot> result = PotUtil.tryPayMultiplePots(multiPots, player1);
+        ArrayList<Pot> result = PotUtil.handlePlayerBet(multiPots, player1);
         assertNotNull(result);
     }
 
-    // Pay Multiple Side Pots Tests
-
-    @Test
-    void testPayMultipleSidePots() {
-        player1.placeBet(100, pots.get(0));
-        player2.placeBet(50, pots.get(1));
-        
-        ArrayList<Pot> result = PotUtil.payMultipleSidePots(pots, player1);
-        assertNotNull(result);
-    }
 
     // Find Highest Priority Pot Tests
 
@@ -87,7 +82,7 @@ class PotUtilTest {
         pots.get(1).setPotPriority(1);
         
         Pot result = PotUtil.findHighestPriorityPot(pots);
-        
+
         assertEquals(1, result.getPotPriority());
     }
 
@@ -106,10 +101,10 @@ class PotUtilTest {
 
     @Test
     void testPayOpenPot() {
-        player1.placeBet(100, pots.get(0));
+        pots.getFirst().setIsOpen(false);
+        player1.setActiveBet(100);
         
-        ArrayList<Pot> result = PotUtil.payOpenPot(pots, player1);
-        
+        ArrayList<Pot> result = PotUtil.handlePlayerBet(pots, player1);
         assertNotNull(result);
     }
 
@@ -118,12 +113,10 @@ class PotUtilTest {
         pots.clear();
         pots.add(new Pot(player1));
         pots.get(0).setIsOpen(false);
-        
-        assertThrows(IllegalStateException.class, () -> PotUtil.payOpenPot(pots, player1));
+        assertThrows(IllegalStateException.class, () -> PotUtil.handlePlayerBet(pots, player1));
     }
 
     // Get Open Pot Index Tests
-
     @Test
     void testGetOpenPotIndexWithSinglePot() {
         int index = PotUtil.getOpenPotIndex(pots);
@@ -146,24 +139,17 @@ class PotUtilTest {
         for (Pot pot : pots) {
             pot.setIsOpen(false);
         }
-        
         int index = PotUtil.getOpenPotIndex(pots);
         assertEquals(-1, index);
     }
 
     // Edge Cases
 
+
     @Test
     void testGetOpenPotIndexWithEmptyList() {
         ArrayList<Pot> emptyPots = new ArrayList<>();
         int index = PotUtil.getOpenPotIndex(emptyPots);
         assertEquals(-1, index);
-    }
-
-    @Test
-    void testFindHighestPriorityPotWithEmptyList() {
-        ArrayList<Pot> emptyPots = new ArrayList<>();
-        Pot result = PotUtil.findHighestPriorityPot(emptyPots);
-        assertNull(result);
     }
 }

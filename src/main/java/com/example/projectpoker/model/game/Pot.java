@@ -14,6 +14,7 @@ public class Pot {
     private Dictionary<Player,Integer> betTable;
     private int potSize;
     private int toPlay;
+    private int investmentPP;
     private boolean isOpen;
     private int potPriority;
 
@@ -22,6 +23,7 @@ public class Pot {
         this.betTable = new Hashtable<>();
         this.potSize = 0;
         this.toPlay = 0;
+        this.investmentPP = 0;
         this.isOpen = true;
         this.potPriority = 0;
     }
@@ -31,6 +33,7 @@ public class Pot {
         this.players.add(player);
         this.potSize = 0;
         this.potPriority = 0;
+        this.investmentPP = 0;
         this.toPlay = 0;
         this.isOpen = true;
         initBetTable();
@@ -41,6 +44,7 @@ public class Pot {
         this.players.add(player);
         this.potSize = 0;
         this.potPriority = potPriority;
+        this.investmentPP = 0;
         this.toPlay = 0;
         this.isOpen = true;
         initBetTable();
@@ -50,6 +54,7 @@ public class Pot {
         this.players = new ArrayList<>(players);
         this.potSize = 0;
         this.potPriority = 0;
+        this.investmentPP = 0;
         this.toPlay = 0;
         this.isOpen = true;
         initBetTable();
@@ -65,6 +70,10 @@ public class Pot {
 
     public void setToPlay(int toPlay) { this.toPlay = toPlay; }
 
+    public int getInvestmentPP() { return investmentPP; }
+
+    public void setInvestmentPP(int investmentPP) { this.investmentPP = investmentPP; }
+
     public void stepPotPriority(int step) { this.potPriority += step; }
 
     public int getPotPriority() { return potPriority; }
@@ -78,11 +87,14 @@ public class Pot {
     public boolean getIsOpen() { return isOpen; }
 
     public void setIsOpen(boolean status) {
+        if (!status) setPotPriority(-1);
         this.isOpen = status;
-        this.potPriority = -1;
     }
 
-    public void closePot() { this.isOpen = false; }
+    public void closePot() {
+        this.isOpen = false;
+        this.toPlay = 0;
+    }
 
     private void initBetTable() {
         this.betTable = new Hashtable<>();
@@ -100,22 +112,23 @@ public class Pot {
     }
 
     private void addBet2Table(Player player, int bet) {
-        int currentBets = betTable.get(player);
-        this.betTable.put(player,currentBets+bet);
-        // if (betTable.get(player) != player.getRoundInvestment().getTotalInvestment()) {
-        //     System.err.println(player.getName() + "'s bets does not match their round investments");
-        // }
+        if (!this.players.contains(player)) {
+            addPlayer(player);
+            this.betTable.put(player,bet);
+        } else {
+            int currentBets = betTable.get(player);
+            this.betTable.put(player,currentBets+bet);
+        }
     }
 
     public void addBet(Player player, int bet) {
-        player.placeBet(bet, this);
         int playerPotInvest = player.getTotalPotInvestment(this);
-        if (playerPotInvest > this.toPlay) this.toPlay = playerPotInvest;
-        addBet2Table(player, bet);
+        if (playerPotInvest > this.investmentPP) this.investmentPP = playerPotInvest;
+        player.placeBet(bet, this);
 
-        //     if (Action.isRaise(player.getAction()) && player.getRoundInvestment() > this.toPlay) {
-        //        this.toPlay = player.getTotalRoundInvestment();
-        //          }
+        if (bet >= this.toPlay && Action.isRaise(player.getAction())) this.toPlay = bet;
+
+        addBet2Table(player, bet);
         this.potSize += bet;
     }
 
@@ -132,10 +145,7 @@ public class Pot {
     public RoundStatus removeFolded(RoundStatus status) {
         players.removeIf(p -> p.getAction() == Action.FOLD);
         if (players.size() == 1) {
-            if (status != RoundStatus.SHOWDOWN) {
-                players.getFirst().win(potSize);
-                potSize = 0;
-            }
+            players.getFirst().win(potSize);
             return RoundStatus.END;
         }
         return RoundStatus.stepRoundStatus(status);
@@ -175,10 +185,5 @@ public class Pot {
             int currentBets = this.betTable.get(p);
             this.betTable.put(p,currentBets-removePotTotal);
         }
-    }
-
-    public void payOut() {
-        if (players.size() > 1) System.err.println("Payout method shouldn't be called if there is more then one player left.");
-        players.getFirst().win(potSize);
     }
 }

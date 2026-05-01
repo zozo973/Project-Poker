@@ -52,15 +52,16 @@ public class Game {
         }
     };
 
-    // Constructor called when starting a new game of poker
-    // @Params
-    //      user: The user player data
-    //      numPlayer: number of total players,
-    //      initBlind: the starting size of the blinds
-    //      whenIncreaseBlinds: How many rounds need to be played before the blinds increase
-    //      gameLength: maximum number of rounds the poker game goes for.
-    //      difficulty: affects the intelligence, risk taking and starting cash of the AI players
-    //
+    /** Constructor called when starting a new game of poker
+     * @Params
+     *      user: The user player data
+     *      numPlayer: number of total players,
+     *      initBlind: the starting size of the blinds
+     *      whenIncreaseBlinds: How many rounds need to be played before the blinds increase
+     *      gameLength: maximum number of rounds the poker game goes for.
+     *      difficulty: affects the intelligence, risk taking and starting cash of the AI players
+      */
+
 
     public Game(Player user, int userBalance, int numPlayers, int initBlind, int whenIncreaseBlinds, int gameLength, Difficulty difficulty) {
         this(user, null, userBalance, numPlayers, initBlind, whenIncreaseBlinds, gameLength, difficulty);
@@ -215,7 +216,6 @@ public class Game {
                 return;
             }
             createNextRound();
-            round.init();
             round.start();
         } finally {
             roundAdvanceInProgress = false;

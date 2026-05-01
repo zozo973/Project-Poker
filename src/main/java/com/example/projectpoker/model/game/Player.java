@@ -2,6 +2,7 @@ package com.example.projectpoker.model.game;
 
 import com.example.projectpoker.model.Hand;
 import com.example.projectpoker.model.game.enums.Action;
+import com.example.projectpoker.model.game.enums.BetType;
 import com.example.projectpoker.model.game.enums.Roles;
 
 import java.beans.PropertyChangeListener;
@@ -9,6 +10,7 @@ import java.beans.PropertyChangeSupport;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import static com.example.projectpoker.model.game.PotUtil.handlePlayerBet;
 import static com.example.projectpoker.model.statistics.SkewNormalSampler.safeRoundToInt;
 
 public class Player {
@@ -244,6 +246,44 @@ public class Player {
             System.out.println("Do you wish to forfeit all invested money in the round and exit?");
 
         }
+
+    }
+
+    public ArrayList<Pot> play(ArrayList<Pot> pots, int toPlay) {
+
+        int requiredToCall = PotUtil.getRequiredToCall(pots, this, toPlay);
+
+        // UI raises are interpreted as "raise to" total for this pot.
+        // Convert to an incremental contribution so repeat raises do not overcharge the player.
+        int betContribution = activeBet == null ? 0 : activeBet;
+
+        if (this.action == Action.RAISE) {
+            if (this.activeBet == null || this.activeBet <= toPlay) {
+                this.action = requiredToCall > 0 ? Action.CALL : Action.CHECK;
+                betContribution = requiredToCall;
+            } else {
+                Pot openPot = getOpenPot();
+                int alreadyInvestedInOpenPot = activePlayer.getTotalPotInvestment(openPot);
+                betContribution = Math.max(0, this.activeBet - alreadyInvestedInOpenPot);
+            }
+        }
+
+        // Allow players to act again on raises
+        if (Action.isRaise(action) && activeBet != null && activeBet > this.toPlay) {
+            setToPlay(this.activeBet);
+            resetOtherPlayerActions(activePlayer);
+        }
+
+        if (Action.isBet(action)) {
+            this.activeBet = betContribution;
+            if (this.activeBet <= 0) {
+                throw new IllegalStateException("Bet action requires a positive active bet.");
+            }
+            this.activeBet = betContribution;
+        }
+        return handlePlayerBet(pots, this);
+
+        // Notify listeners after each completed action (check/call/raise/fold/all-in).
 
     }
 

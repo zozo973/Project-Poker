@@ -2,18 +2,11 @@ package com.example.projectpoker.controller;
 
 import com.example.projectpoker.model.User;
 import com.example.projectpoker.database.UserDAO;
-import com.example.projectpoker.service.SessionManager;
-import com.example.projectpoker.service.UsernameValidation;
-import com.example.projectpoker.service.EmailValidation;
-import com.example.projectpoker.service.PasswordValidation;
-import com.example.projectpoker.service.ValidationResult;
-import com.example.projectpoker.service.PasswordHasher;
+import com.example.projectpoker.service.*;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import java.io.IOException;
 import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.stage.Stage;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
@@ -21,8 +14,6 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 public class RegisterController {
-    private static final int WINDOW_WIDTH = 350;
-    private static final int WINDOW_HEIGHT = 400;
 
     @FXML private TextField usernameField;
     @FXML private TextField emailField;
@@ -40,7 +31,7 @@ public class RegisterController {
 
     public static final Pattern WEAK_CHARS = Pattern.compile(".*[0-9!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>\\/?].*");
     public static final Pattern ILLEGAL_CHARS = Pattern.compile("[\\s\\\\\"'<>\\u0000-\\u001F;:,/| \\[\\]]");
-    public static final Pattern EMAIL_CHARS = Pattern.compile("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$");
+    public static final Pattern EMAIL_CHARS = Pattern.compile("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
 
     @FXML
     private void handleRegister() {
@@ -109,14 +100,18 @@ public class RegisterController {
 //        }
         SessionManager.setCurrentUser(newUser);
         try {
+//            FXMLLoader loader = new FXMLLoader(getClass().getResource(
+//                    "/com/example/projectpoker/MainMenu.fxml"));
+//            Parent root = loader.load();
+//            Stage stage = (Stage) usernameField.getScene().getWindow();
+//            stage.setScene(new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT));
+//            stage.setTitle("PokerPro+");
+//            stage.setMaximized(false);
+//            stage.show();
             FXMLLoader loader = new FXMLLoader(getClass().getResource(
                     "/com/example/projectpoker/MainMenu.fxml"));
             Parent root = loader.load();
-            Stage stage = (Stage) usernameField.getScene().getWindow();
-            stage.setScene(new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT));
-            stage.setTitle("PokerPro+");
-            stage.setMaximized(false);
-            stage.show();
+            usernameField.getScene().setRoot(root);
         } catch (IOException e) {
             messageLabel.setText("Could not load Main Menu.");
         }
@@ -125,14 +120,18 @@ public class RegisterController {
     @FXML
     private void goToLogin() {
         try {
+//            FXMLLoader loader = new FXMLLoader(getClass().getResource(
+//                    "/com/example/projectpoker/Account & Profile UI/login.fxml"));
+//            Parent root = loader.load();
+//            Stage stage = (Stage) usernameField.getScene().getWindow();
+//            stage.setScene(new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT));
+//            stage.setTitle("PokerPro+");
+//            stage.setMaximized(false);
+//            stage.show();
             FXMLLoader loader = new FXMLLoader(getClass().getResource(
                     "/com/example/projectpoker/Account & Profile UI/login.fxml"));
             Parent root = loader.load();
-            Stage stage = (Stage) usernameField.getScene().getWindow();
-            stage.setScene(new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT));
-            stage.setTitle("PokerPro+");
-            stage.setMaximized(false);
-            stage.show();
+            usernameField.getScene().setRoot(root);
         } catch (IOException e) {
             messageLabel.setText("Could not load login screen.");
         }

@@ -25,7 +25,6 @@ public class OptionsMenuController {
             Scene optionsScene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT);
             stage.setScene(optionsScene);
             stage.setTitle("PokerPro+");
-            stage.setMaximized(false);
             stage.show();
         } catch (IOException e) {
             messageLabel.setText("Could not load Options Menu.");

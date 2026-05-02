@@ -45,7 +45,6 @@ public class ProfileController {
             Scene optionsScene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT);
             stage.setScene(optionsScene);
             stage.setTitle("PokerPro+");
-            stage.setMaximized(false);
             stage.show();
         } catch (IOException e) {
             messageLabel.setText("Could not load Options Menu.");
@@ -62,7 +61,6 @@ public class ProfileController {
             Stage stage = (Stage) usernameLabel.getScene().getWindow();
             stage.setScene(new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT));
             stage.setTitle("PokerPro+");
-            stage.setMaximized(false);
             stage.show();
         } catch (IOException e) {
             messageLabel.setText("Could not load login screen.");

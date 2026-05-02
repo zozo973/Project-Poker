@@ -110,7 +110,7 @@ public class RegisterController {
         SessionManager.setCurrentUser(newUser);
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(
-                    "/com/example/projectpoker/MainMenu.fxml"));
+                    "/com/example/projectpoker/Menu FXML/MainMenu.fxml"));
             Parent root = loader.load();
             Stage stage = (Stage) usernameField.getScene().getWindow();
             stage.setScene(new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT));

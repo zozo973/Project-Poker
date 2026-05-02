@@ -49,7 +49,7 @@ public class MainMenuController {
     private void goToOptions() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(
-                    "/com/example/projectpoker/OptionsMenu.fxml"));
+                    "/com/example/projectpoker/Menu FXML/OptionsMenu.fxml"));
             Parent root = loader.load();
             Stage stage = (Stage) (messageLabel).getScene().getWindow();
             Scene optionsScene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT);

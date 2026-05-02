@@ -36,7 +36,7 @@ public class AIActions {
 
     // Gemini API configuration
     private static final String GEMINI_API_KEY = "AIzaSyB-x6qYdQM0Kx0BSBn9W8mXrYaStIXClhk";
-    // gemini-3.1-flash-lite-preview / gemma-4-31b-it
+    // gemini-3.1-flash-lite-preview / gemma-4-31b-it / gemini-2.5-flash
     private static final String API_URL =
             "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite-preview:generateContent?key="
                     + GEMINI_API_KEY;
@@ -131,10 +131,11 @@ public class AIActions {
                 1. Output ONLY a pure JSON array with exactly %d elements. No markdown.
                 2. Each element must contain exactly:
                    - "action": One of "FOLD", "CHECK", "CALL", "RAISE", "ALLIN".
-                   - "amount": Integer. If action is RAISE, provide chip amount. Otherwise 0.
-                3. Example for %d players: %s
+                   - "amount": Integer. ONLY provide a value > 0 if action is RAISE. Otherwise use 0.
+                3. Play reasonably — do NOT fold unless the hand is very weak AND the bet is very high relative to stack.
+                4. Example for %d players: %s
                 """, playerCount, playerCount, playerCount, buildExample(playerCount));
-    }
+        }
 
     private String buildExample(int count) {
         StringBuilder sb = new StringBuilder("[");

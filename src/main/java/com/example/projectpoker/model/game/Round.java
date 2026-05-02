@@ -497,8 +497,14 @@ public class Round {
                     break;
                 case CHECK:
                 default:
-                    activePlayer.setAction(Action.CHECK);
-                    activePlayer.setActiveBet(0);
+                    if (requiredToCall > 0) {
+                        int callAmt = Math.min(requiredToCall, activePlayer.getBalance());
+                        activePlayer.setAction(Action.CALL);
+                        activePlayer.setActiveBet(callAmt);
+                    } else {
+                        activePlayer.setAction(Action.CHECK);
+                        activePlayer.setActiveBet(0);
+                    }
                     break;
             }
             Integer activeBet = activePlayer.getActiveBet();

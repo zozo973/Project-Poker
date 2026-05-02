@@ -49,6 +49,7 @@ public class RoundController implements RoundViewUpdater {
     @FXML private Label aiReasonLabel;
     @FXML private Label aiStatusLabel;
 
+    private volatile boolean actionInProgress = false;
     private final AiCoaching aiCoaching = new AiCoaching();
     private AiAdviceMode currentAiMode = AiAdviceMode.NORMAL;
     private PokerGameUI pokerUI;
@@ -147,6 +148,7 @@ public class RoundController implements RoundViewUpdater {
 
     @Override
     public void onUserTurnStarted() {
+        actionInProgress = false;
         Platform.runLater(() -> {
             toCallButton.setDisable(false);
             betButton.setDisable(false);
@@ -417,30 +419,30 @@ public class RoundController implements RoundViewUpdater {
 
     @FXML
     private void handleCall() {
+        disableActionButtons();
         int amountToCall = getAmountToCall();
         if (amountToCall > 0) {
             submitPlayerAction(Action.CALL, amountToCall);
         } else {
             submitPlayerAction(Action.CHECK, 0);
         }
-        disableActionButtons();
     }
     @FXML
     private void handleRaise() {
+        disableActionButtons();
         int raiseAmount = (int) betSlider.getValue();
         submitPlayerAction(Action.RAISE, raiseAmount);
-        disableActionButtons();
     }
     @FXML
     private void handleFold() {
-        submitPlayerAction(Action.FOLD,0);
         disableActionButtons();
+        submitPlayerAction(Action.FOLD,0);
     }
     @FXML
     private void handleAllIn() {
+        disableActionButtons();
         userPlayer.setActiveBet(userPlayer.getBalance());
         submitPlayerAction(Action.ALLIN, userPlayer.getBalance());
-        disableActionButtons();
     }
 
     private void disableActionButtons() {
@@ -454,6 +456,9 @@ public class RoundController implements RoundViewUpdater {
     private void submitPlayerAction(Action action, int amount) {
 
         if (userPlayer == null) return;
+        // prevent double action
+        if (actionInProgress) return;
+        actionInProgress = true;
 
         userPlayer.setAction(action);
         userPlayer.setActiveBet(amount);

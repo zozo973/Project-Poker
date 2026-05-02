@@ -294,34 +294,49 @@ public class Round {
 
     private void betting() {
 
-        // Try to use Gemini first
+        // Try to use Gemini first (plan A)
         aiDecisions = new HashMap<>();
-        List<AiPlayer> aiPlayerList = new ArrayList<>();
-        List<Card[]> aiHands = new ArrayList<>();
-        for (Integer i : turnOrder) {
-            Player p = players.get(i);
-            if (p instanceof AiPlayer && !Action.hasFolded(p.getAction())) {
-                aiPlayerList.add((AiPlayer) p);
-                aiHands.add(p.getPlayerHand().getCards().toArray(new Card[0]));
-            }
-        }
-        if (!aiPlayerList.isEmpty()) {
-            try {
-                Card[] board = communityCards.toArray(new Card[0]);
-                List<AIActions.AiPlayerResponse> responses =
-                        new AIActions().getAllChoices(aiHands, board, roundStatus);
-                for (int i = 0; i < aiPlayerList.size(); i++) {
-                    aiDecisions.put(aiPlayerList.get(i), responses.get(i));
+        if (roundStatus != RoundStatus.BETTING1) {
+            List<AiPlayer> aiPlayerList = new ArrayList<>();
+            List<Card[]> aiHands = new ArrayList<>();
+            for (Integer i : turnOrder) {
+                Player p = players.get(i);
+                if (p instanceof AiPlayer && !Action.hasFolded(p.getAction())) {
+                    aiPlayerList.add((AiPlayer) p);
+                    aiHands.add(p.getPlayerHand().getCards().toArray(new Card[0]));
                 }
-            } catch (Exception e) {
-                // If fail, go back
-                System.err.println("Gemini API failed, using fallback: " + e.getMessage());
+            }
+            if (!aiPlayerList.isEmpty()) {
+                try {
+                    Card[] board = communityCards.toArray(new Card[0]);
+                    int potSize = pots.stream().mapToInt(Pot::getPotSize).sum();
+                    List<Integer> stackSizes = aiPlayerList.stream()
+                            .map(Player::getBalance)
+                            .collect(java.util.stream.Collectors.toList());
+                    List<AIActions.AiPlayerResponse> responses =
+                            new AIActions().getAllChoices(aiHands, board, roundStatus, toPlay, potSize, stackSizes);
+                    for (int i = 0; i < aiPlayerList.size(); i++) {
+                        aiDecisions.put(aiPlayerList.get(i), responses.get(i));
+                    }
+
+                } catch (Exception e) {
+                    // If fail, go plan B
+                    System.err.println("Gemini API failed, using fallback: " + e.getMessage());
+                }
+            }
+            else {
+                System.out.println("[Round] Pre-flop: skipping Gemini, using Plan B (CALL)");
             }
         }
-
         Player activePlayer;
         boolean bettingEnded;
+        int maxIterations = players.size() * 20;
+        int iterations = 0;
         do {
+            if (++iterations > maxIterations) {
+                System.err.println("[Round] Betting loop exceeded max iterations, forcing end.");
+                break;
+            }
             bettingEnded = false;
             boolean anyPlayerAsked = false;
             for (Integer i : turnOrder) {
@@ -333,12 +348,12 @@ public class Round {
                         int requiredToCall = getRequiredToCall(activePlayer);
                         int playerBalance = activePlayer.getBalance();
 
-                        // If player is all-in (balance <= 0), they automatically check
+                        // If player is all-in (balance <= 0), then check
                         if (playerBalance <= 0) {
                             activePlayer.setAction(Action.CHECK);
                             activePlayer.setActiveBet(0);
                         }
-                        // If player has balance but not enough to call, they automatically go all-in
+                        // If player has balance but not enough to call, then all-in
                         else if (requiredToCall > playerBalance) {
                             activePlayer.setAction(Action.ALLIN);
                             activePlayer.setActiveBet(playerBalance);
@@ -347,6 +362,22 @@ public class Round {
                             chooseAiAction(activePlayer);
                         } else {
                             waitForUserAction(activePlayer);
+                        }
+
+                        try {
+                            processPlayerAction(activePlayer);
+                        } catch (IllegalStateException e) {
+                            System.err.println("[Round] processPlayerAction failed, Plan B: " + e.getMessage());
+                            int req = getRequiredToCall(activePlayer);
+                            if (req == 0) {
+                                activePlayer.setAction(Action.CHECK);
+                                activePlayer.setActiveBet(0);
+                            } else {
+                                int bet = Math.min(req, activePlayer.getBalance());
+                                activePlayer.setAction(bet < req ? Action.ALLIN : Action.CALL);
+                                activePlayer.setActiveBet(bet);
+                            }
+                            continue;
                         }
 
                         processPlayerAction(activePlayer);
@@ -437,10 +468,10 @@ public class Round {
                     break;
                 case RAISE:
                     int alreadyInvested = activePlayer.getTotalPotInvestment(getOpenPot());
-                    int minRaise = Math.max(toPlay * 2, alreadyInvested + 1);
-                    int raiseAmount = Math.max(response.amount, minRaise);
+                    int raiseAmount = Math.max(response.amount, toPlay * 2);
                     raiseAmount = Math.min(raiseAmount, alreadyInvested + activePlayer.getBalance());
-                    if (raiseAmount <= alreadyInvested) {
+                    // downgrade if raiseAmount less than toPlay
+                    if (raiseAmount <= toPlay) {
                         int callAmt = Math.min(requiredToCall, activePlayer.getBalance());
                         if (callAmt <= 0) {
                             activePlayer.setAction(Action.CHECK);
@@ -454,6 +485,7 @@ public class Round {
                         activePlayer.setActiveBet(raiseAmount);
                     }
                     break;
+
 
                 case ALLIN:
                     activePlayer.setAction(Action.ALLIN);
@@ -469,10 +501,15 @@ public class Round {
                     activePlayer.setActiveBet(0);
                     break;
             }
+            Integer activeBet = activePlayer.getActiveBet();
+            if (Action.isBet(activePlayer.getAction()) && (activeBet == null || activeBet <= 0)) {
+                activePlayer.setAction(Action.CHECK);
+                activePlayer.setActiveBet(0);
+            }
             return;
         }
 
-        // For the roles. In case Gemini API not work
+        // Plan B
         int requiredToCall = getRequiredToCall(activePlayer);
 
         // If player is all-in (balance = 0), they can only check

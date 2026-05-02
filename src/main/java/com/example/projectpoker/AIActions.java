@@ -35,18 +35,19 @@ public class AIActions {
     }
 
     // Gemini API configuration
-    private static final String GEMINI_API_KEY = "API";
+    private static final String GEMINI_API_KEY = "AIzaSyB-x6qYdQM0Kx0BSBn9W8mXrYaStIXClhk";
+    // gemini-3.1-flash-lite-preview / gemma-4-31b-it
     private static final String API_URL =
-            "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key="
+            "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite-preview:generateContent?key="
                     + GEMINI_API_KEY;
 
-    public List<AiPlayerResponse> getAllChoices(List<Card[]> handCardsPerPlayer, Card[] boardCards, RoundStatus currentStatus) {
+    public List<AiPlayerResponse> getAllChoices(List<Card[]> handCardsPerPlayer, Card[] boardCards, RoundStatus currentStatus, int toPlay, int potSize, List<Integer> stackSizes) {
         List<AiPlayerResponse> results = new ArrayList<>();
         int expectedCount = handCardsPerPlayer.size();
         try {
             Gson gson = new Gson();
             String systemPrompt = gson.toJson(getSystemPromptForAiPlayer(expectedCount));
-            String userPrompt   = gson.toJson(buildPrompt(handCardsPerPlayer, boardCards, currentStatus));
+            String userPrompt   = gson.toJson(buildPrompt(handCardsPerPlayer, boardCards, currentStatus, toPlay, potSize, stackSizes));
 
             String requestBody = String.format("""
                     {
@@ -68,7 +69,14 @@ public class AIActions {
             System.out.println("[AIActions] HTTP status: " + response.statusCode());
             System.out.println("[AIActions] Raw body: " + response.body());
 
+            if (response.statusCode() != 200) {
+                throw new RuntimeException("Gemini API error " + response.statusCode() + ": " + response.body());
+            }
             JsonObject jsonResponse = gson.fromJson(response.body(), JsonObject.class);
+
+            if (jsonResponse.getAsJsonArray("candidates") == null) {
+                throw new RuntimeException("Gemini returned no candidates.");
+            }
             String generatedText = jsonResponse.getAsJsonArray("candidates")
                     .get(0).getAsJsonObject()
                     .getAsJsonObject("content")
@@ -77,7 +85,14 @@ public class AIActions {
                     .get("text").getAsString();
 
             System.out.println("[AIActions] Gemini raw response: " + generatedText);
-            JsonArray jsonArray = gson.fromJson(generatedText, JsonArray.class);
+            String cleaned = generatedText.trim();
+            if (cleaned.startsWith("```")) {
+                cleaned = cleaned.replaceAll("```json", "").replaceAll("```", "").trim();
+            }
+            com.google.gson.stream.JsonReader reader =
+                    new com.google.gson.stream.JsonReader(new java.io.StringReader(cleaned));
+            reader.setLenient(true);
+            JsonArray jsonArray = gson.fromJson(reader, JsonArray.class);
             for (int i = 0; i < jsonArray.size(); i++) {
                 JsonObject obj = jsonArray.get(i).getAsJsonObject();
                 AiPlayerResponse r = new AiPlayerResponse();
@@ -96,8 +111,10 @@ public class AIActions {
 
         } catch (Exception e) {
             e.printStackTrace();
+            System.err.println("[AIActions] Gemini API failed: " + e.getMessage());
             // If API fails, return CALL for all players as fallback
-            for (int i = 0; i < handCardsPerPlayer.size(); i++) {
+            results.clear();
+            for (int i = 0; i < expectedCount; i++) {
                 AiPlayerResponse r = new AiPlayerResponse();
                 r.errormsg = "AI action failed: " + e.getMessage();
                 results.add(r);
@@ -129,14 +146,18 @@ public class AIActions {
         return sb.toString();
     }
 
-    private String buildPrompt(List<Card[]> handCardsPerPlayer, Card[] boardCards, RoundStatus currentStatus) {
+    private String buildPrompt(List<Card[]> handCardsPerPlayer, Card[] boardCards, RoundStatus currentStatus, int toPlay, int potSize, List<Integer> stackSizes) {
         StringBuilder sb = new StringBuilder();
-        sb.append(String.format("Stage: %s, Board: %s\n", currentStatus.name(), formatCards(boardCards)));
+        sb.append(String.format("Stage: %s, Board: %s, Bet to call: %d, Pot size: %d\n",
+                currentStatus.name(), formatCards(boardCards), toPlay, potSize));
         for (int i = 0; i < handCardsPerPlayer.size(); i++) {
-            sb.append(String.format("Player %d Hand: %s\n", i + 1, formatCards(handCardsPerPlayer.get(i))));
+            int stack = (stackSizes != null && i < stackSizes.size()) ? stackSizes.get(i) : 0;
+            sb.append(String.format("Player %d Hand: %s, Stack: %d\n",
+                    i + 1, formatCards(handCardsPerPlayer.get(i)), stack));
         }
         return sb.toString();
     }
+
 
     private String formatCards(Card[] cards) {
         if (cards == null || cards.length == 0 || cards[0] == null) return "None";

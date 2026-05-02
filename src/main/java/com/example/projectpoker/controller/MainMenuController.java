@@ -1,6 +1,5 @@
 package com.example.projectpoker.controller;
 
-import com.example.projectpoker.PokerApplication;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -19,11 +18,18 @@ public class MainMenuController {
     @FXML
     private void goToGame() {
         try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(
+                    "/com/example/projectpoker/Menu FXML/GameSettings.fxml"));
+            Parent root = loader.load();
             Stage stage = (Stage) messageLabel.getScene().getWindow();
-            PokerApplication app = new PokerApplication();
-            app.createPokerGame(stage);
+            Scene ProfileScene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT);
+            stage.setScene(ProfileScene);
+            stage.setTitle("PokerPro+");
+            stage.setMaximized(false);
+            stage.show();
+
         } catch (IOException e) {
-            messageLabel.setText("Could not start game: " + e.getMessage());
+            messageLabel.setText("Could not load Profile Menu.");
         }
     }
 

@@ -1,5 +1,6 @@
 package com.example.projectpoker.controller;
 
+import com.example.projectpoker.PokerApplication;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import java.io.IOException;
@@ -8,12 +9,22 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.scene.control.Label;
 
-
-public class OptionsMenuController {
+public class GameSettingsController {
     private static final int WINDOW_WIDTH = 350;
     private static final int WINDOW_HEIGHT = 400;
 
     @FXML private Label messageLabel;
+
+    @FXML
+    private void goToGame() {
+        try {
+            Stage stage = (Stage) messageLabel.getScene().getWindow();
+            PokerApplication app = new PokerApplication();
+            app.createPokerGame(stage);
+        } catch (IOException e) {
+            messageLabel.setText("Could not start game: " + e.getMessage());
+        }
+    }
 
     @FXML
     private void goToMain() {
@@ -31,6 +42,4 @@ public class OptionsMenuController {
             messageLabel.setText("Could not load Options Menu.");
         }
     }
-
-
 }

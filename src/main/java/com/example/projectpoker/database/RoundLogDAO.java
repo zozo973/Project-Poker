@@ -12,15 +12,18 @@ import java.sql.Statement;
 public class RoundLogDAO {
     private final Connection connection;
 
+    // Uses the shared SQLite connection for round log queries.
     public RoundLogDAO() {
         this.connection = DatabaseConnection.getInstance();
     }
 
+    // Creates both tables needed to store a round and its player actions.
     public void createTables() {
         createRoundTable();
         createActionTable();
     }
 
+    // Stores one row per completed round.
     private void createRoundTable() {
         String sql = """
                 CREATE TABLE IF NOT EXISTS round_logs (
@@ -43,6 +46,7 @@ public class RoundLogDAO {
         }
     }
 
+    // Stores the ordered player actions that happened inside a round.
     private void createActionTable() {
         String sql = """
                 CREATE TABLE IF NOT EXISTS round_actions (
@@ -64,6 +68,7 @@ public class RoundLogDAO {
         }
     }
 
+    // Inserts the round summary, then uses its generated id for the action rows.
     public void insertRound(Round round, int gameSessionId) {
         String roundSql = """
                 INSERT INTO round_logs (
@@ -82,6 +87,7 @@ public class RoundLogDAO {
             statement.setString(7, round.getRemainingPlayersAsString());
             statement.executeUpdate();
 
+            // The action table needs the new round_logs id as its foreign key.
             try (ResultSet keys = statement.getGeneratedKeys()) {
                 if (keys.next()) {
                     insertActions(keys.getInt(1), round);
@@ -92,6 +98,7 @@ public class RoundLogDAO {
         }
     }
 
+    // Saves the round's action log in play order.
     private void insertActions(int roundLogId, Round round) throws SQLException {
         String actionSql = """
                 INSERT INTO round_actions (
@@ -114,6 +121,7 @@ public class RoundLogDAO {
                 statement.setString(7, entry.displayGameLogEntry());
                 statement.addBatch();
             }
+            // Batching keeps the action inserts together and avoids one database call per action.
             statement.executeBatch();
         }
     }

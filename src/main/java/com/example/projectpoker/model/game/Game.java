@@ -116,7 +116,7 @@ public class Game {
     }
 
     public void createNextRound() {
-        Round round = new Round(players,blindSize);
+        Round round = new Round(players, blindSize, gameSessionId, handsPlayed + 1);
         pcs.firePropertyChange("round",this.round,round);
         setRound(round);
     }
@@ -228,6 +228,7 @@ public class Game {
         clearPlayerHands();
 
         GameLog.add(round.getRoundLog());
+        DatabaseManager.recordRound(gameSessionId, round);
         handsPlayed++;
         // Persist the user's updated balance after each completed round, not just at full game over.
         DatabaseManager.saveUserProgress(userProfile, getUser());

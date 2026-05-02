@@ -9,10 +9,12 @@ import java.util.List;
 public class UserDAO {
     private Connection connection;
 
+    // Uses the shared SQLite connection for all user queries.
     public UserDAO() {
         connection = DatabaseConnection.getInstance();
     }
 
+    // Creates the users table and adds newer columns if an older database is opened.
     public void createTable() {
         try {
             Statement createTable = connection.createStatement();
@@ -34,8 +36,10 @@ public class UserDAO {
         }
     }
 
+    // Adds one missing column without deleting existing user data.
     private void ensureColumnExists(String columnName, String definition) throws SQLException {
         DatabaseMetaData metadata = connection.getMetaData();
+        // SQLite has no simple "ADD COLUMN IF NOT EXISTS", so metadata is checked first.
         try (ResultSet columns = metadata.getColumns(null, null, "users", columnName)) {
             if (!columns.next()) {
                 try (Statement alterTable = connection.createStatement()) {
@@ -45,6 +49,7 @@ public class UserDAO {
         }
     }
 
+    // Inserts a new user and copies the generated database id back into the User object.
     public void insert(User user) {
         try {
             PreparedStatement insertUser = connection.prepareStatement(
@@ -59,6 +64,7 @@ public class UserDAO {
             insertUser.setInt(6, user.getCurrentBalance());
             insertUser.execute();
 
+            // The generated id is needed later for updates and game session records.
             ResultSet keys = insertUser.getGeneratedKeys();
             if (keys.next()) {
                 user.setId(keys.getInt(1));
@@ -68,6 +74,7 @@ public class UserDAO {
         }
     }
 
+    // Updates the stored profile values for an existing user.
     public void update(User user) {
         try {
             PreparedStatement updateUser = connection.prepareStatement(
@@ -85,6 +92,7 @@ public class UserDAO {
         }
     }
 
+    // Deletes one user by their database id.
     public void delete(int id) {
         try {
             PreparedStatement deleteUser = connection.prepareStatement(
@@ -97,6 +105,7 @@ public class UserDAO {
         }
     }
 
+    // Loads every user row and converts each row into a User object.
     public List<User> getAll() {
         List<User> users = new ArrayList<>();
         try {
@@ -121,6 +130,7 @@ public class UserDAO {
         return users;
     }
 
+    // Finds one user by id, or returns null if no row matches.
     public User getById(int id) {
         try {
             PreparedStatement getUser = connection.prepareStatement(
@@ -145,6 +155,7 @@ public class UserDAO {
         return null;
     }
 
+    // Finds one user by username, or returns null if the username is not registered.
     public User getByUsername(String username) {
         try {
             PreparedStatement getUser = connection.prepareStatement(
@@ -169,6 +180,7 @@ public class UserDAO {
         return null;
     }
 
+    // Reuses an existing account when possible, otherwise creates a basic user record.
     public User getOrCreate(String username, String password, int defaultBalance) {
         User existingUser = getByUsername(username);
         if (existingUser != null) {
@@ -182,6 +194,7 @@ public class UserDAO {
         return newUser;
     }
 
+    // Kept for DAO compatibility; the shared connection is closed through DatabaseConnection.
     public void close() {
         // Shared singleton connection is managed centrally.
     }

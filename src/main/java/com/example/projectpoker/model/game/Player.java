@@ -212,7 +212,7 @@ public class Player {
     public int placeBet(int betSize, Pot pot) {
         int b = getBalance();
 
-        if (betSize <= 0) {
+        if (betSize < 0 || (betSize == 0 && !this.action.equals(Action.CALL))) {
             throw new IllegalArgumentException("Bet must be positive.");
         }
 

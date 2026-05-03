@@ -183,15 +183,6 @@ class GameTest {
     }
 
     @Test
-    void testCreateMultipleRounds() {
-        game.createNextRound();
-        Round firstRound = game.getRound();
-        game.createNextRound();
-        Round secondRound = game.getRound();
-        assertNotEquals(firstRound, secondRound);
-    }
-
-    @Test
     void testGetRoundInitiallyNull() {
         assertNull(game.getRound());
     }

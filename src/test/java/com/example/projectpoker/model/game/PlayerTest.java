@@ -64,7 +64,7 @@ class PlayerTest {
     @Test
     void testConstructorWithNameBalanceAndId() throws Exception {
         String validId = "ABCDEFGHIJKL";
-        Player p = new Player("Dave", 2000, validId);
+        Player p = new Player("Dave", 2000, validId, 15);
         assertEquals("Dave", p.getName());
         assertEquals(2000, p.getBalance());
         assertEquals(validId, p.getId().getId());
@@ -72,7 +72,7 @@ class PlayerTest {
 
     @Test
     void testConstructorWithInvalidId() {
-        assertThrows(Exception.class, () -> new Player("Eve", 1000, "badid"));
+        assertThrows(Exception.class, () -> new Player("Eve", 1000, "badid",15));
     }
 
     // Property Change Listener Tests
@@ -156,9 +156,9 @@ class PlayerTest {
     @Test
     void testMatchId() throws Exception {
         String validId = "ABCDEFGHIJKL";
-        Player p1 = new Player("P1", 1000, validId);
-        Player p2 = new Player("P2", 1000, validId);
-        Player p3 = new Player("P3", 1000, "123456789012");
+        Player p1 = new Player("P1", 1000, validId,15);
+        Player p2 = new Player("P2", 1000, validId,15);
+        Player p3 = new Player("P3", 1000, "123456789012",15);
 
         assertTrue(p1.matchId(p1.getId()));
         assertTrue(p1.matchId(p2.getId()));

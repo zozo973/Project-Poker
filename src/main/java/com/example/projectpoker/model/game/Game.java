@@ -213,6 +213,7 @@ public class Game {
                 return;
             }
             createNextRound();
+            round.init();
             round.start();
         } finally {
             roundAdvanceInProgress = false;

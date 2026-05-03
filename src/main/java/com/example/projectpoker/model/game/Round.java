@@ -100,7 +100,7 @@ public class Round {
                 pcs.firePropertyChange("state",oldVal,this.roundStatus);
             }
             case END -> end();
-            case UNINITIALISED -> init();
+            //case UNINITIALISED -> init();
             case BLINDS -> payBlinds();
         }
 

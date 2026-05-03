@@ -181,22 +181,6 @@ class RoundTest {
         assertTrue(openPot.getIsOpen());
     }
 
-//    @Test
-//    void testGetOpenPotIndex() {
-//        assertEquals(0, round.getOpenPotIndex());
-//
-//        round.addPot(new Pot(players));
-//        assertEquals(1, round.getOpenPotIndex());
-//    }
-//
-//    @Test
-//    void testGetOpenPotIndexNoOpenPot() {
-//        round.addPot(new Pot(players));
-//        round.getPots().get(1).setIsOpen(false);
-//        round.getPots().get(0).setIsOpen(false);
-//        assertEquals(-1, round.getOpenPotIndex());
-//    }
-
     // Community Cards Tests
 
     @Test

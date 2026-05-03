@@ -15,7 +15,7 @@ public class CardDeck {
         reset();
     }
 
-    public void shuffle() {
+    private void shuffle() {
         Collections.shuffle(this.cardDeck);
     }
 

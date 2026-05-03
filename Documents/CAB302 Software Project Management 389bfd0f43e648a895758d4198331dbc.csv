@@ -1,0 +1,34 @@
+Title,Members,Priority,Spring W9 - W11,Sprint W3 - W5,Sprint W5 - W7,Sprint W7 - W9,Status,Story points,Tags,Type
+UI Low & Medium Fidelity,Dylan Friend,P0,UI Functionality and Finalise UI Implimentation.,Team Formation. Project decision and intial investigsation,Setup PM tools. User Stories,Menu UI implementation. Revise and reformat User Stores,Done,3,"Docs, Frontend",Task
+User Registration & Login,Basi Loukas,P0,"  • Completing UI implementation","  • Setting up classes and files","  • Created SessionManager class
+  • Created User class with getter and setter methods
+  • Created Register and login controller classes along with 
+  • Created PasswordHasher class
+  • Debugged and fixed merging issues with User Class","  • Integrated Login and Register with main game
+  • Added Username, Email & Password Critieria when registering 
+  • Created 4 validator classes for Username, email and Password criteria functionality 
+  • Decoupled login and register handling methods 
+  • Added all needed test cases for authentication
+  • Fixed resizing issues
+  • Fixed Merging issues and general bugs",Done,25,"Backend, Frontend",Feature
+Hand Evaluator,gattfo,P1,,Built classes to represent cards,Complete methods to determine hand strength and a method to return a winner from multiple hands,Write test cases,Done,3,,Feature
+AI Advice Engine,Ho Yui WONG (Bobby),P0,Bug Fixes,Analysis how to done this and setting up environment and the GitHub branch,Tried to implement Gemini API integration for real-time poker advice.,Completed this function and it can be used in poker game,Done,15,API,Feature
+Advice Mode Selection,Ho Yui WONG (Bobby),P1,Bug Fixes,,,Updated UI for AI Advice function; Advice Mode can be selected in the UI,Done,5,Frontend,Feature
+AI Disclaimer Labels,Ho Yui WONG (Bobby),P3,Bug Fixes,,,Added the label in the game UI,Done,1,Frontend,Feature
+Hand Log Storage,Ben Sheppard,P1,Fixed log initialisation issues and tested round log persistence.,Designed hand/round logging requirements for storing player actions and round results.,Added round metadata and RoundLogEntry getters needed for database storage.,"Implemented RoundLogDAO for saving hand logs, bets, actions, community cards, and remaining players.",Done,11,Backend,Feature
+Site Map,Dylan Friend,P2,UI Functionality and Finalise UI Implimentation.,Team Formation. Project decision and intial investigsation,Setup PM tools. User Stories,Menu UI implementation. Revise and reformat User Stores,Done,1,"Docs, Frontend",Task
+User Stories,Dylan Friend,P1,UI Functionality and Finalise UI Implimentation.,Team Formation. Project decision and intial investigsation,Setup PM tools. User Stories,Menu UI implementation. Revise and reformat User Stores,Done,3,Docs,Task
+Set-up Project Manager Tool,Dylan Friend,P0,UI Functionality and Finalise UI Implimentation.,Team Formation. Project decision and intial investigsation,Setup PM tools. User Stories,Menu UI implementation. Revise and reformat User Stores,Done,2,Docs,Task
+"Game Log Storage ",Ben Sheppard,P1,Added persistence tests and fixed user balance saving after rounds/window close.,Planned how game sessions should be linked to logged-in users.,"Added game session persistence fields such as buy-in, starting balance, final balance, and hands played.",Integrated GameSessionDAO with the game flow so completed sessions can be saved.	,Done,6,,Feature
+Database Connection,Ben Sheppard,P0,," Investigated database requirements and local SQLite/JDBC setup.","Implemented DatabaseConnection and DatabaseManager structure.	Added DAOs for users, game sessions, and round logs.",Finalised database tests using isolated SQLite test database.,Done,13,Backend,Task
+"User Data Storage ",Ben Sheppard,P0,Added database tests to confirm user data persists correctly.,Planned user persistence around the existing registration/login model.,Implemented UserDAO support for saving and retrieving user records.,Integrated SQLite user storage with the authentication/session flow.,Done,4,Backend,Task
+AI Personality,Mitchel Townsend,P2," Bug Fixes and finalise implementation",Team formation and creating project guidelines.,Attempted to implement Gemini API,"Implemented Variation of playstyle based on personality. ",In progress,3,API,Feature
+"LeaderBoard Storage ",Ben Sheppard,P2,"Started backend structure for leaderboard storage using existing database layer. Final leaderboard queries, sorting, and UI integration still in progress.",,Investigated leaderboard storage requirements and ranking data needed from users/game sessions.,Prepared persisted user balances and game session results as the data source for leaderboard rankings.,In progress,17,Backend,Feature
+"User Profile Screen ",Basi Loukas,P3,"  • Completing UI implementation","  • Setting up classes and files","  • Completed ProfileController class",,In progress,4,Frontend,Feature
+"Betting logic ",Hugo,P0,,Unstarted,Built logic for betting and seperating bets into pots as well as paying the winner,,Done,13,,Feature
+Game Logic,Hugo,P0,,Started game logic and built classes to represent different game components,"Built on logic with event listeners and seperated responsibilities between round controller, game and round",,Done,20,,Feature
+Menu Functionality,Dylan Friend,P0,UI Functionality and Finalise UI Implimentation.,Team Formation. Project decision and intial investigsation,"Setup PM tools. User Stories ",Menu UI implementation. Revise and reformat User Stores,In progress,16,Frontend,Feature
+AIAction,Mitchel Townsend,P0," Bug Fixes and finalise implementation",Team formation and creating project guidelines.,Attempted to implement Gemini API,Implemented actions using Gemini API Key.,Done,5,API,Feature
+Game UI,gattfo,P0,Polished PokerGameUI and updated controllers,Unstarted,Develop assets and prototype UI class,Game UI rendering and UI elements,Done,10,"Backend, Frontend",Feature
+Bug finding/fixing,gattfo,P0,"Fixing Bugs that arise from merging features and helping troubleshoot problems, manual and automated testing",,Ongoing,"Changed event listeners structures ",In progress,13,,Task
+Menu UI,Dylan Friend,P0,UI Functionality and Finalise UI Implimentation.,Team Formation. Project decision and intial investigsation,Setup PM tools. User Stories,Menu UI implementation. Revise and reformat User Stores,In progress,13,Frontend,Feature

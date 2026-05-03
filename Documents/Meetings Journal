@@ -96,3 +96,33 @@ Ben- Clarified bug with UserBalance, started testing DB persistence, began writi
 Bobby- Going to stitch together the video.
 Jacob- Finished UI elements. Cleaned up unused and unnecessary methods and across important files like Game and RoundController. Wrote Unit tests for HandEvaluation and PokerGameUI. ToDo: Menu UI assuming Dylan cant do it. Video section.
 Mitch- Got clarification on the required implementation of the AI actions, additionally provided timeline for completion. Aiming to have feature finished by end of day.
+
+Meeting 1 hour 1/5/26
+Present Basilis, Ben, Bobby, Hugo, Jacob, Mitch
+Discussed submission and video details. Decided on this structure for the video:
+
+Dylan / Basilis / Mitch 3m
+Brief introduction: project purpose and benefits
+Overview of user stories (prioritisation, estimate, acceptance criteria)
+Show planning artefacts (release plan, sprint plan, revisions)
+Low‑fidelity UI prototypes (if created)
+Show PM tool usage (boards, tasks, assignments)
+
+Jacob 3m
+Show version control workflow (commits, branches, authorship)
+Walk through relevant Java code
+JavaFX UI structure
+Demo the functional prototype (JavaFX UI + database persistence)
+
+Ben 1m
+Persistence layer (DB access, DAOs)
+
+Hugo 3m
+OO design elements
+Demonstrate the test suite
+Explain test purpose
+Show Red-Green-Refactor evidence
+Run tests
+
+Bobby will edit the video together when everyone has their sections done. We will aim to have it ready by Saturday.
+

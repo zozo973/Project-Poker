@@ -2,6 +2,7 @@ package com.example.projectpoker.model.game;
 
 import com.example.projectpoker.model.Hand;
 import com.example.projectpoker.model.game.enums.Action;
+import com.example.projectpoker.model.game.enums.BetType;
 import com.example.projectpoker.model.game.enums.Roles;
 
 import java.beans.PropertyChangeListener;
@@ -9,6 +10,7 @@ import java.beans.PropertyChangeSupport;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import static com.example.projectpoker.model.game.PotUtil.handlePlayerBet;
 import static com.example.projectpoker.model.statistics.SkewNormalSampler.safeRoundToInt;
 
 public class Player {
@@ -24,6 +26,7 @@ public class Player {
     private String name;
     private boolean isTurn;
     private int balance;
+    private int minBet;
     private RoundInvestment roundInvestment;
     private Action action;
     private Roles role;
@@ -38,6 +41,7 @@ public class Player {
         this.isTurn = false;
         this.action = Action.UNDECIDED;
         this.balance = 1000;
+        this.minBet = 15;
         this.role = Roles.PLAYER;
         this.roundInvestment = new RoundInvestment();
         this.activeBet = null;
@@ -50,6 +54,7 @@ public class Player {
         this.isTurn = false;
         this.action = Action.UNDECIDED;
         this.balance = 1000;
+        this.minBet = 15;
         this.role = Roles.PLAYER;
         this.roundInvestment = new RoundInvestment();
         this.activeBet = null;
@@ -61,6 +66,7 @@ public class Player {
         this.playerHand = new Hand();
         this.isTurn = false;
         this.balance = 1000;
+        this.minBet = 15;
         this.action = Action.UNDECIDED;
         this.role = role;
         this.roundInvestment = new RoundInvestment();
@@ -73,18 +79,20 @@ public class Player {
         this.playerHand = new Hand();
         this.isTurn = false;
         this.balance = balance;
+        this.minBet = 15;
         this.action = Action.UNDECIDED;
         this.role = Roles.PLAYER;
         this.roundInvestment = new RoundInvestment();
         this.activeBet = null;
     }
 
-    public Player(String name, int balance, String id) throws IOException {
+    public Player(String name, int balance, String id, int blindSize) throws IOException {
         this.name = name;
         this.id = new PlayerId(id);
         this.playerHand = new Hand();
         this.isTurn = false;
         this.balance = balance;
+        this.minBet = blindSize;
         this.action = Action.UNDECIDED;
         this.role = Roles.PLAYER;
         this.roundInvestment = new RoundInvestment();
@@ -137,6 +145,10 @@ public class Player {
         pcs.firePropertyChange("balance",oldVal,this.balance);
     }
 
+    public int getMinBet() { return minBet; }
+
+    public void setMinBet(int minBet) { this.minBet = minBet; }
+
     public RoundInvestment getRoundInvestment() { return roundInvestment; }
 
     public int getTotalInvestment() { return roundInvestment.getTotalInvestment(); }
@@ -144,6 +156,7 @@ public class Player {
     public int getTotalPotInvestment(Pot pot) {
         ArrayList<Bet> betsInPot = roundInvestment.getBetsByPot(pot);
         int potInvestment = 0;
+        if (betsInPot.isEmpty()) return 0;
         for (Bet b : betsInPot) {
             potInvestment += b.getBetSize();
         }
@@ -199,7 +212,7 @@ public class Player {
     public int placeBet(int betSize, Pot pot) {
         int b = getBalance();
 
-        if (betSize <= 0) {
+        if (betSize < 0 || (betSize == 0 && !this.action.equals(Action.CALL))) {
             throw new IllegalArgumentException("Bet must be positive.");
         }
 
@@ -247,5 +260,27 @@ public class Player {
 
     }
 
+    public void play(ArrayList<Pot> pots) {
 
+        int toCall = PotUtil.getToCall(pots, this);
+
+        // UI raises are interpreted as "raise to" total for this pot.
+        // Convert to an incremental contribution so repeat raises do not overcharge the player.
+        int betContribution = activeBet == null ? 0 : activeBet;
+
+        if (this.action == Action.RAISE) {
+            if (this.activeBet == null || this.activeBet <= toCall) {
+                this.action = toCall > 0 ? Action.CALL : Action.CHECK;
+                betContribution = toCall;
+            }
+        }
+
+        if (Action.isBet(action)) {
+            this.activeBet = betContribution;
+            if (this.activeBet <= 0) {
+                throw new IllegalStateException("Bet action requires a positive active bet.");
+            }
+            this.activeBet = betContribution;
+        }
+    }
 }

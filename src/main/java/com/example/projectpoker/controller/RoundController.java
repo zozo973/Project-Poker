@@ -25,6 +25,7 @@ import java.util.List;
 
 public class RoundController {
 
+
     public BorderPane mainBorderPane;
     @FXML private Label roundCounterLabel;
     @FXML private Label balanceLabel;
@@ -203,7 +204,7 @@ public class RoundController {
                         .equals(RoundStatus.UNINITIALISED)) {
 
                     throw new IllegalArgumentException(
-                            "Round must be unInitialised when game is uninitialised"
+                            "Round must be uninitialised when game is uninitialised"
                     );
                 }
 
@@ -478,7 +479,7 @@ public class RoundController {
         if (round == null || userPlayer == null) {
             return 0;
         }
-        return Math.max(0, round.getToPlay() - userPlayer.getTotalInvestment());
+        return Math.max(0, round.getTotalToPlay() - userPlayer.getTotalInvestment());
     }
 
     private void handleGameEvent(PropertyChangeEvent evt) {
@@ -600,9 +601,7 @@ public class RoundController {
             case DEAL:
                 onDealCards();
                 break;
-            case FLOP:
-            case TURN:
-            case RIVER:
+            case FLOP, TURN, RIVER:
                 if (round != null) {
                     onCommunityCardsChanged(round.getCommunityCards());
                 }

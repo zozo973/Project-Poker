@@ -51,7 +51,54 @@ public final class PotUtil {
         return pots;
     }
 
-    public static ArrayList<Pot> tryPayMultiplePots(ArrayList<Pot> pots, Player p) {
+    // TODO: potentially remove or implement
+    public static ArrayList<Pot> setPotsToPlay(ArrayList<Pot> pots, int toPlay) {
+        int openPotIndex = getOpenPotIndex(pots);
+        if (openPotIndex == -2) throw new IllegalStateException("There are no open pots, this is an illegal state.");
+        if (openPotIndex != -1) {
+            pots.get(openPotIndex).setToPlay(toPlay);
+        } else {
+            for (int i = pots.size()-1; i >=0 ; i--) {
+                if (pots.get(i).getIsOpen()) {
+                    if (pots.get(i).getInvestmentPP()<toPlay) {
+                        pots.get(i).setToPlay(pots.get(i).getInvestmentPP());
+                        toPlay -= pots.get(i).getInvestmentPP();
+                    } else {
+                        pots.get(i).setToPlay(toPlay);
+                        break;
+                    }
+                }
+            }
+        }
+        return pots;
+    }
+
+    // -- test --
+    public static int getToCall(ArrayList<Pot> pots, Player p) {
+        int openPotIndex = getOpenPotIndex(pots);
+        if (openPotIndex == -2) throw new IllegalStateException("There are no open pots, this is an illegal state.");
+        if (openPotIndex != -1) {
+
+            Pot openPot = pots.get(openPotIndex);
+            int investedInOpenPot = p.getTotalPotInvestment(openPot);
+            if (openPot.getToPlay() == investedInOpenPot) return openPot.getToPlay(p);
+            return Math.max(0, openPot.getInvestmentPP() - investedInOpenPot);
+        } else {
+            int cumToPlay = 0; // cumulative to play
+            for (Pot pot : pots) {
+                cumToPlay += pot.getToPlay(p);
+            }
+            if (cumToPlay == p.getTotalInvestment()) return cumToPlay;
+            return Math.max((cumToPlay - p.getTotalInvestment()), 0);
+        }
+    }
+
+    public static ArrayList<Pot> handlePlayerBet(ArrayList<Pot> pots, Player p) {
+        ArrayList<Pot> paidPots = tryPayMultiplePots(pots,p);
+        return paidPots != null ? paidPots : payOpenPot(pots,p);
+    }
+
+    private static ArrayList<Pot> tryPayMultiplePots(ArrayList<Pot> pots, Player p) {
         ArrayList<Pot> openPots = new ArrayList<>();
         ArrayList<Pot> closedPots = new ArrayList<>();
         int numOpenPots = 0;
@@ -82,7 +129,7 @@ public final class PotUtil {
         return null;
     }
 
-    public static ArrayList<Pot> payMultipleSidePots(ArrayList<Pot> pots, Player p) {
+    private static ArrayList<Pot> payMultipleSidePots(ArrayList<Pot> pots, Player p) {
         Integer activeBet = p.getActiveBet();
         int bet = activeBet != null ? activeBet : 0;
         ArrayList<Pot> paidPots = new ArrayList<>();
@@ -91,9 +138,14 @@ public final class PotUtil {
             totalPotToPlay += pot.getToPlay();
         }
         while (!pots.isEmpty()) {
-            Pot pot =  findHighestPriorityPot(pots);
-            pot.addBet(p,pot.getToPlay());
-            bet -= pot.getToPlay();
+            Pot pot = findHighestPriorityPot(pots);
+            if (pots.size() == 1) {
+                pot.addBet(p,bet);
+                bet = 0;
+        } else {
+                pot.addBet(p,pot.getToPlay());
+                bet -= pot.getToPlay();
+            }
             paidPots.add(pot);
             pots.remove(pot);
         }
@@ -101,9 +153,10 @@ public final class PotUtil {
     }
 
     public static Pot findHighestPriorityPot(ArrayList<Pot> pots) {
+        if (pots.isEmpty()) throw new IllegalStateException("Pots should never be empty, Always at least one pot.");
         int priority = 0;
         for (Pot pot : pots) {
-            if (pot.getPotPriority() < priority) priority = pot.getPotPriority();
+            if (pot.getPotPriority() < priority && pot.getIsOpen()) priority = pot.getPotPriority();
         }
         for (Pot pot : pots) {
             if (pot.getPotPriority() == priority) return pot;
@@ -111,7 +164,7 @@ public final class PotUtil {
         return pots.getLast();
     }
 
-    public static ArrayList<Pot> payOpenPot(ArrayList<Pot> pots, Player p) {
+    private static ArrayList<Pot> payOpenPot(ArrayList<Pot> pots, Player p) {
         Integer activeBet = p.getActiveBet();
         int bet = activeBet != null ? activeBet : 0;
         int i = getOpenPotIndex(pots);
@@ -121,11 +174,16 @@ public final class PotUtil {
     }
 
     public static int getOpenPotIndex(ArrayList<Pot> pots) {
-        if (pots.size() == 1) return 0;
+        if (pots.size() == 1) {
+            if (pots.getFirst().getIsOpen()) return 0;
+            else return -2;
+        }
+        ArrayList<Integer> potIndex = new ArrayList<>();
         for (int i = 0; i < pots.size(); i++) {
             if (pots.get(i).getIsOpen())
-                return i;
+                potIndex.add(i);
         }
-        return -1;
+        if (potIndex.size() > 1) return -1;
+        return potIndex.getFirst();
     }
 }

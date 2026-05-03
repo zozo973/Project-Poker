@@ -26,6 +26,7 @@ import java.util.List;
 
 public class RoundController implements RoundViewUpdater {
 
+
     public BorderPane mainBorderPane;
     @FXML private Label roundCounterLabel;
     @FXML private Label balanceLabel;
@@ -523,7 +524,7 @@ public class RoundController implements RoundViewUpdater {
         if (round == null || userPlayer == null) {
             return 0;
         }
-        return Math.max(0, round.getToPlay() - userPlayer.getTotalInvestment());
+        return Math.max(0, round.getTotalToPlay() - userPlayer.getTotalInvestment());
     }
 
     private void handleGameEvent(PropertyChangeEvent evt) {
@@ -636,9 +637,7 @@ public class RoundController implements RoundViewUpdater {
             case DEAL:
                 onDealCards();
                 break;
-            case FLOP:
-            case TURN:
-            case RIVER:
+            case FLOP, TURN, RIVER:
                 if (round != null) {
                     onCommunityCardsChanged(round.getCommunityCards(), null);
                 }

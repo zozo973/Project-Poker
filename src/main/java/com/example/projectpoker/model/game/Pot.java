@@ -63,15 +63,30 @@ public class Pot {
 
     public ArrayList<Player> getPlayers() { return players; }
 
-    public void addPlayer(Player player) { this.players.add(player); }
+    public void addPlayer(Player player) {
+        this.players.add(player);
+        addPlayer2Table(player);
+    }
 
     public void setPlayers(ArrayList<Player> players) { this.players = players; }
 
     public int getToPlay() { return toPlay; }
 
+    public int getToPlay(Player p) {
+        if (!this.players.contains(p)) addPlayer(p);
+        return this.investmentPP - p.getTotalPotInvestment(this);
+    }
+
     public void setToPlay(int toPlay) { this.toPlay = toPlay; }
 
     public int getInvestmentPP() { return investmentPP; }
+
+    private void setInvestmentPP() {
+        int largestInvestment = 0;
+        for (Player p : this.players) {
+            if (betTable.get(p) > largestInvestment) largestInvestment = betTable.get(p);
+        }
+        this.investmentPP = largestInvestment; }
 
     public void setInvestmentPP(int investmentPP) { this.investmentPP = investmentPP; }
 
@@ -123,11 +138,11 @@ public class Pot {
     }
 
     public void addBet(Player player, int bet) {
-        int playerPotInvest = player.getTotalPotInvestment(this);
-        if (playerPotInvest > this.investmentPP) this.investmentPP = playerPotInvest;
+        if (!this.players.contains(player)) this.players.add(player);
         player.placeBet(bet, this);
+        setInvestmentPP();
 
-        if (bet >= this.toPlay && Action.isRaise(player.getAction())) this.toPlay = bet;
+        if (bet >= this.toPlay && Action.isRaise(player.getAction())) this.toPlay = investmentPP;
 
         addBet2Table(player, bet);
         this.potSize += bet;
@@ -141,6 +156,7 @@ public class Pot {
         addBet2Table(players.get(turnOrder.get(1)),bigBlind);
         this.potSize = smallBlind + bigBlind;
         this.toPlay = Math.max(smallBlind, bigBlind);
+        setInvestmentPP();
     }
 
     public RoundStatus removeFolded(RoundStatus status) {

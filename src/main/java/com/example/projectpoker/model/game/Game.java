@@ -14,6 +14,12 @@ import java.util.Collections;
 
 public class Game {
 
+    // Game Events
+    //      gameStatus Change
+    //      blindSize Change
+    //      players Change
+    //      Round Change
+
     private GameStatus gameStatus;
     private ArrayList<Player> players;
     private int numRoundsLeft;

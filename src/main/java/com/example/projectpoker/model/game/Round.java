@@ -86,15 +86,24 @@ public class Round {
     }
 
     public void setRoundStatus(RoundStatus roundStatus) {
+        var oldVal = this.roundStatus;
         this.roundStatus = roundStatus;
+        pcs.firePropertyChange("state",oldVal,this.roundStatus);
         switch (roundStatus) {
+            case DEAL -> {
+                dealCards();
+                pcs.firePropertyChange("state",oldVal,this.roundStatus);
+            }
             case BETTING1, BETTING2, BETTING3, BETTING4 -> checkBetType();
-            case RIVER, TURN, FLOP, SHOWDOWN -> deal2Table();
-            case DEAL -> dealCards();
+            case RIVER, TURN, FLOP, SHOWDOWN -> {
+                deal2Table();
+                pcs.firePropertyChange("state",oldVal,this.roundStatus);
+            }
             case END -> end();
             case UNINITIALISED -> init();
             case BLINDS -> payBlinds();
         }
+
     }
 
     public BetType getBetType() {
@@ -116,7 +125,6 @@ public class Round {
     public ArrayList<Pot> getPots() { return pots; }
 
     public void setPots(ArrayList<Pot> pots) {
-        var oldVal = this.pots;
         this.pots = pots;
         // Pot internals mutate in place, so always emit to keep UI pot label in sync.
         pcs.firePropertyChange("pots", null, this.pots);
@@ -151,9 +159,18 @@ public class Round {
         return toPlay;
     }
 
-    public void setToPlay(int toPlay) {
+    public int getTotalToPlay() {
+        int total = 0;
+        for (Pot p : this.pots) {
+            total += p.getInvestmentPP();
+        }
+        return total;
+    }
 
+    public void setToPlay(int toPlay) {
+        var oldVal = this.toPlay;
         this.toPlay = toPlay;
+        pcs.firePropertyChange("toPlay",oldVal,this.toPlay);
         this.pots = setPotsToPlay(this.pots, toPlay);
     }
 
@@ -286,6 +303,7 @@ public class Round {
                     deck.burnCard();
                     this.communityCards.add(deck.draw());
                     this.roundStatus = RoundStatus.SHOWDOWN;
+                    break;
                 case 3:
                     // Turn
                     deck.burnCard();
@@ -294,19 +312,24 @@ public class Round {
                     deck.burnCard();
                     this.communityCards.add(deck.draw());
                     this.roundStatus = RoundStatus.SHOWDOWN;
+                    break;
                 case 4:
                     // River
                     deck.burnCard();
                     this.communityCards.add(deck.draw());
                     this.roundStatus = RoundStatus.SHOWDOWN;
+                    break;
                 case 5:
                     this.roundStatus = RoundStatus.SHOWDOWN;
+                    break;
                 default:
                     throw new IllegalStateException("community cards has illegal amount of cards");
             }
-
+            setCommunityCards(this.communityCards);
+            return;
         }
         if (roundStatus.equals(RoundStatus.SHOWDOWN)) {
+            setCommunityCards(this.communityCards);
             playShowdown();
             return;
         }
@@ -319,6 +342,7 @@ public class Round {
         } else {
             this.communityCards.add(deck.draw());
         }
+        setCommunityCards(this.communityCards);
         setRoundStatus(RoundStatus.stepRoundStatus(this.roundStatus));
     }
 
@@ -336,9 +360,10 @@ public class Round {
             for (Integer i : turnOrder) {
                 activePlayer = players.get(i);
                 // Check if Action.Undecided is right.
+                setToPlay(getToCall(this.pots,activePlayer));
                 if (!Action.hasFolded(activePlayer.getAction()) && activePlayer.getAction() == Action.UNDECIDED) {
                     anyPlayerAsked = true;
-                    setToPlay(getToCall(this.pots,activePlayer));
+
                     activePlayer.setIsTurn(true);
                     while (activePlayer.getIsTurn()) {
                         processActivePlayer(activePlayer);
@@ -347,10 +372,9 @@ public class Round {
                             activePlayer.setIsTurn(false);
                         }
                     }
+                    checkIfPlayerRaised(activePlayer);
                 }
                 recordPlayerAction(activePlayer);
-
-                checkIfPlayerRaised(activePlayer);
 
                 if (endBetting(activePlayer)) {
                     bettingEnded = true;
@@ -416,7 +440,7 @@ public class Round {
     private void waitForPlayerDecision(Player activePlayer) {
         if (activePlayer instanceof AiPlayer) {
             Random random = new Random();
-            int thinkTime = random.nextInt((4000-500)+1) + 500;
+            int thinkTime = random.nextInt((2000-500)+1) + 500;
             try {
                 Thread.sleep(thinkTime);
             } catch (InterruptedException e) {
@@ -455,7 +479,7 @@ public class Round {
 
         waitForPlayerDecision(activePlayer);
         activePlayer.play(this.pots);
-        setPots(handlePlayerBet(this.pots,activePlayer));
+        if (Action.isBet(activePlayer.getAction())) setPots(new ArrayList<>(handlePlayerBet(this.pots,activePlayer)));
     }
 
     private void postBetting() {
@@ -480,7 +504,7 @@ public class Round {
 
     public boolean endBetting(Player activePlayer) {
         if (activePlayer == null) return false;
-        if (Action.isRaise(activePlayer.getAction())) return false;
+        if (activePlayer.getAction().equals(Action.RAISE)) return false;
         int numAllIn = 0;
         int numCall = 0;
         int numRaise = 0;
@@ -493,16 +517,22 @@ public class Round {
                 case Action.ALLIN:
                     numAllIn++;
                     recentAllIn = p;
+                    break;
                 case Action.CALL:
                     numCall++;
+                    break;
                 case Action.RAISE:
                     numRaise++;
+                    break;
                 case Action.FOLD:
                     numFold++;
+                    break;
                 case Action.CHECK:
                     numCheck++;
+                    break;
                 case Action.UNDECIDED:
                     numUndecided++;
+                    break;
             }
         }
         // TODO Test and check betting end conditions possible add more.
@@ -578,12 +608,9 @@ public class Round {
         betting();
 
         switch (betType) {
-            case ENDROUND:
-                end();
-            case SKIP2SHOWDOWN:
-                setRoundStatus(RoundStatus.SHOWDOWN);
-            case NORMAL, SIDEPOT:
-                betting();
+            case ENDROUND -> end();
+            case SKIP2SHOWDOWN -> setRoundStatus(RoundStatus.SHOWDOWN);
+            case NORMAL, SIDEPOT -> betting();
         }
     }
 

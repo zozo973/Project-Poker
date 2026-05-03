@@ -81,12 +81,12 @@ public final class PotUtil {
 
             Pot openPot = pots.get(openPotIndex);
             int investedInOpenPot = p.getTotalPotInvestment(openPot);
-            if (openPot.getToPlay() == investedInOpenPot) return openPot.getToPlay();
-            return Math.max(0, openPot.getToPlay() - investedInOpenPot);
+            if (openPot.getToPlay() == investedInOpenPot) return openPot.getToPlay(p);
+            return Math.max(0, openPot.getInvestmentPP() - investedInOpenPot);
         } else {
             int cumToPlay = 0; // cumulative to play
             for (Pot pot : pots) {
-                cumToPlay += pot.getToPlay();
+                cumToPlay += pot.getToPlay(p);
             }
             if (cumToPlay == p.getTotalInvestment()) return cumToPlay;
             return Math.max((cumToPlay - p.getTotalInvestment()), 0);

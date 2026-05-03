@@ -156,6 +156,7 @@ public class Player {
     public int getTotalPotInvestment(Pot pot) {
         ArrayList<Bet> betsInPot = roundInvestment.getBetsByPot(pot);
         int potInvestment = 0;
+        if (betsInPot.isEmpty()) return 0;
         for (Bet b : betsInPot) {
             potInvestment += b.getBetSize();
         }

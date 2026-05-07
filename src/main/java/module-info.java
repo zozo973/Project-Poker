@@ -18,6 +18,7 @@ module com.example.projectpoker {
     requires com.google.gson;
     requires java.net.http;
     requires bcrypt;
+    requires javafx.graphics;
 
 
     opens com.example.projectpoker to javafx.fxml;

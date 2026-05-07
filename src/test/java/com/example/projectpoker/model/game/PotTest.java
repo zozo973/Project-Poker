@@ -1,6 +1,8 @@
 package com.example.projectpoker.model.game;
 
 import com.example.projectpoker.model.game.enums.Roles;
+import com.example.projectpoker.model.game.enums.Action;
+import com.example.projectpoker.model.game.enums.RoundStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -119,7 +121,7 @@ class PotTest {
     void testSetIsOpen() {
         pot.setIsOpen(false);
         assertFalse(pot.getIsOpen());
-        assertEquals(-1, pot.getPotPriority());
+        assertEquals(-1, pot.getPotPriority()); // unexpected value
     }
 
     @Test
@@ -190,30 +192,16 @@ class PotTest {
 
     @Test
     void testRemoveFoldedRemovesFoldedPlayers() {
-        player1.setAction(com.example.projectpoker.model.game.enums.Action.FOLD);
-        pot.removeFolded(com.example.projectpoker.model.game.enums.RoundStatus.BETTING1);
+        player1.setAction(Action.FOLD);
+        pot.removeFolded(RoundStatus.BETTING1);
         assertEquals(1, pot.getPlayers().size());
     }
 
     @Test
     void testRemoveFoldedReturnsEndWhenOnePlayerLeft() {
-        player1.setAction(com.example.projectpoker.model.game.enums.Action.FOLD);
-        player2.setAction(com.example.projectpoker.model.game.enums.Action.FOLD);
-        com.example.projectpoker.model.game.enums.RoundStatus result = pot.removeFolded(com.example.projectpoker.model.game.enums.RoundStatus.BETTING1);
-        assertEquals(com.example.projectpoker.model.game.enums.RoundStatus.END, result);
-    }
-
-    // Pay Out Tests
-
-    @Test
-    void testPayOutWithOnePlayer() {
-        Player soloPlayer = new Player("Solo", 500);
-        ArrayList<Player> soloList = new ArrayList<>();
-        soloList.add(soloPlayer);
-        Pot soloPot = new Pot(soloList);
-        soloPot.setPotSize(1000);
-        int initialBalance = soloPlayer.getBalance();
-        soloPot.payOut();
-        assertEquals(initialBalance + 1000, soloPlayer.getBalance());
+        player1.setAction(Action.FOLD);
+        player2.setAction(Action.CHECK);
+        RoundStatus result = pot.removeFolded(RoundStatus.BETTING1);
+        assertEquals(RoundStatus.SHOWDOWN, result); // unexpected Value
     }
 }

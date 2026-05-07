@@ -62,6 +62,10 @@ public class Card {
 
         return "/com/example/projectpoker/Images/" + suit + rank + ".png";
     }
+
+    public String toString(){
+        return this.getRank() + " of " + this.getSuit().name();
+    }
     // These are instantiated here for testing purposes while I build in the rest of the files.
     // Remove later
     public static Card C2 = new Card(Suit.Clubs, Rank.Two);

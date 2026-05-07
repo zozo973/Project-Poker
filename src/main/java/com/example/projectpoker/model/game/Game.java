@@ -36,6 +36,7 @@ public class Game {
     private int handsPlayed;
     private final User userProfile;
     private int gameSessionId;
+    private boolean sessionFinalized;
 
     private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
     private final PropertyChangeListener playerActionListener = evt -> {
@@ -246,6 +247,20 @@ public class Game {
     }
 
     public void end() {
+        finishSession();
+    }
+
+    public synchronized void closeSession() {
+        finishSession();
+    }
+
+    private synchronized void finishSession() {
+        if (sessionFinalized) {
+            return;
+        }
+
+        // Guard against double-saving if the game ends normally and the window also closes.
+        sessionFinalized = true;
         setGameStatus(GameStatus.ENDED);
         DatabaseManager.finalizeGameSession(gameSessionId, userProfile, this, getUser());
     }
@@ -263,8 +278,9 @@ public class Game {
     }
 
     private ArrayList<Player> initAiPlayers(ArrayList<Player> players, int numPlayers, Difficulty difficulty) {
-        for (int i = numPlayers - 1; i > 0; i--) {
+        for (int i = 0; i < numPlayers - 1; i++) {
             players.add(new AiPlayer(difficulty, getUser().getBalance()));
+            players.get(i+1).setName("AI player " + (i+1));
         }
         Collections.reverse(players);
         return players;

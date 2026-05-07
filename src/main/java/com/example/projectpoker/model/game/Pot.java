@@ -138,13 +138,14 @@ public class Pot {
     }
 
     public void addBet(Player player, int bet) {
-        if (!this.players.contains(player)) this.players.add(player);
+        addBet2Table(player, bet);
         player.placeBet(bet, this);
+
         setInvestmentPP();
 
+        if (this.toPlay == 0 && bet > 0) this.toPlay = bet;
         if (bet >= this.toPlay && Action.isRaise(player.getAction())) this.toPlay = investmentPP;
 
-        addBet2Table(player, bet);
         this.potSize += bet;
     }
 
@@ -161,9 +162,9 @@ public class Pot {
 
     public RoundStatus removeFolded(RoundStatus status) {
         players.removeIf(p -> p.getAction() == Action.FOLD);
-        if (players.size() == 1 || status.equals(RoundStatus.END)) {
-            players.getFirst().win(potSize);
-            return RoundStatus.END;
+
+        if (players.size() == 1) {
+            return RoundStatus.SHOWDOWN;
         }
         return RoundStatus.stepRoundStatus(status);
     }
@@ -185,15 +186,15 @@ public class Pot {
     }
 
     public void adjustPot(Pot sidePot) {
-        if (sidePot.isOpen) {
             if (sidePot.getPotPriority() < this.potPriority) {
-                int removeToPlay = sidePot.getToPlay() - this.toPlay;
-                int removePotTotal = this.potSize - removeToPlay*players.size();
+                int removeInvestmentPP = sidePot.getInvestmentPP() - this.investmentPP;
+                int removePotTotal = this.potSize - removeInvestmentPP*players.size();
                 if (this.potSize <= 0) throw new IllegalStateException("THe pot can't have 0 or negative amount of money in it");
-                if (removeToPlay <= 0 ) throw new IllegalStateException("adjustPot Method has been implemented on the incorrect pot");
-                reInitPot(removeToPlay,removePotTotal);
+                if (removeInvestmentPP <= 0 ) throw new IllegalStateException("adjustPot Method has been implemented on the incorrect pot");
+                reInitPot(removeInvestmentPP,removePotTotal);
+
+                sidePot.initPot(this.players);
             }
-        }
     }
 
     private void reInitPot(int removeToPlay,int removePotTotal) {
@@ -202,6 +203,17 @@ public class Pot {
         for (Player p : players) {
             int currentBets = this.betTable.get(p);
             this.betTable.put(p,currentBets-removePotTotal);
+        }
+    }
+
+    private void initPot(ArrayList<Player> players) {
+        for (Player p : players) {
+            if (!this.players.contains(p)) {
+                addPlayer(p);
+                addPlayer2Table(p,this.investmentPP);
+                this.potSize += this.investmentPP;
+                p.getRoundInvestment().reInit(this);
+            }
         }
     }
 }

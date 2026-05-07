@@ -38,11 +38,6 @@ public class AiPlayer extends Player {
             return;
         }
 
-        if (toCall == 0) {
-            setAction(Action.CHECK);
-            setActiveBet(0);
-            return;
-        }
         Random random = new Random();
         int rv = random.nextInt((100)+1);
 
@@ -54,9 +49,30 @@ public class AiPlayer extends Player {
             betAmount = getBalance();
         } else if (rv < 20) { // 20% chance to raise
             setAction(Action.RAISE);
-            betAmount = getMinBet() * (random.nextInt((int) ((Math.floor((double) getBalance() /getMinBet()) - 1) + 1)) + 1);
+            int minBet = getMinBet();
+            if (toCall != 0) {
+                minBet = toCall;
+            } else {
+                if (minBet == getBalance() && rv < 10) {
+                    betAmount = getBalance();
+                    setAction(Action.ALLIN);
+                } else {
+                    betAmount = 0;
+                    setAction(Action.FOLD);
+                }
+                betAmount = getMinBet() + ((getBalance() - minBet) * (random.nextInt((int) ((Math.floor((double) (getBalance() - minBet) / getMinBet() + 1))))));
+            }
         } else {
+            if (toCall == 0) {
+                setAction(Action.CHECK);
+                setActiveBet(0);
+                return;
+            } else setAction(Action.CALL);
+        }
+        if (betAmount == toCall && getAction().equals(Action.RAISE)) {
             setAction(Action.CALL);
+        } else if (betAmount < toCall && getAction().equals(Action.RAISE)) {
+            throw new IllegalStateException("Can not raise when bet amount is less then the amount to call.");
         }
         setActiveBet(betAmount);
     }

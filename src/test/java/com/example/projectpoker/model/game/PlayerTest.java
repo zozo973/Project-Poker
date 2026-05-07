@@ -32,7 +32,7 @@ class PlayerTest {
         assertEquals(1000, p.getBalance());
         assertEquals(Roles.PLAYER, p.getRole());
         assertFalse(p.getIsTurn());
-        assertNull(p.getAction());
+        assertEquals(Action.UNDECIDED,p.getAction());
         assertNotNull(p.getId());
     }
 
@@ -299,6 +299,7 @@ class PlayerTest {
 
     @Test
     void testPlaceBetExceedsBalanceThrows() {
+        player.setAction(Action.RAISE);
         assertThrows(IllegalArgumentException.class, () -> player.placeBet(2000, new Pot()));
     }
 

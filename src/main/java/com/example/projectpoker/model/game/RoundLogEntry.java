@@ -11,6 +11,13 @@ public class RoundLogEntry {
     private Pot currentPot;
     private String entryDescription;
 
+    // RoundLogEntry constructor for inputting end of round entry into the RoundLogEntry
+    public RoundLogEntry(String entryDescription) {
+        this.player = null;
+        this.betSize = 0;
+        this.entryDescription = entryDescription;
+    }
+
     // RoundLogEntry constructor for inputting specific entryDescriptions into the RoundLogEntry
     public RoundLogEntry(Player player, String entryDescription) {
 

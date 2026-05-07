@@ -148,6 +148,7 @@ public class RoundController {
             toCallButton.setDisable(false);
             betButton.setDisable(false);
             allInButton.setDisable(false);
+            // TODO User should not be able to fold if they can check
             foldButton.setDisable(false);
             updateBetSlider();
         });

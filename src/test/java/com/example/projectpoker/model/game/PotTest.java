@@ -200,8 +200,8 @@ class PotTest {
     @Test
     void testRemoveFoldedReturnsEndWhenOnePlayerLeft() {
         player1.setAction(Action.FOLD);
-        player2.setAction(Action.FOLD);
+        player2.setAction(Action.CHECK);
         RoundStatus result = pot.removeFolded(RoundStatus.BETTING1);
-        assertEquals(RoundStatus.END, result); // unexpected Value
+        assertEquals(RoundStatus.SHOWDOWN, result); // unexpected Value
     }
 }

@@ -54,6 +54,23 @@ public class RoundInvestment {
 
     private void add2TotalInvestment(int val) { this.totalInvestment += val; }
 
+    public void reInit(Pot pot) {
+        ArrayList<Bet> adjustBets = new ArrayList<>();
+        for (Bet bet : this.bets) {
+            if (bet.getPot().getPotPriority()>pot.getPotPriority()) {
+                Bet adjustedBet = new Bet(
+                        bet.getBetSize() - pot.getInvestmentPP(),
+                        bet.getPot()
+                );
+                adjustBets.add(adjustedBet);
+            } else {
+                adjustBets.add(bet);
+            }
+        }
+        adjustBets.add(new Bet(pot.getInvestmentPP(),pot));
+        this.bets = adjustBets;
+    }
+
     public void reset() {
         this.totalInvestment = 0;
         this.bets = new ArrayList<>();

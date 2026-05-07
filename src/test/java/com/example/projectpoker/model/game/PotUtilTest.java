@@ -1,5 +1,6 @@
 package com.example.projectpoker.model.game;
 
+import com.example.projectpoker.model.game.enums.Action;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -21,8 +22,8 @@ class PotUtilTest {
         player3 = new Player("Player3", 1000);
         
         pots = new ArrayList<>();
-        pots.add(new Pot(player1));
-        pots.add(new Pot(player2));
+        pots.add(new Pot(player1,0));
+        pots.add(new Pot(player2,1));
     }
 
     // Add New Side Pot Tests
@@ -30,8 +31,8 @@ class PotUtilTest {
     @Test
     void testAddNewSidePotCreatesNewPot() {
         int initialSize = pots.size();
-        player1.placeBet(200, pots.get(0));
-        ArrayList<Pot> result = PotUtil.addNewSidePot(pots, player1);
+        player1.placeBet(200, pots.getFirst());
+        ArrayList<Pot> result = PotUtil.addNewSidePot(pots, player1,200);
         assertTrue(result.size() > initialSize);
     }
 
@@ -39,8 +40,8 @@ class PotUtilTest {
     void testAddNewSidePotUpdatesPriority() {
         player1.setRole(com.example.projectpoker.model.game.enums.Roles.BIGBLIND);
         player2.setRole(com.example.projectpoker.model.game.enums.Roles.PLAYER);
-        player1.placeBet(200, pots.get(0));
-        ArrayList<Pot> result = PotUtil.addNewSidePot(pots, player1);
+        player1.placeBet(200, pots.getFirst());
+        ArrayList<Pot> result = PotUtil.addNewSidePot(pots, player1,200);
         assertNotNull(result);
     }
 
@@ -48,15 +49,21 @@ class PotUtilTest {
 
     @Test
     void testTryPayMultiplePotsWithMultipleOpenPots() {
+
         pots.clear();
         ArrayList<Player> players = new ArrayList<>();
         players.add(player1);
         players.add(player2);
         players.add(player3);
+
         player1.setActiveBet(100);
+        player1.setAction(Action.RAISE);
+
         Pot openPot1 = new Pot(players);
         openPot1.setPotPriority(0);
+
         openPot1.addBet(player2,20);
+        player2.setAction(Action.RAISE);
         openPot1.addBet(player3,20);
         openPot1.setIsOpen(true);
 
@@ -102,9 +109,13 @@ class PotUtilTest {
     @Test
     void testPayOpenPot() {
         pots.getFirst().setIsOpen(false);
+        player1.setAction(Action.RAISE);
         player1.setActiveBet(100);
         
         ArrayList<Pot> result = PotUtil.handlePlayerBet(pots, player1);
+
+        assertEquals(100,pots.getLast().getToPlay());
+        assertEquals(100,pots.getLast().getInvestmentPP());
         assertNotNull(result);
     }
 
@@ -112,14 +123,18 @@ class PotUtilTest {
     void testPayOpenPotThrowsWhenNoOpenPot() {
         pots.clear();
         pots.add(new Pot(player1));
-        pots.get(0).setIsOpen(false);
+        pots.getFirst().setIsOpen(false);
         assertThrows(IllegalStateException.class, () -> PotUtil.handlePlayerBet(pots, player1));
     }
 
     // Get Open Pot Index Tests
     @Test
     void testGetOpenPotIndexWithSinglePot() {
-        int index = PotUtil.getOpenPotIndex(pots);
+        this.pots.clear();
+        pots.add(new Pot(player1));
+        pots.getFirst().setIsOpen(true);
+
+        Integer index = PotUtil.getOpenPotIndex(pots);
         assertEquals(0, index);
     }
 
@@ -130,8 +145,8 @@ class PotUtilTest {
         pots.add(closedPot);
         pots.add(new Pot(player3));
         
-        int index = PotUtil.getOpenPotIndex(pots);
-        assertTrue(index >= 0);
+        Integer index = PotUtil.getOpenPotIndex(pots);
+        assertNull(index);
     }
 
     @Test
@@ -139,17 +154,14 @@ class PotUtilTest {
         for (Pot pot : pots) {
             pot.setIsOpen(false);
         }
-        int index = PotUtil.getOpenPotIndex(pots);
-        assertEquals(-1, index);
+        assertThrows(IllegalStateException.class, () -> PotUtil.getOpenPotIndex(pots));
     }
 
     // Edge Cases
 
-
     @Test
     void testGetOpenPotIndexWithEmptyList() {
         ArrayList<Pot> emptyPots = new ArrayList<>();
-        int index = PotUtil.getOpenPotIndex(emptyPots);
-        assertEquals(-1, index);
+        assertThrows(IllegalStateException.class, () -> PotUtil.getOpenPotIndex(emptyPots));
     }
 }

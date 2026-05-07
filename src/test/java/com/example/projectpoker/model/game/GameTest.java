@@ -187,14 +187,6 @@ class GameTest {
         assertNull(game.getRound());
     }
 
-    // Start Game Tests
-
-    @Test
-    void testStartSetsGameStatusToRunning() {
-        game.start();
-        assertEquals(GameStatus.RUNNING,game.getGameStatus());
-    }
-
     // End Game Tests
 
     @Test

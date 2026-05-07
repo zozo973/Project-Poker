@@ -56,7 +56,9 @@ public class PokerApplication extends Application {
         User loggedInUser = SessionManager.getCurrentUser();
         Player user = new Player(loggedInUser.getUsername(), loggedInUser.getCurrentBalance());
         int userBuyIn = loggedInUser.getCurrentBalance();
-        int blind = safeRoundToInt((userBuyIn * 0.03));
+        // TODO: Change how blind is chosen:
+        //        int blind = safeRoundToInt((userBuyIn * 0.03));
+        int blind = 30;
 
         Game game = new Game(user, loggedInUser, userBuyIn, 6, blind, 10, 40, Difficulty.GAMBLINGADDICT);
         controller.setGame(game);

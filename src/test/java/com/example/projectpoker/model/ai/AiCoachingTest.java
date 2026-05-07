@@ -1,4 +1,4 @@
-package com.example.projectpoker.model.game;
+package com.example.projectpoker.model.ai;
 
 import com.example.projectpoker.AiCoaching;
 import com.example.projectpoker.model.game.Card;

@@ -194,7 +194,18 @@ public class Player {
 
     public Integer getActiveBet() { return activeBet; }
 
-    public void setActiveBet(Integer activeBet) { this.activeBet = activeBet; }
+    public void setActiveBet(Integer activeBet) {
+        if (!action.equals(Action.ALLIN)) {
+            if (activeBet != null && activeBet % 5 != 0 ) {
+                activeBet = Math.round((float) activeBet / 5) * 5;
+            }
+        } else {
+            activeBet = this.balance;
+        }
+        this.activeBet = activeBet;
+
+    }
+
 
     public void roundReset() {
         pcs.firePropertyChange("roundReset",this, new Player(getName(),getBalance()));
@@ -216,6 +227,11 @@ public class Player {
             throw new IllegalArgumentException("Bet must be positive.");
         }
 
+        if (betSize > this.balance) {
+            if (!this.action.equals(Action.ALLIN)) throw new IllegalArgumentException("Bet must be equal to or less than the players balance.");
+            else betSize = this.balance;
+        }
+
         else if (betSize == b) {
             setBalance(0);
             if (this.action != Action.ALLIN) {
@@ -226,6 +242,7 @@ public class Player {
         }
         this.activeBet = betSize;
         this.roundInvestment.add2Bets(betSize,pot);
+        System.out.println(name + " is " + action + " " + betSize);
         return betSize;
     }
 

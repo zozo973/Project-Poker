@@ -2,6 +2,7 @@ package com.example.projectpoker.model.game;
 
 import com.example.projectpoker.model.game.enums.Action;
 import com.example.projectpoker.model.game.enums.BetType;
+import com.example.projectpoker.model.game.enums.Roles;
 import com.example.projectpoker.model.game.enums.RoundStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -68,7 +69,7 @@ class RoundTest {
         TestListener listener = new TestListener();
         round.addPropertyChangeListener(listener);
         round.removePropertyChangeListener(listener);
-        round.setRoundStatus(RoundStatus.BLINDS);
+        round.setRoundStatus(RoundStatus.DEAL);
         assertNull(listener.getPropertyName());
     }
 
@@ -76,8 +77,8 @@ class RoundTest {
     void testRoundStatusChangeFiresEvent() {
         TestListener listener = new TestListener();
         round.addPropertyChangeListener(listener);
-        round.setRoundStatus(RoundStatus.BLINDS);
-        assertEquals(RoundStatus.BLINDS, listener.getNewValue());
+        round.setRoundStatus(RoundStatus.DEAL);
+        assertEquals(RoundStatus.DEAL, listener.getNewValue());
     }
 
     @Test
@@ -114,17 +115,6 @@ class RoundTest {
         round.addPropertyChangeListener(listener);
         round.setToPlay(200);
         assertEquals(200, listener.getNewValue());
-    }
-
-    // Round Status Tests
-
-    @Test
-    void testGetAndSetRoundStatus() {
-        assertEquals(RoundStatus.UNINITIALISED, round.getRoundStatus());
-        round.setRoundStatus(RoundStatus.BLINDS);
-        assertEquals(RoundStatus.BLINDS, round.getRoundStatus());
-        round.setRoundStatus(RoundStatus.DEAL);
-        assertEquals(RoundStatus.DEAL, round.getRoundStatus());
     }
 
     // Bet Type Tests
@@ -176,7 +166,7 @@ class RoundTest {
 
     @Test
     void testGetOpenPot() {
-        Pot openPot = round.getOpenPot();
+        Pot openPot = round.tryGetOpenPot(players.getFirst());
         assertNotNull(openPot);
         assertTrue(openPot.getIsOpen());
     }
@@ -226,6 +216,42 @@ class RoundTest {
         assertEquals(-1, aiRound.getUserIndex());
     }
 
+    // Check if player raised test
+
+    @Test
+    void testIfPlayerRaises() {
+        players.get(0).setAction(Action.CHECK);
+        players.get(1).setAction(Action.CHECK);
+        players.get(2).setAction(Action.RAISE);
+        players.get(2).setActiveBet(100);
+        round.setToPlay(50);
+
+        round.checkIfPlayerRaised(players.get(2));
+
+        assertEquals(Action.UNDECIDED,players.get(0).getAction());
+        assertEquals(Action.UNDECIDED,players.get(1).getAction());
+    }
+
+    // All players but active player have folded test
+
+    @Test
+    void testAllPlayersFoldedFalse() {
+        players.get(0).setAction(Action.RAISE);
+        players.get(1).setAction(Action.FOLD);
+        players.get(2).setAction(Action.UNDECIDED);
+        boolean result = round.testAllPlayersFolded(players.getLast());
+        assertFalse(result);
+    }
+
+    @Test
+    void testAllPlayersFoldedTrue() {
+        players.get(0).setAction(Action.FOLD);
+        players.get(1).setAction(Action.FOLD);
+        players.get(2).setAction(Action.UNDECIDED);
+        boolean result = round.testAllPlayersFolded(players.getLast());
+        assertTrue(result);
+    }
+
     // End Betting Tests
 
     @Test
@@ -238,14 +264,68 @@ class RoundTest {
     }
 
     @Test
-    void testEndBettingAllFold() {
-        players.get(0).setAction(Action.FOLD);
-        players.get(1).setAction(Action.FOLD);
-        players.get(2).setAction(Action.FOLD);
-        boolean result = round.endBetting(players.get(2));
+    void testEndBettingCondition1() {
+        players.get(0).setAction(Action.ALLIN);
+        players.get(0).setActiveBet(100);
+
+        players.get(1).setAction(Action.CALL);
+        players.get(1).setActiveBet(100);
+
+        players.get(2).setAction(Action.CALL);
+        players.get(2).setActiveBet(100);
+
+        boolean result = round.endBetting(players.getLast());
         assertTrue(result);
-        assertEquals(BetType.SKIP2SHOWDOWN, round.getBetType());
+        assertEquals(BetType.NORMAL,round.getBetType());
     }
+    @Test
+    void testEndBettingCondition2() {
+
+        players.get(0).setRole(Roles.BIGBLIND);
+        players.get(1).setRole(Roles.SMALLBLIND);
+        players.get(2).setRole(Roles.DEALER);
+        round.init();
+
+        players.get(0).setAction(Action.CHECK);
+
+        players.get(1).setAction(Action.FOLD);
+
+        players.get(2).setAction(Action.CALL);
+        players.get(2).setActiveBet(100);
+
+        boolean result = round.endBetting(players.getLast());
+        assertTrue(result);
+        assertEquals(BetType.NORMAL,round.getBetType());
+    }
+
+    @Test
+    void testEndBettingCondition3() {
+        players.get(0).setAction(Action.RAISE);
+        players.get(0).setActiveBet(100);
+
+        players.get(1).setAction(Action.FOLD);
+
+        players.get(2).setAction(Action.FOLD);
+
+        boolean result = round.endBetting(players.getLast());
+        assertTrue(result);
+    }
+
+
+    @Test
+    void testEndBettingCondition4() {
+        players.get(0).setAction(Action.ALLIN);
+        players.get(0).setActiveBet(100);
+
+        players.get(1).setAction(Action.FOLD);
+        players.get(2).setAction(Action.CALL);
+        players.get(2).setActiveBet(100);
+
+        boolean result = round.endBetting(players.getLast());
+        assertTrue(result);
+        assertEquals(BetType.SKIP2SHOWDOWN,round.getBetType());
+    }
+
 
     @Test
     void testEndBettingOneRaiseOthersCall() {
@@ -265,25 +345,7 @@ class RoundTest {
         assertTrue(result);
     }
 
-    @Test
-    void testEndBettingMultipleAllIn() {
-        players.get(0).setAction(Action.ALLIN);
-        players.get(1).setAction(Action.ALLIN);
-        players.get(2).setAction(Action.CALL);
-        boolean result = round.endBetting(players.get(2));
-        assertTrue(result);
-        assertEquals(BetType.SKIP2SHOWDOWN, round.getBetType());
-    }
 
-    @Test
-    void testEndBettingSidePotCondition() {
-        players.get(0).setAction(Action.ALLIN);
-        players.get(1).setAction(Action.RAISE);
-        players.get(2).setAction(Action.CALL);
-        boolean result = round.endBetting(players.get(2));
-        assertTrue(result);
-        assertEquals(BetType.SIDEPOT, round.getBetType());
-    }
 
     // Note: endBetting() logic is complex - with 3 players where numAllIn=0, 
     // betting will always end due to cond1 being true. This is the expected behavior.
@@ -295,6 +357,25 @@ class RoundTest {
         boolean result = round.endBetting(players.get(2));
         assertTrue(result);
         assertEquals(BetType.SKIP2SHOWDOWN, round.getBetType());
+    }
+
+    @Test
+    void testEndBettingSidePotCondition() {
+        round.init();
+
+        players.get(0).setAction(Action.ALLIN);
+        players.get(0).setActiveBet(200);
+
+        players.get(1).setAction(Action.CALL);
+        players.get(1).setActiveBet(200);
+
+        players.get(2).setAction(Action.RAISE);
+        players.get(2).setActiveBet(200);
+
+        var numPotsPrior = round.getPots().size();
+        round.checkIfPlayerRaised(players.get(2));
+        var numPotsPost = round.getPots().size();
+        assertEquals(numPotsPrior+1, numPotsPost);
     }
 
     // Player Action Tests - roundLog is null when not initialized

@@ -1,23 +1,34 @@
 package com.example.projectpoker.model.game;
 
+import com.example.projectpoker.AIActions;
 import com.example.projectpoker.model.game.enums.Action;
 import com.example.projectpoker.model.game.enums.Difficulty;
 import com.example.projectpoker.model.statistics.SkewNormalSampler;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
+import static com.example.projectpoker.model.game.PotUtil.getOpenPotIndex;
+import static com.example.projectpoker.model.game.PotUtil.getToCall;
 import static java.lang.Math.abs;
 
 public class AiPlayer extends Player {
 
     private final Difficulty difficulty;
+    private AIActions.AiPlayerResponse response;
+
 
     public AiPlayer(Difficulty difficulty, int playerBalance) {
         super();
         this.difficulty = difficulty;
         this.setBalance(generateAiPlayer(playerBalance));
     }
+
+    public AIActions.AiPlayerResponse getResponse() { return response; }
+
+    public void setResponse(AIActions.AiPlayerResponse response) { this.response = response; }
 
     private int generateAiPlayer(int playerBalance) {
         int scale = (difficulty.ordinal() - 2);
@@ -29,6 +40,66 @@ public class AiPlayer extends Player {
 
     @Override
     public void play(ArrayList<Pot> pots) {
+        // For Gemini use
+
+        if (this.response != null && this.response.errormsg == null) {
+            int toCall = getToCall(pots, this);
+            switch (response.action) {
+                case CALL:
+                    int callAmount = Math.min(toCall, getBalance());
+                    if (toCall < getBalance()) {
+                        setAction(Action.ALLIN);
+                        setActiveBet(getBalance());
+                    } else if (callAmount <= 0) {
+                        setAction(Action.CHECK);
+                        setActiveBet(0);
+                    } else {
+                        setAction(Action.CALL);
+                        setActiveBet(callAmount);
+                    }
+                    break;
+                case RAISE:
+                    int raiseAmount = Math.max(response.amount, getMinBet());
+                    if (raiseAmount >= getBalance()) {
+                        setAction(Action.ALLIN);
+                        setActiveBet(getBalance());
+                    }
+                    if (raiseAmount <= toCall) {
+                        int callAmt = Math.min(toCall, getBalance());
+                        if (callAmt <= 0) {
+                            setAction(Action.CHECK);
+                            setActiveBet(0);
+                        } else {
+                            setAction(Action.CALL);
+                            setActiveBet(callAmt);
+                        }
+                    } else {
+                        setAction(Action.RAISE);
+                        setActiveBet(raiseAmount);
+                    }
+                    break;
+
+                case ALLIN:
+                    setAction(Action.ALLIN);
+                    setActiveBet(getBalance());
+                    break;
+                case FOLD:
+                    setAction(Action.FOLD);
+                    setActiveBet(0);
+                    break;
+                case CHECK:
+                default:
+                    setAction(Action.CHECK);
+                    setActiveBet(0);
+                    break;
+            }
+        return;
+        }
+        // For the roles. In case Gemini API not work
+        aiFailPlayFallBack(pots);
+    }
+
+    private void aiFailPlayFallBack(ArrayList<Pot> pots) {
         int toCall = PotUtil.getToCall(pots, this);
 
         // If player is all-in (balance = 0), they can only check
@@ -76,8 +147,6 @@ public class AiPlayer extends Player {
         }
         setActiveBet(betAmount);
     }
-
-
 
     @Override
     public void forfeitGame() {

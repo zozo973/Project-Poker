@@ -412,7 +412,6 @@ public class Round {
         boolean bettingEnded;
         do {
             bettingEnded = false;
-            boolean anyPlayerAsked = false;
             for (Integer i : turnOrder) {
                 activePlayer = players.get(i);
                 // Check if Action.Undecided is right.
@@ -420,7 +419,6 @@ public class Round {
                 System.out.println(activePlayer.getName() + ", to call: " + this.toPlay + ", Action:" + activePlayer.getAction());
                 if (!Action.hasFolded(activePlayer.getAction()) && activePlayer.getAction().equals(Action.UNDECIDED)) {
                     if (testAllPlayersFolded(activePlayer)) break;
-                    anyPlayerAsked = true;
 
                     activePlayer.setIsTurn(true);
                     while (activePlayer.getIsTurn()) {
@@ -442,11 +440,6 @@ public class Round {
                     break;
                 }
             }
-            // If we went through all players without asking any to act, check if betting should end
-            //if (!anyPlayerAsked) {
-            //    // All remaining players have made their decisions, check if betting is complete
-            //    bettingEnded = checkIfBettingComplete();
-            //}
         } while (!bettingEnded);
         postBetting();
     }
@@ -492,41 +485,6 @@ public class Round {
         return true;
     }
 
-    private boolean checkIfBettingComplete() {
-        int numAllIn = 0;
-        int numCall = 0;
-        int numRaise = 0;
-        int numFold = 0;
-        int numCheck = 0;
-        int numUndecided = 0;
-
-        for (Player p : players) {
-            if (p.getAction() == Action.ALLIN) {
-                numAllIn++;
-            } else if (p.getAction() == Action.CALL) {
-                numCall++;
-            } else if (p.getAction() == Action.RAISE) {
-                numRaise++;
-            } else if (p.getAction() == Action.FOLD) {
-                numFold++;
-            } else if (p.getAction() == Action.CHECK) {
-                numCheck++;
-            } else if (p.getAction() == Action.UNDECIDED) {
-                numUndecided++;
-            }
-        }
-
-        if (numUndecided > 0) return false;
-
-        // If all non-folded players are all-in, betting is complete
-        if (numUndecided == 0 && (players.size() - numFold) <= numAllIn + 1) {
-            return true;
-        }
-
-        // If only one non-folded player remains, betting is complete
-        return (players.size() - numFold) == 1;
-    }
-
     private void waitForPlayerDecision(Player activePlayer) {
         if (activePlayer instanceof AiPlayer) {
             Random random = new Random();
@@ -550,84 +508,6 @@ public class Round {
         }
     }
 
-    // Temporary AI behaviour AI always checks or calls raises if it can.
-    private void chooseAiAction(Player activePlayer) {
-        // For Gemini use
-        AIActions.AiPlayerResponse response = aiDecisions.get(activePlayer);
-        if (response != null && response.errormsg == null) {
-            int requiredToCall = getRequiredToCall(activePlayer);
-            switch (response.action) {
-                case CALL:
-                    int callAmount = Math.min(requiredToCall, activePlayer.getBalance());
-                    if (callAmount <= 0) {
-                        activePlayer.setAction(Action.CHECK);
-                        activePlayer.setActiveBet(0);
-                    } else {
-                        activePlayer.setAction(Action.CALL);
-                        activePlayer.setActiveBet(callAmount);
-                    }
-                    break;
-                case RAISE:
-                    int alreadyInvested = activePlayer.getTotalPotInvestment(getOpenPot());
-                    int minRaise = Math.max(toPlay * 2, alreadyInvested + 1);
-                    int raiseAmount = Math.max(response.amount, minRaise);
-                    raiseAmount = Math.min(raiseAmount, alreadyInvested + activePlayer.getBalance());
-                    if (raiseAmount <= alreadyInvested) {
-                        int callAmt = Math.min(requiredToCall, activePlayer.getBalance());
-                        if (callAmt <= 0) {
-                            activePlayer.setAction(Action.CHECK);
-                            activePlayer.setActiveBet(0);
-                        } else {
-                            activePlayer.setAction(Action.CALL);
-                            activePlayer.setActiveBet(callAmt);
-                        }
-                    } else {
-                        activePlayer.setAction(Action.RAISE);
-                        activePlayer.setActiveBet(raiseAmount);
-                    }
-                    break;
-
-                case ALLIN:
-                    activePlayer.setAction(Action.ALLIN);
-                    activePlayer.setActiveBet(activePlayer.getBalance());
-                    break;
-                case FOLD:
-                    activePlayer.setAction(Action.FOLD);
-                    activePlayer.setActiveBet(0);
-                    break;
-                case CHECK:
-                default:
-                    activePlayer.setAction(Action.CHECK);
-                    activePlayer.setActiveBet(0);
-                    break;
-            }
-            return;
-        }
-
-        // For the roles. In case Gemini API not work
-        int requiredToCall = getRequiredToCall(activePlayer);
-
-        // If player is all-in (balance = 0), they can only check
-        if (activePlayer.getBalance() <= 0) {
-            activePlayer.setAction(Action.CHECK);
-            activePlayer.setActiveBet(0);
-            return;
-        }
-
-        if (requiredToCall == 0) {
-            activePlayer.setAction(Action.CHECK);
-            activePlayer.setActiveBet(0);
-            return;
-        }
-
-        int betAmount = Math.min(requiredToCall, activePlayer.getBalance());
-        if (betAmount < requiredToCall) {
-            activePlayer.setAction(Action.ALLIN);
-        } else {
-            activePlayer.setAction(Action.CALL);
-        }
-        activePlayer.setActiveBet(betAmount);
-    }
     private void processActivePlayer(Player activePlayer) {
         int playerBalance = activePlayer.getBalance();
 
@@ -646,6 +526,10 @@ public class Round {
         }
 
         waitForPlayerDecision(activePlayer);
+
+        if (activePlayer instanceof AiPlayer) {
+            ((AiPlayer) activePlayer).setResponse(aiDecisions.get(activePlayer));
+        }
         activePlayer.play(this.pots);
     }
 

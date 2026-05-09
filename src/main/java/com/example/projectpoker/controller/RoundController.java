@@ -656,6 +656,18 @@ public class RoundController {
         aiActionLabel.setText("Action: -");
         aiReasonLabel.setText("Reason: -");
 
+            if (userPlayer == null || userPlayer.getPlayerHand() == null || userPlayer.getPlayerHand().getCards() == null) {
+                aiStatusLabel.setText("AI unavailable: player hand not ready yet.");
+                btnGenerate.setDisable(false);
+                return;
+            }
+
+            if (round == null || round.getCommunityCards() == null) {
+                aiStatusLabel.setText("AI unavailable: round not ready yet.");
+                btnGenerate.setDisable(false);
+                return;
+            }
+
         Card[] hand  = userPlayer.getPlayerHand().getCards().toArray(new Card[0]);
         Card[] board = round.getCommunityCards().toArray(new Card[0]);
         RoundStatus status = round.getRoundStatus();

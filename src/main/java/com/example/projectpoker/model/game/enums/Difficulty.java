@@ -8,8 +8,14 @@ public enum Difficulty {
     PROFESSIONAL("You will be robbed"),
     WSOPTABLE("You will never financially, physically and emotionally recover");
 
-    private final String desciption;
+    private final String description;
 
-    Difficulty(String desciption) {this.desciption = desciption; }
+    Difficulty(String description) {
+        this.description = description;
+    }
+
+    public String getDescription() {
+        return description;
+    }
 
 }

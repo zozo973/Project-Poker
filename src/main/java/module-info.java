@@ -2,6 +2,7 @@ module com.example.projectpoker {
     requires javafx.controls;
     requires javafx.fxml;
     requires javafx.web;
+    requires java.sql;
 
 
     requires org.controlsfx.controls;
@@ -16,8 +17,8 @@ module com.example.projectpoker {
     requires com.google.api.client.json.gson;
     requires com.google.gson;
     requires java.net.http;
-    requires java.sql;
     requires bcrypt;
+
 
     opens com.example.projectpoker to javafx.fxml;
     exports com.example.projectpoker;

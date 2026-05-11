@@ -5,7 +5,6 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class DatabaseConnection {
-    // Tests override this property so they can run against an isolated SQLite file.
     private static final String DB_PATH_PROPERTY = "projectpoker.db.path";
     private static Connection instance = null;
 

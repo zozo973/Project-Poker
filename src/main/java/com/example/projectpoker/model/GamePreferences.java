@@ -10,7 +10,7 @@ public class GamePreferences {
     public static final int DEFAULT_OPPONENTS = 5;
     public static final Difficulty DEFAULT_DIFFICULTY = Difficulty.GAMBLINGADDICT;
     public static final String DEFAULT_CARD_BACK_KEY = "back1";
-    public static final String DEFAULT_BOARD_KEY = "classic";
+    public static final String DEFAULT_BOARD_KEY = "classic1";
 
     public record AssetOption(String key, String displayName, String resourcePath) {}
 
@@ -111,4 +111,3 @@ public class GamePreferences {
         return options.getFirst().resourcePath();
     }
 }
-

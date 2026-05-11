@@ -60,7 +60,7 @@ public class AiPlayer extends Player {
                     break;
                 case RAISE:
                     int raiseAmount = Math.max(response.amount, getMinBet());
-                    if (raiseAmount >= getBalance()) {
+                    if (raiseAmount <= getBalance()) {
                         setAction(Action.ALLIN);
                         setActiveBet(getBalance());
                     }
@@ -70,8 +70,13 @@ public class AiPlayer extends Player {
                             setAction(Action.CHECK);
                             setActiveBet(0);
                         } else {
-                            setAction(Action.CALL);
-                            setActiveBet(callAmt);
+                            if (callAmt == getBalance()) {
+                                setAction(Action.ALLIN);
+                                setActiveBet(callAmt);
+                            } else {
+                                setAction(Action.CALL);
+                                setActiveBet(callAmt);
+                            }
                         }
                     } else {
                         setAction(Action.RAISE);
@@ -89,7 +94,11 @@ public class AiPlayer extends Player {
                     break;
                 case CHECK:
                 default:
-                    setAction(Action.CHECK);
+                    if (toCall == 0) {
+                        setAction(Action.CHECK);
+                    } else {
+                        setAction(Action.FOLD);
+                    }
                     setActiveBet(0);
                     break;
             }

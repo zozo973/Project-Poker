@@ -471,6 +471,7 @@ public class Round {
                     p.setAction(Action.CHECK);
                 }
             }
+
         } else if (activePlayer.getAction().equals(Action.ALLIN) && activePlayer.getActiveBet() == this.toPlay) {
             activePlayer.setAction(Action.CHECK);
         }

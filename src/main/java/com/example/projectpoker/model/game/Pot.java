@@ -165,7 +165,8 @@ public class Pot {
 
         if (players.size() == 1) {
             return RoundStatus.SHOWDOWN;
-        }
+        } else if (status.equals(RoundStatus.END)) return RoundStatus.END;
+
         return RoundStatus.stepRoundStatus(status);
     }
 

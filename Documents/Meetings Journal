@@ -126,3 +126,14 @@ Run tests
 
 Bobby will edit the video together when everyone has their sections done. We will aim to have it ready by Saturday.
 
+Tutorial meeting 8/05
+Present:
+Jacob, Ben, Mitchell.
+Discussed user testing. Created user testing document to add questions to questionnaire. Discussed that PokerApplication should be hardcoded to only 3 players to allow AI to respond quicker.
+Discussed presentation, only five people should be speaking because the presentation is only 5 mins. Currently speaking is Ben, Jacob, Mitchell. Need 2 more. Bobby already not talking. Most of the presentation will be NEED to be on the powerpoint due to time constraints.
+TO DO:
+user testing (add questions to online doc and interview users)
+potentially add leaderboard UI and database logic if time allows (Ben)
+finish UI (Dylan)
+finetuning AI (Mitchell)
+start final presentation script and powerpoint

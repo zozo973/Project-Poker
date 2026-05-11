@@ -1,11 +1,13 @@
 package com.example.projectpoker;
 
 import com.example.projectpoker.controller.RoundController;
+import com.example.projectpoker.model.GamePreferences;
 import com.example.projectpoker.model.game.Game;
 import com.example.projectpoker.model.game.Player;
 import com.example.projectpoker.model.game.enums.Difficulty;
 import com.example.projectpoker.database.DatabaseManager;
 import com.example.projectpoker.model.User;
+import com.example.projectpoker.service.GamePreferencesService;
 import com.example.projectpoker.service.SessionManager;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -51,6 +53,10 @@ public class PokerApplication extends Application {
 
         RoundController controller = loader.getController();
         PokerGameUI pokerUI = new PokerGameUI();
+
+        GamePreferences preferences = new GamePreferencesService().loadForCurrentUser();
+        pokerUI.setCardBackResourcePath(preferences.getCardBackResourcePath());
+        pokerUI.setBoardResourcePath(preferences.getBoardResourcePath());
         controller.setUI(pokerUI);
 
         User loggedInUser = SessionManager.getCurrentUser();
@@ -60,7 +66,10 @@ public class PokerApplication extends Application {
         //        int blind = safeRoundToInt((userBuyIn * 0.03));
         int blind = 30;
 
-        Game game = new Game(user, loggedInUser, userBuyIn, 6, blind, 10, 40, Difficulty.GAMBLINGADDICT);
+        int totalPlayers = preferences.getOpponentCount() + 1;
+        Difficulty difficulty = preferences.getDifficulty();
+
+        Game game = new Game(user, loggedInUser, userBuyIn, totalPlayers, blind, 10, 40, difficulty);
         controller.setGame(game);
         controller.setRound(game.getRound(), user);
         game.init();

@@ -2,7 +2,6 @@ package com.example.projectpoker.model.game;
 
 import com.example.projectpoker.model.Hand;
 import com.example.projectpoker.model.game.enums.Action;
-import com.example.projectpoker.model.game.enums.BetType;
 import com.example.projectpoker.model.game.enums.Roles;
 
 import java.beans.PropertyChangeListener;
@@ -10,7 +9,6 @@ import java.beans.PropertyChangeSupport;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import static com.example.projectpoker.model.game.PotUtil.handlePlayerBet;
 import static com.example.projectpoker.model.statistics.SkewNormalSampler.safeRoundToInt;
 
 public class Player {

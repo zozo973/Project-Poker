@@ -12,7 +12,6 @@ import javafx.scene.control.Label;
 
 public class MainMenuController {
     private static final int WINDOW_WIDTH = 350;
-    private static final int WINDOW_HEIGHT = 400;
     private static final int OPTIONS_HEIGHT = 560;
     private static final int PROFILE_HEIGHT = 430;
 

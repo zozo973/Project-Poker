@@ -2,6 +2,7 @@ package com.example.projectpoker.controller;
 
 import com.example.projectpoker.service.SessionManager;
 import com.example.projectpoker.model.User;
+import com.example.projectpoker.database.UserDAO;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import java.io.IOException;
@@ -12,7 +13,7 @@ import javafx.scene.control.Label;
 
 public class ProfileController {
     private static final int WINDOW_WIDTH = 350;
-    private static final int WINDOW_HEIGHT = 400;
+    private static final int WINDOW_HEIGHT = 430;
 
     @FXML private Label usernameLabel;
     @FXML private Label totalHandsLabel;
@@ -33,6 +34,26 @@ public class ProfileController {
         totalHandsLabel.setText(Integer.toString(user.getTotalHandsPlayed()));
         totalWinsLabel.setText(Integer.toString(user.getTotalWins()));
         balanceLabel.setText(Integer.toString(user.getCurrentBalance()));
+    }
+
+    @FXML
+    private void handleBuyIn() {
+        User user = SessionManager.getCurrentUser();
+
+        if (user == null) {
+            messageLabel.setText("No user logged in.");
+            return;
+        }
+
+        // Add 1000 to the user's balance
+        user.setCurrentBalance(user.getCurrentBalance() + 1000);
+
+        // Persist to database
+        new UserDAO().update(user);
+
+        // Update the UI
+        balanceLabel.setText(Integer.toString(user.getCurrentBalance()));
+        messageLabel.setText("Successfully added $1000! New balance: $" + user.getCurrentBalance());
     }
 
     @FXML

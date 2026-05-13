@@ -58,6 +58,7 @@ public class PokerApplication extends Application {
         pokerUI.setCardBackResourcePath(preferences.getCardBackResourcePath());
         pokerUI.setBoardResourcePath(preferences.getBoardResourcePath());
         controller.setUI(pokerUI);
+        controller.setPreferredDarkMode(preferences.isDarkModeEnabled());
 
         User loggedInUser = SessionManager.getCurrentUser();
         Player user = new Player(loggedInUser.getUsername(), loggedInUser.getCurrentBalance());

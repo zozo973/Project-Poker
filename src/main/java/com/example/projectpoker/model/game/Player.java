@@ -228,7 +228,12 @@ public class Player {
         }
 
         if (betSize > this.balance) {
-            if (!this.action.equals(Action.ALLIN)) throw new IllegalArgumentException("Bet must be equal to or less than the players balance.");
+            if (!this.action.equals(Action.ALLIN)) throw new IllegalArgumentException(
+                    "Bet must be <= balance | betSize=" + betSize +
+                            " balance=" + this.balance +
+                            " action=" + this.action +
+                            " activeBet=" + this.activeBet
+            );
             else betSize = this.balance;
         }
 

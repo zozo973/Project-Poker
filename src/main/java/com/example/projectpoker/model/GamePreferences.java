@@ -11,6 +11,7 @@ public class GamePreferences {
     public static final Difficulty DEFAULT_DIFFICULTY = Difficulty.GAMBLINGADDICT;
     public static final String DEFAULT_CARD_BACK_KEY = "back1";
     public static final String DEFAULT_BOARD_KEY = "classic1";
+    public static final boolean DEFAULT_DARK_MODE = false;
 
     public record AssetOption(String key, String displayName, String resourcePath) {}
 
@@ -45,16 +46,22 @@ public class GamePreferences {
     private final Difficulty difficulty;
     private final String cardBackKey;
     private final String boardKey;
+    private final boolean darkModeEnabled;
 
     public GamePreferences(int opponentCount, Difficulty difficulty, String cardBackKey, String boardKey) {
+        this(opponentCount, difficulty, cardBackKey, boardKey, DEFAULT_DARK_MODE);
+    }
+
+    public GamePreferences(int opponentCount, Difficulty difficulty, String cardBackKey, String boardKey, boolean darkModeEnabled) {
         this.opponentCount = clampOpponents(opponentCount);
         this.difficulty = difficulty == null ? DEFAULT_DIFFICULTY : difficulty;
         this.cardBackKey = containsOption(CARD_BACK_OPTIONS, cardBackKey) ? cardBackKey : DEFAULT_CARD_BACK_KEY;
         this.boardKey = containsOption(BOARD_OPTIONS, boardKey) ? boardKey : DEFAULT_BOARD_KEY;
+        this.darkModeEnabled = darkModeEnabled;
     }
 
     public static GamePreferences defaults() {
-        return new GamePreferences(DEFAULT_OPPONENTS, DEFAULT_DIFFICULTY, DEFAULT_CARD_BACK_KEY, DEFAULT_BOARD_KEY);
+        return new GamePreferences(DEFAULT_OPPONENTS, DEFAULT_DIFFICULTY, DEFAULT_CARD_BACK_KEY, DEFAULT_BOARD_KEY, DEFAULT_DARK_MODE);
     }
 
     public int getOpponentCount() {
@@ -71,6 +78,10 @@ public class GamePreferences {
 
     public String getBoardKey() {
         return boardKey;
+    }
+
+    public boolean isDarkModeEnabled() {
+        return darkModeEnabled;
     }
 
     public String getCardBackResourcePath() {

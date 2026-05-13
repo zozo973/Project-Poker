@@ -10,6 +10,7 @@ import java.io.IOException;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
@@ -22,7 +23,7 @@ import java.util.List;
 
 public class OptionsMenuController {
     private static final int WINDOW_WIDTH = 350;
-    private static final int MAIN_MENU_HEIGHT = 400;
+    private static final int MAIN_MENU_HEIGHT = 430;
 
     private final GamePreferencesService preferencesService = new GamePreferencesService();
     private final List<GamePreferences.AssetOption> cardBackOptions = GamePreferences.CARD_BACK_OPTIONS;
@@ -38,6 +39,7 @@ public class OptionsMenuController {
     @FXML private ImageView cardBackPreview;
     @FXML private Label boardNameLabel;
     @FXML private ImageView boardPreview;
+    @FXML private CheckBox darkModeCheckBox;
 
     @FXML
     private void initialize() {
@@ -54,6 +56,7 @@ public class OptionsMenuController {
         GamePreferences loaded = preferencesService.loadForCurrentUser();
         opponentsSpinner.getValueFactory().setValue(loaded.getOpponentCount());
         difficultyComboBox.setValue(loaded.getDifficulty());
+        darkModeCheckBox.setSelected(loaded.isDarkModeEnabled());
 
         cardBackIndex = indexForKey(cardBackOptions, loaded.getCardBackKey());
         boardIndex = indexForKey(boardOptions, loaded.getBoardKey());
@@ -99,11 +102,14 @@ public class OptionsMenuController {
             selectedDifficulty = GamePreferences.DEFAULT_DIFFICULTY;
         }
 
+        boolean darkModeEnabled = darkModeCheckBox != null && darkModeCheckBox.isSelected();
+
         GamePreferences preferences = new GamePreferences(
                 opponentsSpinner.getValue(),
                 selectedDifficulty,
                 cardBackOptions.get(cardBackIndex).key(),
-                boardOptions.get(boardIndex).key()
+                boardOptions.get(boardIndex).key(),
+                darkModeEnabled
         );
 
         preferencesService.saveForCurrentUser(preferences);

@@ -1,6 +1,7 @@
 package com.example.projectpoker.controller;
 
 import com.example.projectpoker.AiCoaching;
+import com.example.projectpoker.model.GamePreferences;
 import com.example.projectpoker.model.game.enums.AiAdviceMode;
 
 import com.example.projectpoker.PokerGameUI;
@@ -9,14 +10,20 @@ import com.example.projectpoker.model.game.TablePosition;
 import com.example.projectpoker.model.game.enums.Action;
 import com.example.projectpoker.model.game.enums.GameStatus;
 import com.example.projectpoker.model.game.enums.RoundStatus;
+import com.example.projectpoker.service.GamePreferencesService;
 import javafx.concurrent.Task;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
+import javafx.stage.Stage;
 
 
+import java.io.IOException;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
@@ -24,6 +31,9 @@ import java.util.List;
 
 
 public class RoundController {
+    private static final int BET_STEP = 5;
+    private static final String DARK_MODE_CLASS = "game-dark";
+    private static final String DARK_THEME_STYLESHEET = "/com/example/projectpoker/poker-round-dark.css";
 
 
     public BorderPane mainBorderPane;
@@ -32,7 +42,7 @@ public class RoundController {
     @FXML private Label potLabel;
     @FXML private Label phaseLabel;
     @FXML private Label toCallLabel;
-    @FXML private Slider betSlider;
+    @FXML private Spinner<Integer> betSpinner;
     @FXML private Button betButton;
     @FXML private Button toCallButton;
     @FXML private Button allInButton;
@@ -40,6 +50,8 @@ public class RoundController {
     @FXML private Button foldButton;
     @FXML private Button startGameButton;
     @FXML private Pane tablePane;
+    @FXML private CheckMenuItem fullscreenToggle;
+    @FXML private CheckMenuItem darkModeToggle;
 
     // For Ai Coaching
     @FXML private ToggleButton btnSafe;
@@ -51,6 +63,7 @@ public class RoundController {
     @FXML private Label aiStatusLabel;
 
     private final AiCoaching aiCoaching = new AiCoaching();
+    private final GamePreferencesService preferencesService = new GamePreferencesService();
     private AiAdviceMode currentAiMode = AiAdviceMode.NORMAL;
     private PokerGameUI pokerUI;
     private Game game;
@@ -58,6 +71,7 @@ public class RoundController {
     private Player userPlayer;
     private Player activeTurnPlayer;
     private volatile boolean roundTransitionInProgress;
+    private boolean preferredDarkMode;
     private final ArrayList<Player> observedPlayers = new ArrayList<>();
     private final PropertyChangeListener gameListener = this::handleGameEvent;
     private final PropertyChangeListener roundListener = this::handleRoundEvent;
@@ -67,6 +81,25 @@ public class RoundController {
         this.pokerUI = pokerUI;
         pokerUI.setTablePane(tablePane);
         disableActionButtons();
+
+        if (mainBorderPane != null) {
+            mainBorderPane.sceneProperty().addListener((obs, oldScene, newScene) -> {
+                if (newScene != null) {
+                    if (darkModeToggle != null) {
+                        darkModeToggle.setSelected(preferredDarkMode);
+                    }
+                    applyDarkMode(preferredDarkMode);
+                }
+            });
+        }
+    }
+
+    public void setPreferredDarkMode(boolean enabled) {
+        preferredDarkMode = enabled;
+        if (darkModeToggle != null) {
+            darkModeToggle.setSelected(enabled);
+        }
+        applyDarkMode(enabled);
     }
 
     public void setGame(Game game) {
@@ -150,7 +183,7 @@ public class RoundController {
             allInButton.setDisable(false);
             // TODO User should not be able to fold if they can check
             foldButton.setDisable(false);
-            updateBetSlider();
+            updateBetInput();
         });
     }
 
@@ -160,7 +193,7 @@ public class RoundController {
             if (player == userPlayer) {
                 balanceLabel.setText("Balance: " + newBalance);
                 updateCallDisplay();
-                updateBetSlider();
+                updateBetInput();
 
                 if (newBalance > oldBalance) {
                     int winnings = newBalance - oldBalance;
@@ -328,7 +361,7 @@ public class RoundController {
         renderChipStacksNow();
         updateCallDisplay();
         updateRoundCounterLabel();
-        updateBetSlider();
+        updateBetInput();
     }
 
     private void updateCallDisplay() {
@@ -357,45 +390,25 @@ public class RoundController {
         }
     }
 
-    private void updateBetSlider() {
+    private void updateBetInput() {
         if (userPlayer == null || round == null) return;
 
         int balance = userPlayer.getBalance();
         int amountToCall = getAmountToCall();
-        int blind = game != null ? game.getBlindSize() : 0;
-        int minBetUnit = Math.max(blind, 1);
+        int maxRaise = Math.max(0, (balance / BET_STEP) * BET_STEP);
 
         toCallButton.setText(amountToCall > 0 ? "Call" : "Check");
 
-        if (balance <= 0) {
-            betSlider.setDisable(true);
-            betSlider.setMin(0);
-            betSlider.setMax(0);
-            betSlider.setValue(0);
+        SpinnerValueFactory.IntegerSpinnerValueFactory valueFactory =
+                new SpinnerValueFactory.IntegerSpinnerValueFactory(0, maxRaise, 0, BET_STEP);
+        betSpinner.setValueFactory(valueFactory);
+        betSpinner.setEditable(true);
+
+        if (maxRaise <= 0) {
+            betSpinner.setDisable(true);
             return;
         }
-
-        int minBet = Math.min(minBetUnit, balance);
-        int maxBet = Math.max(minBet, (balance / minBetUnit) * minBetUnit);
-
-        if (maxBet < minBet) {
-            betSlider.setDisable(true);
-            betSlider.setMin(0);
-            betSlider.setMax(0);
-            betSlider.setValue(0);
-            return;
-        }
-
-        betSlider.setDisable(false);
-        betSlider.setMin(minBet);
-        betSlider.setMax(maxBet);
-        betSlider.setMajorTickUnit(minBetUnit);
-        betSlider.setBlockIncrement(minBetUnit);
-
-        double current = betSlider.getValue();
-        if (current < minBet) current = minBet;
-        if (current > maxBet) current = maxBet;
-        betSlider.setValue(current);
+        betSpinner.setDisable(false);
     }
 
     @FXML
@@ -426,6 +439,75 @@ public class RoundController {
     }
 
     @FXML
+    private void quitToMainMenu() {
+        if (game != null) {
+            game.closeSession();
+        }
+
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/projectpoker/MainMenu.fxml"));
+            Parent root = loader.load();
+
+            Stage stage = (Stage) mainBorderPane.getScene().getWindow();
+            stage.setScene(new Scene(root, 350, 400));
+            stage.setTitle("PokerPro+");
+            stage.setFullScreen(false);
+            stage.show();
+        } catch (IOException ex) {
+            aiStatusLabel.setText("Error: Could not return to main menu.");
+        }
+    }
+
+    @FXML
+    private void toggleFullscreen() {
+        if (mainBorderPane == null || mainBorderPane.getScene() == null) {
+            return;
+        }
+        Stage stage = (Stage) mainBorderPane.getScene().getWindow();
+        stage.setFullScreen(fullscreenToggle != null && fullscreenToggle.isSelected());
+    }
+
+    @FXML
+    private void toggleDarkMode() {
+        boolean enabled = darkModeToggle != null && darkModeToggle.isSelected();
+        preferredDarkMode = enabled;
+        applyDarkMode(enabled);
+        saveDarkModePreference(enabled);
+    }
+
+    private void applyDarkMode(boolean enabled) {
+        if (mainBorderPane == null || mainBorderPane.getScene() == null) {
+            return;
+        }
+
+        Scene scene = mainBorderPane.getScene();
+        String stylesheet = getClass().getResource(DARK_THEME_STYLESHEET).toExternalForm();
+        if (!scene.getStylesheets().contains(stylesheet)) {
+            scene.getStylesheets().add(stylesheet);
+        }
+
+        if (enabled) {
+            if (!scene.getRoot().getStyleClass().contains(DARK_MODE_CLASS)) {
+                scene.getRoot().getStyleClass().add(DARK_MODE_CLASS);
+            }
+        } else {
+            scene.getRoot().getStyleClass().remove(DARK_MODE_CLASS);
+        }
+    }
+
+    private void saveDarkModePreference(boolean enabled) {
+        GamePreferences current = preferencesService.loadForCurrentUser();
+        GamePreferences updated = new GamePreferences(
+                current.getOpponentCount(),
+                current.getDifficulty(),
+                current.getCardBackKey(),
+                current.getBoardKey(),
+                enabled
+        );
+        preferencesService.saveForCurrentUser(updated);
+    }
+
+    @FXML
     private void handleCall() {
         int amountToCall = getAmountToCall();
         if (amountToCall > 0) {
@@ -437,7 +519,17 @@ public class RoundController {
     }
     @FXML
     private void handleRaise() {
-        int raiseAmount = (int) betSlider.getValue();
+        Integer selected = betSpinner.getValue();
+        int raiseAmount = selected == null ? 0 : selected;
+        if (raiseAmount <= 0) {
+            return;
+        }
+        int maxRaise = Math.max(0, (userPlayer.getBalance() / BET_STEP) * BET_STEP);
+        raiseAmount = Math.min(raiseAmount, maxRaise);
+        raiseAmount = (raiseAmount / BET_STEP) * BET_STEP;
+        if (raiseAmount <= 0) {
+            return;
+        }
         submitPlayerAction(Action.RAISE, raiseAmount);
         disableActionButtons();
     }
@@ -457,6 +549,9 @@ public class RoundController {
 
         toCallButton.setDisable(true);
         betButton.setDisable(true);
+        if (betSpinner != null) {
+            betSpinner.setDisable(true);
+        }
         foldButton.setDisable(true);
         allInButton.setDisable(true);
     }
@@ -490,7 +585,7 @@ public class RoundController {
                 onGameStatusChanged((GameStatus) evt.getNewValue());
                 break;
             case "blindSize":
-                Platform.runLater(this::updateBetSlider);
+                Platform.runLater(this::updateBetInput);
                 break;
             case "round":
                 onRoundCreation((Round) evt.getNewValue());

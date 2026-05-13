@@ -16,7 +16,13 @@
             <HBox spacing="20" alignment="CENTER_LEFT" style="-fx-padding: 10;">
                 <Label text="App Name"/>
                 <Label text="Profile Name"/>
-                <Label text="Settings / Options"/>
+                <MenuButton text="Settings / Options">
+                    <items>
+                        <MenuItem text="Quit to Main Menu" onAction="#quitToMainMenu"/>
+                        <CheckMenuItem fx:id="fullscreenToggle" text="Fullscreen" onAction="#toggleFullscreen"/>
+                        <CheckMenuItem fx:id="darkModeToggle" text="Dark Mode" onAction="#toggleDarkMode"/>
+                    </items>
+                </MenuButton>
             </HBox>
         </top>
 
@@ -89,10 +95,8 @@
                   style="-fx-padding: 15;">
 
 
-                <Slider fx:id="betSlider"
-                        prefWidth="400"
-                        showTickMarks="true"
-                        showTickLabels="true"/>
+                <Spinner fx:id="betSpinner"
+                         prefWidth="180"/>
 
 
                 <HBox spacing="20"

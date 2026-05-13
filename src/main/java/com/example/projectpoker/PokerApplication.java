@@ -21,7 +21,7 @@ public class PokerApplication extends Application {
     private static final int AUTH_WIDTH = 350;
     private static final int AUTH_HEIGHT = 480;
     private static final int GAME_WIDTH = 1110;
-    private static final int GAME_HEIGHT = 600;
+    private static final int GAME_HEIGHT = 550;
 
     @Override
     public void start(Stage stage) throws IOException {

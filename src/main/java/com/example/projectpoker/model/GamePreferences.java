@@ -8,7 +8,7 @@ public class GamePreferences {
     public static final int MIN_OPPONENTS = 1;
     public static final int MAX_OPPONENTS = 5;
     public static final int DEFAULT_OPPONENTS = 5;
-    public static final Difficulty DEFAULT_DIFFICULTY = Difficulty.GAMBLINGADDICT;
+    public static final Difficulty DEFAULT_DIFFICULTY = Difficulty.GAMBLING_ADDICT;
     public static final String DEFAULT_CARD_BACK_KEY = "back1";
     public static final String DEFAULT_BOARD_KEY = "classic1";
     public static final boolean DEFAULT_DARK_MODE = false;
@@ -23,6 +23,7 @@ public class GamePreferences {
             new AssetOption("back5", "Brutal", "/com/example/projectpoker/Images/Back5.png"),
             new AssetOption("back6", "Decor", "/com/example/projectpoker/Images/Back6.png"),
             new AssetOption("back7", "Necra", "/com/example/projectpoker/Images/Back7.png"),
+            new AssetOption("back13", "Pokemon", "/com/example/projectpoker/Images/Back13.png"),
             new AssetOption("back8", "Yugioh", "/com/example/projectpoker/Images/Back8.png"),
             new AssetOption("back9", "Yugioh Anime", "/com/example/projectpoker/Images/Back9.png"),
             new AssetOption("back10", "Magic the Gathering", "/com/example/projectpoker/Images/Back10.png"),

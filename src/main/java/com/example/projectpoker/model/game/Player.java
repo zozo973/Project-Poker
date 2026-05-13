@@ -245,7 +245,6 @@ public class Player {
         }
         this.activeBet = betSize;
         this.roundInvestment.add2Bets(betSize,pot);
-        System.out.println(name + " is " + action + " " + betSize);
         return betSize;
     }
 
@@ -273,9 +272,6 @@ public class Player {
         // Send current balance to database and exit game.
         if (this.action.equals(Action.FOLD)) {
             setAction(Action.FORFEIT);
-        } else {
-            System.out.println("Do you wish to forfeit all invested money in the round and exit?");
-
         }
 
     }

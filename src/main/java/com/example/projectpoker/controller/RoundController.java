@@ -28,6 +28,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 
 public class RoundController {
@@ -61,6 +62,7 @@ public class RoundController {
     @FXML private Label aiActionLabel;
     @FXML private Label aiReasonLabel;
     @FXML private Label aiStatusLabel;
+    @FXML private TextArea gameLogTextArea;
 
     private final AiCoaching aiCoaching = new AiCoaching();
     private final GamePreferencesService preferencesService = new GamePreferencesService();
@@ -163,6 +165,7 @@ public class RoundController {
         this.userPlayer = userPlayer;
         if (round != null) {
             round.addPropertyChangeListener(roundListener);
+            appendGameLog("--- Round " + round.getRoundNumber() + " ---");
         }
         runOnFxThread(this::refreshAll);
     }
@@ -197,7 +200,7 @@ public class RoundController {
 
                 if (newBalance > oldBalance) {
                     int winnings = newBalance - oldBalance;
-                    System.out.println("You just won the round congratulations you won " + winnings + " from that round");
+                    appendGameLog("You won " + winnings + " chips this round.");
                 }
             }
         });
@@ -276,15 +279,43 @@ public class RoundController {
             return;
         }
 
-        runOnFxThread(() -> {
-            boolean revealOpponents = round.getRoundStatus() == RoundStatus.SHOWDOWN;
-            pokerUI.initialiseTable();
+        runOnFxThread(this::redrawTableStateNow);
+    }
 
-            if (round.getCommunityCards() != null && !round.getCommunityCards().isEmpty()) {
-                pokerUI.displayCards(round.getCommunityCards(), TablePosition.BoardPos, true);
+    private void redrawTableStateNow() {
+        boolean revealOpponents = round.getRoundStatus() == RoundStatus.SHOWDOWN;
+        pokerUI.initialiseTable();
+
+        if (round.getCommunityCards() != null && !round.getCommunityCards().isEmpty()) {
+            pokerUI.displayCards(round.getCommunityCards(), TablePosition.BoardPos, true);
+        }
+        renderHoleCardsNow(revealOpponents, false);
+    }
+
+    private void renderCardsBeforeBetting() {
+        if (round == null || game == null || pokerUI == null) {
+            return;
+        }
+
+        if (Platform.isFxApplicationThread()) {
+            redrawTableStateNow();
+            return;
+        }
+
+        CountDownLatch latch = new CountDownLatch(1);
+        Platform.runLater(() -> {
+            try {
+                redrawTableStateNow();
+            } finally {
+                latch.countDown();
             }
-            renderHoleCardsNow(revealOpponents, false);
         });
+
+        try {
+            latch.await();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
     }
 
     private void renderNameplatesNow() {
@@ -563,8 +594,17 @@ public class RoundController {
         userPlayer.setAction(action);
         userPlayer.setActiveBet(amount);
 
-        System.out.println("Action submitted: " + action + " amount=" + amount
-        );
+        if (action == Action.CALL && amount > 0) {
+            appendGameLog("You call " + amount + ".");
+        } else if (action == Action.RAISE && amount > 0) {
+            appendGameLog("You raise to " + amount + ".");
+        } else if (action == Action.ALLIN) {
+            appendGameLog("You go all-in for " + amount + ".");
+        } else if (action == Action.CHECK) {
+            appendGameLog("You check.");
+        } else if (action == Action.FOLD) {
+            appendGameLog("You fold.");
+        }
 
 
         // Release the betting loop
@@ -618,9 +658,30 @@ public class RoundController {
             case "toPlay":
                 Platform.runLater(this::updateCallDisplay);
                 break;
+            case "logEntry":
+                appendGameLog(String.valueOf(evt.getNewValue()));
+                break;
             default:
                 break;
         }
+    }
+
+    private void appendGameLog(String message) {
+        if (message == null || message.isBlank()) {
+            return;
+        }
+        runOnFxThread(() -> {
+            if (gameLogTextArea == null) {
+                return;
+            }
+            if (!gameLogTextArea.getText().isEmpty()) {
+                gameLogTextArea.appendText("\n");
+            }
+            gameLogTextArea.appendText(message);
+            int endPosition = gameLogTextArea.getLength();
+            gameLogTextArea.positionCaret(endPosition);
+            Platform.runLater(() -> gameLogTextArea.positionCaret(gameLogTextArea.getLength()));
+        });
     }
 
     private void handlePlayerEvent(PropertyChangeEvent evt) {
@@ -696,6 +757,9 @@ public class RoundController {
                 break;
             case DEAL:
                 onDealCards();
+                break;
+            case BETTING1, BETTING2, BETTING3, BETTING4:
+                renderCardsBeforeBetting();
                 break;
             case FLOP, TURN, RIVER:
                 if (round != null) {

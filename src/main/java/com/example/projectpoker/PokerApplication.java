@@ -16,13 +16,12 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import java.io.IOException;
 
-import static com.example.projectpoker.model.statistics.SkewNormalSampler.safeRoundToInt;
 
 public class PokerApplication extends Application {
     private static final int AUTH_WIDTH = 350;
     private static final int AUTH_HEIGHT = 480;
-    private static final int GAME_WIDTH = 1050;
-    private static final int GAME_HEIGHT = 525;
+    private static final int GAME_WIDTH = 1110;
+    private static final int GAME_HEIGHT = 600;
 
     @Override
     public void start(Stage stage) throws IOException {

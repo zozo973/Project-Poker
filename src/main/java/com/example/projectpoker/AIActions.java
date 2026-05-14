@@ -35,8 +35,51 @@ public class AIActions {
         public String errormsg;
     }
 
+    public AiPlayerResponse getChoice(
+            Card[] handCards,
+            Card[] boardCards,
+            RoundStatus currentStatus,
+            int toPlay,
+            int potSize,
+            int stackSize,
+            int requiredToCall,
+            int alreadyInvested
+    ) {
+        List<Card[]> handCardsPerPlayer = new ArrayList<>();
+        handCardsPerPlayer.add(handCards);
+
+        List<Integer> stackSizes = new ArrayList<>();
+        stackSizes.add(stackSize);
+
+        List<Integer> requiredToCallList = new ArrayList<>();
+        requiredToCallList.add(requiredToCall);
+
+        List<Integer> alreadyInvestedList = new ArrayList<>();
+        alreadyInvestedList.add(alreadyInvested);
+
+        List<AiPlayerResponse> responses = getAllChoices(
+                handCardsPerPlayer,
+                boardCards,
+                currentStatus,
+                toPlay,
+                potSize,
+                stackSizes,
+                requiredToCallList,
+                alreadyInvestedList
+        );
+
+        if (responses == null || responses.isEmpty()) {
+            AiPlayerResponse r = new AiPlayerResponse();
+            r.playerNumber = 1;
+            r.errormsg = "Gemini returned no response for single AI player.";
+            return r;
+        }
+
+        return responses.get(0);
+    }
+
     // Gemini API configuration
-    private static final String GEMINI_API_KEY = "AIzaSyB-x6qYdQM0Kx0BSBn9W8mXrYaStIXClhk";
+    private static final String GEMINI_API_KEY = "api";
     // gemini-3.1-flash-lite-preview / gemma-4-31b-it / gemini-2.5-flash
     private static final String API_URL =
             "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite-preview:generateContent?key="
@@ -73,7 +116,7 @@ public class AIActions {
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
             System.out.println("[AIActions] HTTP status: " + response.statusCode());
-            System.out.println("[AIActions] Raw body: " + response.body());
+            //System.out.println("[AIActions] Raw body: " + response.body());
 
             if (response.statusCode() != 200) {
                 throw new RuntimeException("Gemini API error " + response.statusCode() + ": " + response.body());
@@ -82,7 +125,8 @@ public class AIActions {
 
             String generatedText = extractGeneratedText(jsonResponse);
 
-            System.out.println("[AIActions] Gemini raw response: " + generatedText);
+            //System.out.println("[AIActions] Gemini raw response: " + generatedText);
+            System.out.println("[AIActions] Gemini response received.");
             String cleaned = generatedText.trim();
             if (cleaned.startsWith("```")) {
                 cleaned = cleaned.replaceAll("```json", "").replaceAll("```", "").trim();
@@ -108,10 +152,10 @@ public class AIActions {
                 results.add(r);
             }
 
-            System.out.println("[AIActions] Gemini API success — got " + results.size() + " decisions for " + expectedCount + " AI players.");
+            //System.out.println("[AIActions] Gemini API success — got " + results.size() + " decisions for " + expectedCount + " AI players.");
 
         } catch (Exception e) {
-            e.printStackTrace();
+            //e.printStackTrace();
             System.err.println("[AIActions] Gemini API failed: " + e.getMessage());
             // If API fails, return CALL for all players as fallback
             results.clear();

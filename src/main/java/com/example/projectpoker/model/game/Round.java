@@ -296,48 +296,6 @@ public class Round {
 
         // Try to use Gemini first (plan A)
         aiDecisions = new HashMap<>();
-        if (roundStatus != RoundStatus.BETTING1) {
-            List<AiPlayer> aiPlayerList = new ArrayList<>();
-            List<Card[]> aiHands = new ArrayList<>();
-            for (Integer i : turnOrder) {
-                Player p = players.get(i);
-                if (p instanceof AiPlayer && !Action.hasFolded(p.getAction())) {
-                    aiPlayerList.add((AiPlayer) p);
-                    aiHands.add(p.getPlayerHand().getCards().toArray(new Card[0]));
-                }
-            }
-            if (!aiPlayerList.isEmpty()) {
-                try {
-                    Card[] board = communityCards.toArray(new Card[0]);
-                    int potSize = pots.stream().mapToInt(Pot::getPotSize).sum();
-                    List<Integer> stackSizes = aiPlayerList.stream()
-                            .map(Player::getBalance)
-                            .collect(java.util.stream.Collectors.toList());
-
-                    List<Integer> requiredToCallList = aiPlayerList.stream()
-                            .map(this::getRequiredToCall)
-                            .collect(java.util.stream.Collectors.toList());
-
-                    List<Integer> alreadyInvestedList = aiPlayerList.stream()
-                            .map(p -> p.getTotalPotInvestment(getOpenPot()))
-                            .collect(java.util.stream.Collectors.toList());
-
-                    List<AIActions.AiPlayerResponse> responses =
-                            new AIActions().getAllChoices(aiHands, board, roundStatus, toPlay, potSize, stackSizes, requiredToCallList, alreadyInvestedList
-                            );
-                    for (int i = 0; i < aiPlayerList.size(); i++) {
-                        aiDecisions.put(aiPlayerList.get(i), responses.get(i));
-                    }
-
-                } catch (Exception e) {
-                    // If fail, go plan B
-                    System.err.println("Gemini API failed, using fallback: " + e.getMessage());
-                }
-            }
-            else {
-                System.out.println("[Round] Pre-flop: skipping Gemini, using Plan B (CALL)");
-            }
-        }
         Player activePlayer;
         boolean bettingEnded;
         int maxIterations = players.size() * 20;
@@ -459,10 +417,47 @@ public class Round {
     }
 
     private void chooseAiAction(Player activePlayer) {
-        // Use Gemini to control AiPlayer's action
-        AIActions.AiPlayerResponse response = aiDecisions.get(activePlayer);
-        if (response != null && response.errormsg == null && response.action != null) {
+        int seatIndex = players.indexOf(activePlayer);
+        String aiLabel = activePlayer.getName();
+        if (aiLabel == null || aiLabel.isBlank()) {
+            aiLabel = "AI seat " + seatIndex;
+        }
+        AIActions.AiPlayerResponse response = null;
+
+        // Pre-flop: keep simple fallback to save API usage.
+        if (roundStatus == RoundStatus.BETTING1) {
+            fallbackAiAction(activePlayer);
+            return;
+        }
+
+        try {
+            Card[] handCards = activePlayer.getPlayerHand().getCards().toArray(new Card[0]);
+            Card[] boardCards = communityCards.toArray(new Card[0]);
+
+            int potSize = pots.stream().mapToInt(Pot::getPotSize).sum();
             int requiredToCall = getRequiredToCall(activePlayer);
+            int alreadyInvested = activePlayer.getTotalPotInvestment(getOpenPot());
+
+            response = new AIActions().getChoice(
+                    handCards,
+                    boardCards,
+                    roundStatus,
+                    toPlay,
+                    potSize,
+                    activePlayer.getBalance(),
+                    requiredToCall,
+                    alreadyInvested
+            );
+
+        } catch (Exception e) {
+            System.err.println("[Round] Gemini single AI request failed: " + e.getMessage());
+            fallbackAiAction(activePlayer);
+            return;
+        }
+        if (response != null && response.errormsg == null && response.action != null) {
+            System.out.println("[Round] " + aiLabel + " Gemini action: " + response.action + ", amount=" + response.amount);
+            int requiredToCall = getRequiredToCall(activePlayer);
+
             switch (response.action) {
                 case CALL:
                     int callAmount = Math.min(requiredToCall, activePlayer.getBalance());
@@ -474,17 +469,22 @@ public class Round {
                         activePlayer.setActiveBet(callAmount);
                     }
                     break;
+
                 case RAISE:
                     int alreadyInvested = activePlayer.getTotalPotInvestment(getOpenPot());
                     int maxRaiseTo = alreadyInvested + activePlayer.getBalance();
+
                     int raiseToAmount = response.amount;
                     int minimumRaiseTo = toPlay + Math.max(1, requiredToCall);
+
                     if (raiseToAmount < minimumRaiseTo) {
                         raiseToAmount = minimumRaiseTo;
                     }
+
                     if (raiseToAmount > maxRaiseTo) {
                         raiseToAmount = maxRaiseTo;
                     }
+
                     if (raiseToAmount <= toPlay || raiseToAmount <= alreadyInvested) {
                         fallbackAiAction(activePlayer);
                     } else if (raiseToAmount == maxRaiseTo) {
@@ -495,14 +495,17 @@ public class Round {
                         activePlayer.setActiveBet(raiseToAmount);
                     }
                     break;
+
                 case ALLIN:
                     activePlayer.setAction(Action.ALLIN);
                     activePlayer.setActiveBet(activePlayer.getBalance());
                     break;
+
                 case FOLD:
                     activePlayer.setAction(Action.FOLD);
                     activePlayer.setActiveBet(0);
                     break;
+
                 case CHECK:
                 default:
                     if (requiredToCall > 0) {
@@ -520,15 +523,15 @@ public class Round {
             }
             return;
         }
-        // Plan B
         if (response == null) {
             System.err.println("[Round] No Gemini decision for AI player, using fallback.");
         } else if (response.errormsg != null) {
-            System.err.println("[Round] Invalid Gemini decision for AI Player " + response.playerNumber + ": " + response.errormsg);
+            System.err.println("[Round] Invalid Gemini decision for AI Player "
+                    + response.playerNumber + ": " + response.errormsg);
         } else if (response.action == null) {
-            System.err.println("[Round] Gemini decision has null action for AI Player " + response.playerNumber + ", using fallback.");
+            System.err.println("[Round] Gemini decision has null action for AI Player "
+                    + response.playerNumber + ", using fallback.");
         }
-
         fallbackAiAction(activePlayer);
     }
 

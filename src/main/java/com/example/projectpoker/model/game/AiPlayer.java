@@ -143,7 +143,9 @@ public class AiPlayer extends Player {
                 }
                 return;
             }
-            betAmount = getMinBet() + ((getBalance() - minBet) * (random.nextInt((int) ((Math.floor((double) (getBalance() - minBet) / getMinBet() + 1))))));
+            int raiseStep = Math.max(getMinBet(), 1);
+            int maxExtraSteps = Math.max(0, (getBalance() - minBet) / raiseStep);
+            betAmount = minBet + (raiseStep * random.nextInt(maxExtraSteps + 1));
         } else {
             if (betAmount == toCall) {
                 setAction(Action.CALL);

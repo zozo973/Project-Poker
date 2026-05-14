@@ -291,6 +291,7 @@ public class PokerGameUI {
 
             view.setViewport(new Rectangle2D(0,0,width,height * position.vScale));
             view.setFitWidth(CARD_WIDTH);
+            if(position == PlayerPos){view.setFitWidth(CARD_WIDTH*1.3);} //Draw users cards larger
             view.setPreserveRatio(true);
             view.setLayoutX(position.x + i * position.spacingX);
             view.setLayoutY(position.y + i * position.spacingY);

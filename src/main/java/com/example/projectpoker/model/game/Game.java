@@ -227,7 +227,6 @@ public class Game {
             return;
         }
 
-        clearPlayerHands();
 
         GameLog.add(round.getFinalLog());
 

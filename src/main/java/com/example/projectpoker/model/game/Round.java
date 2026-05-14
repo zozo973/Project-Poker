@@ -418,7 +418,10 @@ public class Round {
                 setToPlay(getToCall(this.pots,activePlayer));
                 System.out.println(activePlayer.getName() + ", to call: " + this.toPlay + ", Action:" + activePlayer.getAction());
                 if (!Action.hasFolded(activePlayer.getAction()) && activePlayer.getAction().equals(Action.UNDECIDED)) {
-                    if (testAllPlayersFolded(activePlayer)) break;
+                    if (testAllPlayersFolded(activePlayer)) {
+                        endBetting(activePlayer);
+                        break;
+                    }
 
                     activePlayer.setIsTurn(true);
                     while (activePlayer.getIsTurn()) {
@@ -614,12 +617,11 @@ public class Round {
         System.out.println("Condition 2: "+cond2);
         System.out.println("Condition 3: "+cond3);
         System.out.println("Condition 4: "+cond4);
-
-        if (numUndecided > 0 || numAllIn > 1 || numRaise > 1) {
-            return false;
-        } else if (cond3) {
+        if (cond3) {
             playShowdown();
-            return  true;
+            return true;
+        } else if (numUndecided > 0 || numAllIn > 1 || numRaise > 1) {
+            return false;
         } else if(cond4) {
             if (numCall == 1) setBetType(BetType.SKIP2SHOWDOWN);
             else setBetType(BetType.NORMAL);

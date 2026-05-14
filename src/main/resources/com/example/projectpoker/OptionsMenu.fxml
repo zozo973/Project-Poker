@@ -1,25 +1,68 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Spinner?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
 
-<VBox alignment="CENTER" spacing="15.0"
+<VBox alignment="TOP_CENTER" spacing="12.0"
       xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
       fx:controller="com.example.projectpoker.controller.OptionsMenuController"
-      prefHeight="400.0" prefWidth="350.0">
+      prefHeight="520.0" prefWidth="350.0">
 
     <padding>
-        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
+        <Insets bottom="16.0" left="18.0" right="18.0" top="16.0"/>
     </padding>
 
-    <!-- Title -->
     <Label text="Options Menu" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
 
-    <!-- Message label for errors/success -->
+    <HBox alignment="CENTER_LEFT" spacing="10.0">
+        <Label text="Opponents" prefWidth="130.0"/>
+        <Spinner fx:id="opponentsSpinner" editable="false" prefWidth="120.0"/>
+    </HBox>
+
+    <VBox spacing="6.0" alignment="CENTER_LEFT">
+        <HBox alignment="CENTER_LEFT" spacing="10.0">
+            <Label text="Difficulty" prefWidth="130.0"/>
+            <ComboBox fx:id="difficultyComboBox" onAction="#onDifficultyChanged" prefWidth="170.0"/>
+        </HBox>
+        <Label fx:id="difficultyDescriptionLabel" wrapText="true" style="-fx-font-size: 11px; -fx-text-fill: #444;"/>
+    </VBox>
+
+    <HBox alignment="CENTER_LEFT" spacing="10.0">
+        <Label text="Theme" prefWidth="130.0"/>
+        <CheckBox fx:id="darkModeCheckBox" text="Dark Mode"/>
+    </HBox>
+
+    <Label text="Card Back" style="-fx-font-weight: bold;"/>
+    <HBox alignment="CENTER" spacing="10.0">
+        <Button text="&lt;" onAction="#previousCardBack" minWidth="36.0"/>
+        <ImageView fx:id="cardBackPreview" fitWidth="70.0" preserveRatio="true"/>
+        <Button text="&gt;" onAction="#nextCardBack" minWidth="36.0"/>
+    </HBox>
+    <Label fx:id="cardBackNameLabel"/>
+
+    <Label text="Board" style="-fx-font-weight: bold;"/>
+    <HBox alignment="CENTER" spacing="10.0">
+        <Button text="&lt;" onAction="#previousBoard" minWidth="36.0"/>
+        <ImageView fx:id="boardPreview" fitWidth="220.0" preserveRatio="true"/>
+        <Button text="&gt;" onAction="#nextBoard" minWidth="36.0"/>
+    </HBox>
+    <Label fx:id="boardNameLabel"/>
+
     <Label fx:id="messageLabel"/>
 
-    <!-- Link to main menu -->
-    <Button text="Back" onAction="#goToMain"/>
+    <HBox alignment="CENTER" spacing="10.0">
+        <Button text="Save" onAction="#savePreferences"/>
+        <Button text="Back" onAction="#goToMain"/>
+    </HBox>
+
+    <Region prefHeight="8.0"/>
 </VBox>

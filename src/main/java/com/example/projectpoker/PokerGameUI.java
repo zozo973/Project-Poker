@@ -25,6 +25,8 @@ public class PokerGameUI {
     private static final double POT_CHIP_WIDTH = 110;
     private static final String GREY_NAMEPLATE_STYLE = "-fx-background-color: grey; -fx-text-fill: black; -fx-border-color: black; -fx-border-radius: 4; -fx-background-radius: 4; -fx-padding: 4 8 4 8; -fx-font-size: 11;";
     private static final String YELLOW_NAMEPLATE_STYLE = "-fx-background-color: yellow; -fx-text-fill: black; -fx-border-color: black; -fx-border-radius: 4; -fx-background-radius: 4; -fx-padding: 4 8 4 8; -fx-font-size: 11;";
+    private static final String DEFAULT_BOARD_IMAGE = "/com/example/projectpoker/Images/Poker_Board.png";
+    private static final String DEFAULT_CARD_BACK_IMAGE = "/com/example/projectpoker/Images/Back1.png";
 
     private Pane tablePane;
     private final Map<TablePosition, Label> nameplates = new HashMap<>();
@@ -32,6 +34,20 @@ public class PokerGameUI {
     private final List<ImageView> chipViews = new ArrayList<>();
     private final Map<TablePosition, ImageView> playerChipStacks = new HashMap<>();
     private ImageView potChipStack;
+    private String boardResourcePath = DEFAULT_BOARD_IMAGE;
+    private String cardBackResourcePath = DEFAULT_CARD_BACK_IMAGE;
+
+    public void setBoardResourcePath(String boardResourcePath) {
+        if (boardResourcePath != null && !boardResourcePath.isBlank()) {
+            this.boardResourcePath = boardResourcePath;
+        }
+    }
+
+    public void setCardBackResourcePath(String cardBackResourcePath) {
+        if (cardBackResourcePath != null && !cardBackResourcePath.isBlank()) {
+            this.cardBackResourcePath = cardBackResourcePath;
+        }
+    }
 
     public void setTablePane(Pane tablePane) {
         this.tablePane = tablePane;
@@ -214,8 +230,7 @@ public class PokerGameUI {
 
     private void displayTable() {
 
-        Image tableImage =
-                loadImage("/com/example/projectpoker/Images/Poker_Board.png");
+        Image tableImage = loadImage(boardResourcePath);
 
         ImageView tableView = new ImageView(tableImage);
 
@@ -229,7 +244,7 @@ public class PokerGameUI {
     private void displayDeck(TablePosition position) {
 
         ImageView deckBottom = new ImageView(loadImage("/com/example/projectpoker/Images/Deck_Blank.png"));
-        ImageView cardBack = new ImageView(loadImage("/com/example/projectpoker/Images/Back1.png"));
+        ImageView cardBack = new ImageView(loadImage(cardBackResourcePath));
 
         deckBottom.setFitWidth(52);
         deckBottom.setPreserveRatio(true);
@@ -250,7 +265,7 @@ public class PokerGameUI {
 
     private void displayFolded() {
 
-        ImageView cardBack = new ImageView(loadImage("/com/example/projectpoker/Images/Back1.png"));
+        ImageView cardBack = new ImageView(loadImage(cardBackResourcePath));
 
         cardBack.setFitWidth(50);
         cardBack.setPreserveRatio(true);
@@ -268,7 +283,7 @@ public class PokerGameUI {
             Card card = cards.get(i);
             Image img;
             if (revealed) {img = loadImage(card.getCardImagePath());}
-            else {img = loadImage("/com/example/projectpoker/Images/Back1.png");}
+            else {img = loadImage(cardBackResourcePath);}
 
             ImageView view = new ImageView(img);
             double width = img.getWidth();

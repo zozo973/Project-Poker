@@ -17,6 +17,9 @@ public class DatabaseManager {
     public static void initializeDatabase() {
         UserDAO userDAO = new UserDAO();
         userDAO.createTable();
+        UserPreferencesDAO userPreferencesDAO = new UserPreferencesDAO();
+        userPreferencesDAO.createTable();
+        userPreferencesDAO.createDefaultRowsForMissingUsers();
         new GameSessionDAO().createTable();
         new RoundLogDAO().createTables();
     }

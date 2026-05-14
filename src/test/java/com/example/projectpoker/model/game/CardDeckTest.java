@@ -77,7 +77,7 @@ public class CardDeckTest {
     void shuffleDoesNotChangeDeckSize() {
         CardDeck testDeck = new CardDeck();
         int deckSize = drawAllCards(testDeck).size();
-        testDeck.shuffle();
+        testDeck.reset();
         int shuffledSize = drawAllCards(testDeck).size();
         assertEquals(deckSize, shuffledSize, "Shuffle should not change deck size");
     }

@@ -15,7 +15,7 @@ public class CardDeck {
         reset();
     }
 
-    public void shuffle() {
+    private void shuffle() {
         Collections.shuffle(this.cardDeck);
     }
 
@@ -38,6 +38,13 @@ public class CardDeck {
         if (cardDeck.isEmpty()) { return null; }
         Card c = cardDeck.getFirst();
         cardDeck.removeFirst();
+
+        try {
+            Thread.sleep(1500);
+        } catch (Exception e) {
+            throw new IllegalStateException("Game interrupted while drawing a card from the deck.",e);
+        }
+
         return c;
     }
 

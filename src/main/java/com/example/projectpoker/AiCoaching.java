@@ -21,7 +21,7 @@ import static com.example.projectpoker.model.game.Card.*;
 public class AiCoaching {
 
     //API Key in here
-    private static final String GEMINI_API_KEY = "API_KEY_HERE";
+    private static final String GEMINI_API_KEY = "Your API key here";
     private static final String API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" + GEMINI_API_KEY;
 
     public static class AiAdvice {

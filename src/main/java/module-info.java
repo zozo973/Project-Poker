@@ -1,12 +1,25 @@
 module com.example.projectpoker {
     requires javafx.controls;
     requires javafx.fxml;
-    requires java.net.http;
-    requires com.google.gson;
-    requires java.desktop;
+    requires javafx.web;
     requires java.sql;
+
+
+    requires org.controlsfx.controls;
+    requires com.dlsc.formsfx;
+    requires net.synedra.validatorfx;
+    requires org.kordamp.ikonli.javafx;
+    requires org.kordamp.bootstrapfx.core;
+    requires eu.hansolo.tilesfx;
+    requires com.almasb.fxgl.all;
+    requires java.desktop;
+    requires com.google.api.client;
+    requires com.google.api.client.json.gson;
+    requires com.google.gson;
+    requires java.net.http;
     requires bcrypt;
     requires javafx.graphics;
+
 
     opens com.example.projectpoker to javafx.fxml;
     exports com.example.projectpoker;

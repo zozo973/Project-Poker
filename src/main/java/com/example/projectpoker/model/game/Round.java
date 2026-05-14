@@ -619,6 +619,7 @@ public class Round {
         System.out.println("Condition 4: "+cond4);
         if (cond3) {
             playShowdown();
+            setBetType(BetType.ENDROUND);
             return true;
         } else if (numUndecided > 0 || numAllIn > 1 || numRaise > 1) {
             return false;

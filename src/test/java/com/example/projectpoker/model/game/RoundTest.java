@@ -235,7 +235,19 @@ class RoundTest {
     // All players but active player have folded test
 
     @Test
-    void testAllPlayersFoldedFalse() {
+    void testOnePLayerUndecidedAndOtherPlayersFold() {
+        players.get(0).setAction(Action.FOLD);
+        players.get(1).setAction(Action.FOLD);
+        players.get(2).setAction(Action.UNDECIDED);
+        boolean result = round.endBetting(players.getLast());
+
+        assertEquals(BetType.ENDROUND,round.getBetType());
+        assertEquals(RoundStatus.END,round.getRoundStatus());
+        assertTrue(result);
+    }
+
+    @Test
+    void testPlayerUndecidedFalse() {
         players.get(0).setAction(Action.RAISE);
         players.get(1).setAction(Action.FOLD);
         players.get(2).setAction(Action.UNDECIDED);

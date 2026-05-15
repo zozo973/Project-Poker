@@ -131,6 +131,14 @@ public class Round {
 
     public RoundLog getFinalLog() { return this.finalLog; }
 
+    public boolean isPersisted() {
+        return persisted;
+    }
+
+    public void markPersisted() {
+        this.persisted = true;
+    }
+
     public void setBetType(BetType betType) {
         var oldVal = this.betType;
         this.betType = betType;

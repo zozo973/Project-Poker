@@ -2,6 +2,7 @@ package com.example.projectpoker.model.game;
 
 import com.example.projectpoker.model.game.enums.Difficulty;
 import com.example.projectpoker.model.game.enums.GameStatus;
+import com.example.projectpoker.model.game.enums.RoundStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -193,6 +194,17 @@ class GameTest {
     void testEndSetsGameStatusToEnded() {
         game.end();
         assertEquals(GameStatus.ENDED, game.getGameStatus());
+    }
+
+    @Test
+    void testCloseSessionCountsCompletedRoundOnce() {
+        game.createNextRound();
+        game.getRound().setRoundStatus(RoundStatus.END);
+
+        game.closeSession();
+        game.closeSession();
+
+        assertEquals(1, game.getHandsPlayed());
     }
 
     // Test players are initialized with user

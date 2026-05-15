@@ -32,7 +32,6 @@ public class MainMenuController {
             messageLabel.getScene().setRoot(root);
         } catch (IOException e) {
             messageLabel.setText("Could not load Profile Menu.");
-            e.printStackTrace();
         }
     }
 

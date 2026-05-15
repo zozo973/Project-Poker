@@ -1,6 +1,6 @@
 .root {
     -fx-background-color:
-        /* 1. Square Black (Fills the window/corners) */
+                /* 1. Square Black (Fills the window/corners) */
             #111111,
                 /* 2. Curved Black (The "Outer Rail") */
             #111111,
@@ -22,12 +22,11 @@
             13;      /* Layer 4: Curves the green felt */
 
     -fx-font-family: "Segoe UI", Helvetica, Arial, sans-serif;
-    -fx-padding: 60; /* Keeps your text inside the green felt area */
+    -fx-padding: 60;
 }
 
-/* Pearl White Labels */
 .label {
-    -fx-text-fill: #F0EAD6; /* Pearl White */
+    -fx-text-fill: #F0EAD6;
     -fx-font-weight: bold;
 }
 
@@ -36,13 +35,13 @@
     -fx-border-radius: 0;
 }
 
-/* Specific style for the Login and Register buttons */
+/* Style for the Login and Register buttons */
 .rounded-button {
     -fx-background-color: #b61547;
     -fx-text-fill: #F0EAD6;
     -fx-font-size: 16px;
     -fx-font-weight: bold;
-    -fx-background-radius: 8; /* "Lightly rounded" */
+    -fx-background-radius: 8;
     -fx-border-color: #d4af37;
     -fx-border-radius: 8;
     -fx-border-width: 1;
@@ -52,9 +51,12 @@
 
 .rounded-button:hover {
     -fx-background-color: #d41a54;
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+    -fx-effect: dropshadow(gaussian, rgba(182, 21, 71, 0.5), 10, 0, 0, 0);
 }
 .button:hover {
-    -fx-background-color: #d41a54; /* Slightly lighter red on hover */
+    -fx-background-color: #d41a54;
     -fx-translate-y: -1;
 }
 

@@ -17,6 +17,9 @@ public class DatabaseManager {
     public static void initializeDatabase() {
         UserDAO userDAO = new UserDAO();
         userDAO.createTable();
+        UserPreferencesDAO userPreferencesDAO = new UserPreferencesDAO();
+        userPreferencesDAO.createTable();
+        userPreferencesDAO.createDefaultRowsForMissingUsers();
         new GameSessionDAO().createTable();
         new RoundLogDAO().createTables();
     }
@@ -58,7 +61,7 @@ public class DatabaseManager {
         new UserDAO().update(user);
     }
 
-    // Writes the final game result, including balance, hands played, wins, and session status.
+    // Writes the final game result, including balance, wins, and session status.
     public static void finalizeGameSession(int gameSessionId, User user, Game game, Player player) {
         if (user == null) {
             return;
@@ -66,11 +69,8 @@ public class DatabaseManager {
 
         initializeDatabase();
 
-        // Keep stored stats valid even if a game ends before a round is counted.
-        int handsPlayed = Math.max(game.getHandsPlayed(), 0);
         boolean wonGame = player.getBalance() > game.getStartingUserBalance();
         user.setCurrentBalance(player.getBalance());
-        user.setTotalHandsPlayed(user.getTotalHandsPlayed() + handsPlayed);
         if (wonGame) {
             user.setTotalWins(user.getTotalWins() + 1);
         }

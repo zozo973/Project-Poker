@@ -21,6 +21,7 @@ public class RoundLogDAO {
     public void createTables() {
         createRoundTable();
         createActionTable();
+        createCompletedHandTrigger();
     }
 
     // Stores one row per completed round.
@@ -60,6 +61,28 @@ public class RoundLogDAO {
                     description TEXT NOT NULL,
                     FOREIGN KEY (round_log_id) REFERENCES round_logs(id)
                 )
+                """;
+        try (Statement statement = connection.createStatement()) {
+            statement.execute(sql);
+        } catch (SQLException ex) {
+            System.err.println(ex);
+        }
+    }
+
+    // Keeps user profile hand totals in sync with the durable round log.
+    private void createCompletedHandTrigger() {
+        String sql = """
+                CREATE TRIGGER IF NOT EXISTS increment_user_hands_after_round_log
+                AFTER INSERT ON round_logs
+                BEGIN
+                    UPDATE users
+                    SET totalHandsPlayed = totalHandsPlayed + 1
+                    WHERE id = (
+                        SELECT user_id
+                        FROM game_sessions
+                        WHERE game_sessions.id = NEW.game_session_id
+                    );
+                END
                 """;
         try (Statement statement = connection.createStatement()) {
             statement.execute(sql);

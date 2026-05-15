@@ -1,11 +1,13 @@
 package com.example.projectpoker;
 
 import com.example.projectpoker.controller.RoundController;
+import com.example.projectpoker.model.GamePreferences;
 import com.example.projectpoker.model.game.Game;
 import com.example.projectpoker.model.game.Player;
 import com.example.projectpoker.model.game.enums.Difficulty;
 import com.example.projectpoker.database.DatabaseManager;
 import com.example.projectpoker.model.User;
+import com.example.projectpoker.service.GamePreferencesService;
 import com.example.projectpoker.service.SessionManager;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -14,13 +16,12 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import java.io.IOException;
 
-import static com.example.projectpoker.model.statistics.SkewNormalSampler.safeRoundToInt;
 
 public class PokerApplication extends Application {
-    private static final int AUTH_WIDTH = 400;
-    private static final int AUTH_HEIGHT = 525;
-    private static final int GAME_WIDTH = 1050;
-    private static final int GAME_HEIGHT = 525;
+    private static final int AUTH_WIDTH = 420;
+    private static final int AUTH_HEIGHT = 550;
+    private static final int GAME_WIDTH = 1110;
+    private static final int GAME_HEIGHT = 550;
 
     @Override
     public void start(Stage stage) throws IOException {
@@ -50,14 +51,24 @@ public class PokerApplication extends Application {
 
         RoundController controller = loader.getController();
         PokerGameUI pokerUI = new PokerGameUI();
+
+        GamePreferences preferences = new GamePreferencesService().loadForCurrentUser();
+        pokerUI.setCardBackResourcePath(preferences.getCardBackResourcePath());
+        pokerUI.setBoardResourcePath(preferences.getBoardResourcePath());
         controller.setUI(pokerUI);
+        controller.setPreferredDarkMode(preferences.isDarkModeEnabled());
 
         User loggedInUser = SessionManager.getCurrentUser();
         Player user = new Player(loggedInUser.getUsername(), loggedInUser.getCurrentBalance());
         int userBuyIn = loggedInUser.getCurrentBalance();
-        int blind = safeRoundToInt((userBuyIn * 0.03));
+        // TODO: Change how blind is chosen:
+        //        int blind = safeRoundToInt((userBuyIn * 0.03));
+        int blind = 30;
 
-        Game game = new Game(user, loggedInUser, userBuyIn, 6, blind, 10, 40, Difficulty.GAMBLINGADDICT);
+        int totalPlayers = preferences.getOpponentCount() + 1;
+        Difficulty difficulty = preferences.getDifficulty();
+
+        Game game = new Game(user, loggedInUser, userBuyIn, totalPlayers, blind, 10, 40, difficulty);
         controller.setGame(game);
         controller.setRound(game.getRound(), user);
         game.init();

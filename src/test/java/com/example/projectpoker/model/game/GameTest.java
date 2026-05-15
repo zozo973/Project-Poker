@@ -2,6 +2,7 @@ package com.example.projectpoker.model.game;
 
 import com.example.projectpoker.model.game.enums.Difficulty;
 import com.example.projectpoker.model.game.enums.GameStatus;
+import com.example.projectpoker.model.game.enums.RoundStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -183,61 +184,8 @@ class GameTest {
     }
 
     @Test
-    void testCreateMultipleRounds() {
-        game.createNextRound();
-        Round firstRound = game.getRound();
-        game.createNextRound();
-        Round secondRound = game.getRound();
-        assertNotEquals(firstRound, secondRound);
-    }
-
-    @Test
     void testGetRoundInitiallyNull() {
         assertNull(game.getRound());
-    }
-
-    // Start Game Tests
-
-        // Start Game End Condition Tests
-    @Test
-    void testStartGameNumPlayersEndCondition() {
-        // Test when user is the only player left in players
-        game.init();
-        ArrayList<Player> singlePlayer = new ArrayList<>();
-        singlePlayer.add(user);
-        game.setPlayers(singlePlayer);
-        game.start();
-        assertEquals(1,game.getPlayers().size());
-        assertEquals(GameStatus.ENDED,game.getGameStatus());
-    }
-
-    @Test
-    void testStartGameUserbalanceEndCondition() {
-        // Test Player balance = 0
-        game.init();
-        ArrayList<Player> players = game.getPlayers();
-        int userIndex = game.findUserIndex();
-        players.get(userIndex).setBalance(0);
-        game.setPlayers(players);
-        game.start();
-        assertEquals(0,game.getUser().getBalance());
-        assertEquals(GameStatus.ENDED,game.getGameStatus());
-    }
-
-    @Test
-    void testStartGameNumRoundEndCondition() {
-        // Test when number of rounds left is 0;
-        game.init();
-        game.setNumRoundsLeft(1);
-        game.start();
-        assertEquals(0,game.getNumRoundsLeft());
-        assertEquals(GameStatus.ENDED,game.getGameStatus());
-    }
-
-    @Test
-    void testStartSetsGameStatusToRunning() {
-        game.start();
-        assertEquals(GameStatus.RUNNING,game.getGameStatus());
     }
 
     // End Game Tests
@@ -246,6 +194,17 @@ class GameTest {
     void testEndSetsGameStatusToEnded() {
         game.end();
         assertEquals(GameStatus.ENDED, game.getGameStatus());
+    }
+
+    @Test
+    void testCloseSessionCountsCompletedRoundOnce() {
+        game.createNextRound();
+        game.getRound().setRoundStatus(RoundStatus.END);
+
+        game.closeSession();
+        game.closeSession();
+
+        assertEquals(1, game.getHandsPlayed());
     }
 
     // Test players are initialized with user

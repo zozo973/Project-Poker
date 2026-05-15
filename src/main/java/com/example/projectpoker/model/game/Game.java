@@ -5,6 +5,7 @@ import com.example.projectpoker.model.User;
 import com.example.projectpoker.model.game.enums.Action;
 import com.example.projectpoker.model.game.enums.Difficulty;
 import com.example.projectpoker.model.game.enums.GameStatus;
+import com.example.projectpoker.model.game.enums.RoundStatus;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
@@ -20,7 +21,6 @@ public class Game {
     //      players Change
     //      Round Change
 
-
     private GameStatus gameStatus;
     private ArrayList<Player> players;
     private int numRoundsLeft;
@@ -31,9 +31,8 @@ public class Game {
     private int numPlayers;
     private final int userBuyIn;
     private Round round;
-    private final ArrayList<ArrayList<RoundLogEntry>> GameLog;
+    private ArrayList<RoundLog> GameLog;
     private boolean roundAdvanceInProgress;
-
     private final int startingUserBalance;
     private int handsPlayed;
     private final User userProfile;
@@ -53,15 +52,16 @@ public class Game {
         }
     };
 
-    // Constructor called when starting a new game of poker
-    // @Params
-    //      user: The user player data
-    //      numPlayer: number of total players,
-    //      initBlind: the starting size of the blinds
-    //      whenIncreaseBlinds: How many rounds need to be played before the blinds increase
-    //      gameLength: maximum number of rounds the poker game goes for.
-    //      difficulty: affects the intelligence, risk taking and starting cash of the AI players
-    //
+    /** Constructor called when starting a new game of poker
+     * @Params
+     *      user: The user player data
+     *      numPlayer: number of total players,
+     *      initBlind: the starting size of the blinds
+     *      whenIncreaseBlinds: How many rounds need to be played before the blinds increase
+     *      gameLength: maximum number of rounds the poker game goes for.
+     *      difficulty: affects the intelligence, risk taking and starting cash of the AI players
+      */
+
 
     public Game(Player user, int userBalance, int numPlayers, int initBlind, int whenIncreaseBlinds, int gameLength, Difficulty difficulty) {
         this(user, null, userBalance, numPlayers, initBlind, whenIncreaseBlinds, gameLength, difficulty);
@@ -83,7 +83,6 @@ public class Game {
         this.handsPlayed = 0;
         this.userProfile = userProfile;
         this.gameSessionId = -1;
-        this.sessionFinalized = false;
     }
 
     public void addPropertyChangeListener(PropertyChangeListener listener) {
@@ -94,12 +93,14 @@ public class Game {
         pcs.removePropertyChangeListener(listener);
     }
 
+    public ArrayList<RoundLog> getGameLog() { return GameLog; }
+
     public GameStatus getGameStatus() {
         return gameStatus;
     }
 
     public void setGameStatus (GameStatus gameStatus) {
-        GameStatus oldVal = this.gameStatus;
+        var oldVal = this.gameStatus;
         this.gameStatus = gameStatus;
         pcs.firePropertyChange("state",oldVal,this.gameStatus);
     }
@@ -116,7 +117,8 @@ public class Game {
     }
 
     public void createNextRound() {
-        Round round = new Round(players,blindSize);
+        for (Player p : this.players) p.setMinBet((int) Math.round (this.blindSize*0.5));
+        Round round = new Round(players, blindSize, gameSessionId, handsPlayed + 1);
         pcs.firePropertyChange("round",this.round,round);
         setRound(round);
     }
@@ -132,7 +134,7 @@ public class Game {
     public int getBlindSize() { return blindSize; }
 
     public void setBlindSize(int blindSize) {
-        int oldVal = this.blindSize;
+        var oldVal = this.blindSize;
         this.blindSize = blindSize;
         pcs.firePropertyChange("blindSize",oldVal,this.blindSize);
     }
@@ -183,7 +185,7 @@ public class Game {
         startNextRound();
     }
 
-    private synchronized void startNextRound() {
+    public synchronized void startNextRound() {
 
         // Guarding behaviour so that multiple rounds cant be started simultaneously
         if (roundAdvanceInProgress) {
@@ -219,18 +221,16 @@ public class Game {
             roundAdvanceInProgress = false;
         }
     }
+
     public synchronized void onRoundEnded() {
 
-        if (round == null || round.getRoundStatus() != com.example.projectpoker.model.game.enums.RoundStatus.END) {
+        if (round == null || round.getRoundStatus() != RoundStatus.END) {
             return;
         }
 
-        clearPlayerHands();
 
-        GameLog.add(round.getRoundLog());
-        handsPlayed++;
-        // Persist the user's updated balance after each completed round, not just at full game over.
-        DatabaseManager.saveUserProgress(userProfile, getUser());
+        GameLog.add(round.getFinalLog());
+        countCompletedRound();
 
         nextRoundInitialisation();
 
@@ -262,8 +262,21 @@ public class Game {
 
         // Guard against double-saving if the game ends normally and the window also closes.
         sessionFinalized = true;
+        countCompletedRound();
         setGameStatus(GameStatus.ENDED);
         DatabaseManager.finalizeGameSession(gameSessionId, userProfile, this, getUser());
+    }
+
+    private void countCompletedRound() {
+        if (round == null
+                || round.isPersisted()
+                || round.getRoundStatus() != RoundStatus.END) {
+            return;
+        }
+
+        handsPlayed++;
+        DatabaseManager.recordRound(gameSessionId, round);
+        round.markPersisted();
     }
 
     private void nextRoundInitialisation() {
@@ -279,8 +292,9 @@ public class Game {
     }
 
     private ArrayList<Player> initAiPlayers(ArrayList<Player> players, int numPlayers, Difficulty difficulty) {
-        for (int i = numPlayers - 1; i > 0; i--) {
+        for (int i = 0; i < numPlayers - 1; i++) {
             players.add(new AiPlayer(difficulty, getUser().getBalance()));
+            players.get(i+1).setName("AI player " + (i+1));
         }
         Collections.reverse(players);
         return players;

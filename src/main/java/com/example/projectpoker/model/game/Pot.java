@@ -3,6 +3,7 @@ package com.example.projectpoker.model.game;
 import com.example.projectpoker.model.HandEvaluation;
 import com.example.projectpoker.model.PlayerResult;
 import com.example.projectpoker.model.game.enums.Action;
+import com.example.projectpoker.model.game.enums.Roles;
 import com.example.projectpoker.model.game.enums.RoundStatus;
 
 import java.util.ArrayList;
@@ -14,6 +15,7 @@ public class Pot {
     private Dictionary<Player,Integer> betTable;
     private int potSize;
     private int toPlay;
+    private int investmentPP;
     private boolean isOpen;
     private int potPriority;
 
@@ -22,6 +24,7 @@ public class Pot {
         this.betTable = new Hashtable<>();
         this.potSize = 0;
         this.toPlay = 0;
+        this.investmentPP = 0;
         this.isOpen = true;
         this.potPriority = 0;
     }
@@ -31,6 +34,7 @@ public class Pot {
         this.players.add(player);
         this.potSize = 0;
         this.potPriority = 0;
+        this.investmentPP = 0;
         this.toPlay = 0;
         this.isOpen = true;
         initBetTable();
@@ -41,6 +45,7 @@ public class Pot {
         this.players.add(player);
         this.potSize = 0;
         this.potPriority = potPriority;
+        this.investmentPP = 0;
         this.toPlay = 0;
         this.isOpen = true;
         initBetTable();
@@ -50,6 +55,7 @@ public class Pot {
         this.players = new ArrayList<>(players);
         this.potSize = 0;
         this.potPriority = 0;
+        this.investmentPP = 0;
         this.toPlay = 0;
         this.isOpen = true;
         initBetTable();
@@ -57,13 +63,32 @@ public class Pot {
 
     public ArrayList<Player> getPlayers() { return players; }
 
-    public void addPlayer(Player player) { this.players.add(player); }
+    public void addPlayer(Player player) {
+        this.players.add(player);
+        addPlayer2Table(player);
+    }
 
     public void setPlayers(ArrayList<Player> players) { this.players = players; }
 
     public int getToPlay() { return toPlay; }
 
+    public int getToPlay(Player p) {
+        if (!this.players.contains(p)) addPlayer(p);
+        return this.investmentPP - p.getTotalPotInvestment(this);
+    }
+
     public void setToPlay(int toPlay) { this.toPlay = toPlay; }
+
+    public int getInvestmentPP() { return investmentPP; }
+
+    private void setInvestmentPP() {
+        int largestInvestment = 0;
+        for (Player p : this.players) {
+            if (betTable.get(p) > largestInvestment) largestInvestment = betTable.get(p);
+        }
+        this.investmentPP = largestInvestment; }
+
+    public void setInvestmentPP(int investmentPP) { this.investmentPP = investmentPP; }
 
     public void stepPotPriority(int step) { this.potPriority += step; }
 
@@ -78,11 +103,14 @@ public class Pot {
     public boolean getIsOpen() { return isOpen; }
 
     public void setIsOpen(boolean status) {
+        if (!status) setPotPriority(-1);
         this.isOpen = status;
-        this.potPriority = -1;
     }
 
-    public void closePot() { this.isOpen = false; }
+    public void closePot() {
+        this.isOpen = false;
+        this.toPlay = 0;
+    }
 
     private void initBetTable() {
         this.betTable = new Hashtable<>();
@@ -100,22 +128,24 @@ public class Pot {
     }
 
     private void addBet2Table(Player player, int bet) {
-        int currentBets = betTable.get(player);
-        this.betTable.put(player,currentBets+bet);
-        // if (betTable.get(player) != player.getRoundInvestment().getTotalInvestment()) {
-        //     System.err.println(player.getName() + "'s bets does not match their round investments");
-        // }
+        if (!this.players.contains(player)) {
+            addPlayer(player);
+            this.betTable.put(player,bet);
+        } else {
+            int currentBets = betTable.get(player);
+            this.betTable.put(player,currentBets+bet);
+        }
     }
 
     public void addBet(Player player, int bet) {
-        player.placeBet(bet, this);
-        int playerPotInvest = player.getTotalPotInvestment(this);
-        if (playerPotInvest > this.toPlay) this.toPlay = playerPotInvest;
         addBet2Table(player, bet);
+        player.placeBet(bet, this);
 
-        //     if (Action.isRaise(player.getAction()) && player.getRoundInvestment() > this.toPlay) {
-        //        this.toPlay = player.getTotalRoundInvestment();
-        //          }
+        setInvestmentPP();
+
+        if (this.toPlay == 0 && bet > 0) this.toPlay = bet;
+        if (bet >= this.toPlay && Action.isRaise(player.getAction())) this.toPlay = investmentPP;
+
         this.potSize += bet;
     }
 
@@ -127,21 +157,20 @@ public class Pot {
         addBet2Table(players.get(turnOrder.get(1)),bigBlind);
         this.potSize = smallBlind + bigBlind;
         this.toPlay = Math.max(smallBlind, bigBlind);
+        setInvestmentPP();
     }
 
     public RoundStatus removeFolded(RoundStatus status) {
         players.removeIf(p -> p.getAction() == Action.FOLD);
+
         if (players.size() == 1) {
-            if (status != RoundStatus.SHOWDOWN) {
-                players.getFirst().win(potSize);
-                potSize = 0;
-            }
-            return RoundStatus.END;
-        }
+            return RoundStatus.SHOWDOWN;
+        } else if (status.equals(RoundStatus.END)) return RoundStatus.END;
+
         return RoundStatus.stepRoundStatus(status);
     }
 
-    public void showDown(ArrayList<Card> communityCards) {
+    public int showDown(ArrayList<Card> communityCards) {
         ArrayList<PlayerResult> gameResults;
         gameResults = HandEvaluation.whoWins(communityCards, this.players);
         int numWinners = gameResults.size();
@@ -149,23 +178,24 @@ public class Pot {
             for (Player p : players) {
                 if (p.matchId(gameResult.getPlayerId())) {
                     p.win(potSize / numWinners);
+                    p.setRole(Roles.WINNER);
                     break;
                 }
             }
         }
-        potSize = 0;
+        return numWinners;
     }
 
     public void adjustPot(Pot sidePot) {
-        if (sidePot.isOpen) {
             if (sidePot.getPotPriority() < this.potPriority) {
-                int removeToPlay = sidePot.getToPlay() - this.toPlay;
-                int removePotTotal = this.potSize - removeToPlay*players.size();
+                int removeInvestmentPP = sidePot.getInvestmentPP() - this.investmentPP;
+                int removePotTotal = this.potSize - removeInvestmentPP*players.size();
                 if (this.potSize <= 0) throw new IllegalStateException("THe pot can't have 0 or negative amount of money in it");
-                if (removeToPlay <= 0 ) throw new IllegalStateException("adjustPot Method has been implemented on the incorrect pot");
-                reInitPot(removeToPlay,removePotTotal);
+                if (removeInvestmentPP <= 0 ) throw new IllegalStateException("adjustPot Method has been implemented on the incorrect pot");
+                reInitPot(removeInvestmentPP,removePotTotal);
+
+                sidePot.initPot(this.players);
             }
-        }
     }
 
     private void reInitPot(int removeToPlay,int removePotTotal) {
@@ -177,8 +207,14 @@ public class Pot {
         }
     }
 
-    public void payOut() {
-        if (players.size() > 1) System.err.println("Payout method shouldn't be called if there is more then one player left.");
-        players.getFirst().win(potSize);
+    private void initPot(ArrayList<Player> players) {
+        for (Player p : players) {
+            if (!this.players.contains(p)) {
+                addPlayer(p);
+                addPlayer2Table(p,this.investmentPP);
+                this.potSize += this.investmentPP;
+                p.getRoundInvestment().reInit(this);
+            }
+        }
     }
 }

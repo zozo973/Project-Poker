@@ -55,7 +55,11 @@
         <Label fx:id="balanceLabel" text="\$0" styleClass="stat-value"/>
     </VBox>
 
-    <Label fx:id="messageLabel" styleClass="message-label"/>
+    <!-- Buy In button -->
+    <Button text="Buy In (+1000)" onAction="#handleBuyIn" styleClass="buyin-button"/>
+
+    <!-- Message label for errors/success -->
+    <Label fx:id="messageLabel" text="" styleClass="message-label"/>
 
     <!-- Buttons -->
     <HBox alignment="CENTER" spacing="10">

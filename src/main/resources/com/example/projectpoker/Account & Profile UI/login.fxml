@@ -21,7 +21,7 @@
     </padding>
 
     <!-- Title -->
-    <Label style="-fx-font-size: 35px; -fx-font-weight: bold;" text="Account Login" />
+    <Label style="-fx-font-size: 35px; -fx-font-weight: bold; -fx-text-fill: #d4af37;" text="Account Login" />
 
     <!-- Username field -->
     <TextField fx:id="usernameField" promptText="Enter username">

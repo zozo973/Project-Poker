@@ -26,15 +26,13 @@
     -fx-font-weight: bold;
 }
 
-/* Subtle category labels like "Username", "Total Wins" */
 .stat-label {
     -fx-text-fill: #F0EAD6;
     -fx-font-size: 16px;
     -fx-font-weight: bold;
-    -fx-padding: 10 0 0 0; /* Add a little space above each category */
+    -fx-padding: 10 0 0 0;
 }
 
-/* The actual values shown below each stat label */
 .stat-value {
     -fx-text-fill: #b61547;
     -fx-font-size: 26px;
@@ -43,8 +41,8 @@
 }
 
 .stat-value:hover {
-    -fx-text-fill: #e74c3c; /* Brighter red on hover */
-    -fx-scale-x: 1.1;       /* Grows slightly */
+    -fx-text-fill: #e74c3c;
+    -fx-scale-x: 1.1;
     -fx-scale-y: 1.1;
     /* Red glow effect */
     -fx-effect: dropshadow(three-pass-box, rgba(182, 21, 71, 0.8), 15, 0, 0, 0);
@@ -54,6 +52,13 @@
 .button {
     -fx-background-radius: 0;
     -fx-border-radius: 0;
+}
+
+.button:hover {
+    -fx-background-color: #d41a54;
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+    -fx-effect: dropshadow(gaussian, rgba(182, 21, 71, 0.5), 10, 0, 0, 0);
 }
 
 .rounded-button {
@@ -71,11 +76,9 @@
 
 .rounded-button:hover {
     -fx-background-color: #d41a54;
-}
-
-.button:hover {
-    -fx-background-color: #d41a54;
-    -fx-translate-y: -1;
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+    -fx-effect: dropshadow(gaussian, rgba(182, 21, 71, 0.5), 10, 0, 0, 0);
 }
 
 .message-label {
@@ -83,4 +86,25 @@
     -fx-font-size: 12px;
     -fx-font-weight: bold;
     -fx-wrap-text: true;
+}
+
+.buyin-button {
+    -fx-background-color: #04a12b;
+    -fx-text-fill: #F0EAD6;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8;
+    -fx-border-color: #d4af37;
+    -fx-border-radius: 8;
+    -fx-border-width: 1;
+    -fx-cursor: hand;
+    -fx-padding: 10 30 10 30;
+    -fx-min-width: 200px;
+}
+
+.buyin-button:hover {
+    -fx-background-color: #00cc33;
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+    -fx-effect: dropshadow(gaussian, rgba(182, 21, 71, 0.5), 10, 0, 0, 0);
 }

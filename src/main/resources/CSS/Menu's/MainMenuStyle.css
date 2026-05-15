@@ -12,14 +12,12 @@
     -fx-padding: 40;
 }
 
-/* Title Styling */
 .menu-title {
     -fx-font-size: 36px;
     -fx-font-weight: bold;
     -fx-text-fill: #d4af37;
 }
 
-/* Reusing your Red/Gold Button Style */
 .menu-button {
     -fx-background-color: #b61547;
     -fx-text-fill: #F0EAD6;
@@ -31,7 +29,7 @@
     -fx-border-width: 1;
     -fx-cursor: hand;
     -fx-padding: 10 30 10 30;
-    -fx-min-width: 200px; /* Keeps all buttons the same width */
+    -fx-min-width: 200px;
 }
 
 .menu-button:hover {
@@ -41,11 +39,10 @@
     -fx-effect: dropshadow(gaussian, rgba(182, 21, 71, 0.5), 10, 0, 0, 0);
 }
 
-/* Specific style for buttons that sit next to each other */
 .small-menu-button {
     -fx-background-color: #b61547;
     -fx-text-fill: #F0EAD6;
-    -fx-font-size: 14px; /* Slightly smaller font */
+    -fx-font-size: 14px;
     -fx-font-weight: bold;
     -fx-background-radius: 8;
     -fx-border-color: #d4af37;
@@ -53,7 +50,7 @@
     -fx-border-width: 1;
     -fx-cursor: hand;
     -fx-padding: 8 15 8 15;
-    -fx-min-width: 100px; /* Much smaller minimum width */
+    -fx-min-width: 100px;
     -fx-pref-width: 110px;
 }
 
@@ -75,7 +72,7 @@
     -fx-border-width: 1;
     -fx-cursor: hand;
     -fx-padding: 10 30 10 30;
-    -fx-min-width: 200px; /* Keeps all buttons the same width */
+    -fx-min-width: 200px;
 }
 
 .start-button:hover {

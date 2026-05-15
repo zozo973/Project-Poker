@@ -17,9 +17,6 @@
 
     <!-- Title -->
     <Label text="Main Menu" styleClass="menu-title">
-<!--        <VBox.margin>-->
-<!--            <Insets bottom="20.0" top="30.0"/>-->
-<!--        </VBox.margin>-->
     </Label>
 
     <!-- Message label for errors/success -->

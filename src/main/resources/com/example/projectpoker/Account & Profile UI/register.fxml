@@ -18,7 +18,7 @@
     </padding>
 
     <!-- Title -->
-    <Label text="Create Account" style="-fx-font-size: 33px; -fx-font-weight: bold;"/>
+    <Label text="Create Account" style="-fx-font-size: 35px; -fx-font-weight: bold; -fx-text-fill: #d4af37;"/>
 
     <!-- Username field -->
     <TextField fx:id="usernameField" promptText="Enter username"/>

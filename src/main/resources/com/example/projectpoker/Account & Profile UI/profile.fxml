@@ -5,11 +5,11 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.geometry.Insets?>
 
-<VBox alignment="CENTER" spacing="15.0"
+<VBox alignment="TOP_CENTER" spacing="12.0"
       xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
       fx:controller="com.example.projectpoker.controller.ProfileController"
-      prefHeight="400.0" prefWidth="350.0">
+      prefHeight="650.0" prefWidth="350.0">
 
     <padding>
         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
@@ -34,8 +34,14 @@
     <Label text="Current Balance"/>
     <Label fx:id="balanceLabel" text=""/>
 
+    <!-- Buy In button -->
+    <Button text="Buy In (+1000)" onAction="#handleBuyIn"/>
+
     <!-- Message label for errors/success -->
     <Label fx:id="messageLabel" text=""/>
+
+    <!-- Button for going back to the main menu -->
+    <Button text="Back" onAction="#goToMain"/>
 
     <!-- Button for logging out -->
     <Button text="Log Out" onAction="#logOut"/>

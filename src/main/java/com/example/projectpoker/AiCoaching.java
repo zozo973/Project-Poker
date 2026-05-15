@@ -21,7 +21,7 @@ import static com.example.projectpoker.model.game.Card.*;
 public class AiCoaching {
 
     //API Key in here
-    private static final String GEMINI_API_KEY = "";
+    private static final String GEMINI_API_KEY = "Your API key here";
     private static final String API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" + GEMINI_API_KEY;
 
     public static class AiAdvice {
@@ -180,38 +180,6 @@ public class AiCoaching {
             }
         }
         return sb.toString();
-    }
-
-
-    // For Test API connection ----------------------------------------------------------------------------------------
-    public static void main(String[] args) {
-        System.out.println("Preparing 3 different test for Ai Coaching...\n");
-
-        AiCoaching coach = new AiCoaching();
-
-        // Test 1: test Null situation
-        System.out.println("-------------------------------------------------");
-        System.out.println("Test 1：Null + 'Normal' Mode");
-        AiAdvice advice1 = coach.getAdvice(null, null, RoundStatus.BETTING1, AiAdviceMode.NORMAL);
-        printResult(advice1);
-
-        // Test 2: test the situation when user get the great cards
-        System.out.println("-------------------------------------------------");
-        System.out.println("Test 2 ：A pair of Ace + 'RISKY' Mode");
-        Card[] strongHand = {SA,HA};
-        Card[] flopBoard = {C2,D5,S9};
-        AiAdvice advice2 = coach.getAdvice(strongHand, flopBoard, RoundStatus.FLOP, AiAdviceMode.RISKY);
-        printResult(advice2);
-
-        // Test 3: test the situation when user get the bad cards
-        System.out.println("-------------------------------------------------");
-        System.out.println("Test 3：2(Hearts) & 7(Clubs) + 'SAFE' Mode");
-        Card[] weakHand = {H2,C7};
-        Card[] turnBoard = {DA,HK,SQ,CJ};
-        AiAdvice advice3 = coach.getAdvice(weakHand, turnBoard, RoundStatus.TURN, AiAdviceMode.SAFE);
-        printResult(advice3);
-
-        System.out.println("-----Finish-----");
     }
 
     private static void printResult(AiAdvice advice) {

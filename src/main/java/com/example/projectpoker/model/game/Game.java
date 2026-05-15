@@ -20,7 +20,6 @@ public class Game {
     //      players Change
     //      Round Change
 
-
     private GameStatus gameStatus;
     private ArrayList<Player> players;
     private int numRoundsLeft;
@@ -31,13 +30,13 @@ public class Game {
     private int numPlayers;
     private final int userBuyIn;
     private Round round;
-    private ArrayList<ArrayList<RoundLogEntry>> GameLog;
+    private ArrayList<RoundLog> GameLog;
     private boolean roundAdvanceInProgress;
-
     private final int startingUserBalance;
     private int handsPlayed;
     private final User userProfile;
     private int gameSessionId;
+    private boolean sessionFinalized;
 
     private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
     private final PropertyChangeListener playerActionListener = evt -> {
@@ -52,15 +51,16 @@ public class Game {
         }
     };
 
-    // Constructor called when starting a new game of poker
-    // @Params
-    //      user: The user player data
-    //      numPlayer: number of total players,
-    //      initBlind: the starting size of the blinds
-    //      whenIncreaseBlinds: How many rounds need to be played before the blinds increase
-    //      gameLength: maximum number of rounds the poker game goes for.
-    //      difficulty: affects the intelligence, risk taking and starting cash of the AI players
-    //
+    /** Constructor called when starting a new game of poker
+     * @Params
+     *      user: The user player data
+     *      numPlayer: number of total players,
+     *      initBlind: the starting size of the blinds
+     *      whenIncreaseBlinds: How many rounds need to be played before the blinds increase
+     *      gameLength: maximum number of rounds the poker game goes for.
+     *      difficulty: affects the intelligence, risk taking and starting cash of the AI players
+      */
+
 
     public Game(Player user, int userBalance, int numPlayers, int initBlind, int whenIncreaseBlinds, int gameLength, Difficulty difficulty) {
         this(user, null, userBalance, numPlayers, initBlind, whenIncreaseBlinds, gameLength, difficulty);
@@ -92,9 +92,7 @@ public class Game {
         pcs.removePropertyChangeListener(listener);
     }
 
-    public ArrayList<ArrayList<RoundLogEntry>> getGameLog() { return GameLog; }
-
-    public void setGameLog(ArrayList<ArrayList<RoundLogEntry>> gameLog) { GameLog = gameLog; }
+    public ArrayList<RoundLog> getGameLog() { return GameLog; }
 
     public GameStatus getGameStatus() {
         return gameStatus;
@@ -118,6 +116,7 @@ public class Game {
     }
 
     public void createNextRound() {
+        for (Player p : this.players) p.setMinBet((int) Math.round (this.blindSize*0.5));
         Round round = new Round(players,blindSize);
         pcs.firePropertyChange("round",this.round,round);
         setRound(round);
@@ -221,6 +220,7 @@ public class Game {
             roundAdvanceInProgress = false;
         }
     }
+
     public synchronized void onRoundEnded() {
 
         if (round == null || round.getRoundStatus() != com.example.projectpoker.model.game.enums.RoundStatus.END) {
@@ -229,7 +229,7 @@ public class Game {
 
         clearPlayerHands();
 
-        GameLog.add(round.getRoundLog());
+        GameLog.add(round.getFinalLog());
 
         nextRoundInitialisation();
 
@@ -246,29 +246,21 @@ public class Game {
         }
     }
 
-
-    public void start(boolean test) {
-        if (!test) return;
-        // Valid game before starting
-        setGameStatus(GameStatus.RUNNING);
-        while (gameStatus == GameStatus.RUNNING) {
-            // createNextRound();
-            // System.out.println(round.getRoundStatus());
-            // this.round.init();
-            // System.out.println(round.getRoundStatus());
-            //  this.round.start();
-            // System.out.println(round.getRoundStatus());
-
-            // Loss Condition
-            if (getUser().getBalance() == 0) { end(); break; }
-            else if (this.numRoundsLeft == 0) { end(); break; }
-            else if (this.players.size() == 1 && !(this.players.getFirst() instanceof AiPlayer)) { end(); break; }
-            this.GameLog.add(round.getRoundLog());
-            nextRoundInitialisation();
-        }
+    public void end() {
+        finishSession();
     }
 
-    public void end() {
+    public synchronized void closeSession() {
+        finishSession();
+    }
+
+    private synchronized void finishSession() {
+        if (sessionFinalized) {
+            return;
+        }
+
+        // Guard against double-saving if the game ends normally and the window also closes.
+        sessionFinalized = true;
         setGameStatus(GameStatus.ENDED);
         DatabaseManager.finalizeGameSession(gameSessionId, userProfile, this, getUser());
     }
@@ -286,8 +278,9 @@ public class Game {
     }
 
     private ArrayList<Player> initAiPlayers(ArrayList<Player> players, int numPlayers, Difficulty difficulty) {
-        for (int i = numPlayers - 1; i > 0; i--) {
+        for (int i = 0; i < numPlayers - 1; i++) {
             players.add(new AiPlayer(difficulty, getUser().getBalance()));
+            players.get(i+1).setName("AI player " + (i+1));
         }
         Collections.reverse(players);
         return players;

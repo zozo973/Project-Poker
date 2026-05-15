@@ -1,0 +1,46 @@
+.game-dark {
+    -fx-background-color: #000000;
+}
+
+.game-dark .border-pane,
+.game-dark .stack-pane,
+.game-dark .vbox,
+.game-dark .hbox,
+.game-dark .anchor-pane {
+    -fx-background-color: #000000;
+}
+
+.game-dark .label {
+    -fx-text-fill: #f2f2f2;
+}
+
+.game-dark .button,
+.game-dark .toggle-button,
+.game-dark .menu-button,
+.game-dark .spinner,
+.game-dark .text-field {
+    -fx-background-color: #1f1f1f;
+    -fx-text-fill: #f2f2f2;
+}
+
+.game-dark .menu-button .label,
+.game-dark .button .label,
+.game-dark .toggle-button .label {
+    -fx-text-fill: #f2f2f2;
+}
+
+/* Keep settings dropdown readable: white menu popup with black text. */
+.game-dark .context-menu {
+    -fx-background-color: white;
+}
+
+.game-dark .context-menu .label,
+.game-dark .menu-item .label,
+.game-dark .check-menu-item .label {
+    -fx-text-fill: black;
+}
+
+.game-dark .separator *.line {
+    -fx-border-color: #6d6d6d;
+}
+

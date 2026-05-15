@@ -26,23 +26,23 @@ public enum RoundStatus {
 
     private static RoundStatus getRoundStatus(int i) {
         switch (i){
-            case 1: return BLINDS;
-            case 2: return DEAL;
-            case 3: return BETTING1;
-            case 4: return FLOP;
-            case 5: return BETTING2;
-            case 6: return TURN;
-            case 7: return BETTING3;
-            case 8: return RIVER;
-            case 9: return BETTING4;
-            case 10: return SHOWDOWN;
-            case 11: return END;
+            case 0: return BLINDS;
+            case 1: return DEAL;
+            case 2: return BETTING1;
+            case 3: return FLOP;
+            case 4: return BETTING2;
+            case 5: return TURN;
+            case 6: return BETTING3;
+            case 7: return RIVER;
+            case 8: return BETTING4;
+            case 9: return SHOWDOWN;
+            case 10: return END;
             default: return UNINITIALISED;
         }
     }
 
     public static RoundStatus stepRoundStatus(RoundStatus status) {
-        if (status == END) System.err.println("Cannot step the Round status as the round has ended");
+        if (status == END) throw new IllegalStateException("Cannot step the Round status as the round has ended");
         return getRoundStatus(status.ordinal() + 1);
     }
 }

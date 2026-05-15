@@ -5,17 +5,19 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class DatabaseConnection {
+    private static final String DB_PATH_PROPERTY = "projectpoker.db.path";
     private static Connection instance = null;
-    private static final String URL = "jdbc:sqlite:projectpoker.db";
 
+    // Opens the single SQLite connection used by the DAO classes.
     private DatabaseConnection() {
         try {
-            instance = DriverManager.getConnection(URL);
+            instance = DriverManager.getConnection(getUrl());
         } catch (SQLException sqlEx) {
             throw new IllegalStateException("Failed to connect to SQLite database.", sqlEx);
         }
     }
 
+    // Returns the shared connection, reopening it if it has not been created yet.
     public static Connection getInstance() {
         try {
             if (instance == null || instance.isClosed()) {
@@ -27,6 +29,7 @@ public class DatabaseConnection {
         return instance;
     }
 
+    // Closes the shared connection so tests or shutdown code can clean up safely.
     public static void closeConnection() {
         if (instance == null) {
             return;
@@ -41,10 +44,22 @@ public class DatabaseConnection {
         }
     }
 
+    // Builds the SQLite JDBC URL, using the test database path when one is provided.
     public static String getUrl() {
         if (instance == null) {
-            new DatabaseConnection();
+            // Default to the real app database unless a test provides its own path.
+            String databasePath = System.getProperty(DB_PATH_PROPERTY, "projectpoker.db");
+            return "jdbc:sqlite:" + databasePath;
         }
-        return URL;
+        return getUrlFromConnection();
+    }
+
+    // Reads the URL from the active connection instead of rebuilding it.
+    private static String getUrlFromConnection() {
+        try {
+            return instance.getMetaData().getURL();
+        } catch (SQLException sqlEx) {
+            throw new IllegalStateException("Failed to read SQLite database URL.", sqlEx);
+        }
     }
 }

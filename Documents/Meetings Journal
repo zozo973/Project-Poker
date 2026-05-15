@@ -1,10 +1,11 @@
-6/3 Tutorial. Formed group brainstormed some ideas. Started a Discord channel for further communication.
+6/3 Tutorial 2 hour. Formed group brainstormed some ideas. Started a Discord channel for further communication.
 Named group Team Gaslight.
+- Minutes: 2 hours
 
-13/3 Tutorial. Present Ben, Basillus, Jacob, Mitch, Hugo(phone).
+13/3 Tutorial 2 hour. Present Ben, Basillis, Jacob, Mitch, Hugo(phone).
 Decided that we would do a simple banking app with the potential add-on of an investing platform.
 
-18/3 Meeting 1hour. Present Ben, Basillus, Bobby, Dylan, Hugo, Jacob
+18/3 Meeting 1 hour. Present Ben, Basillis, Bobby, Dylan, Hugo, Jacob
 
 After the project theme "Living, working, growing with AI" was released we decided that the existing project wasnt going to be sufficient to meet the criteria.
 We held a Discord call to decide on a new project idea. These were the suggestions.
@@ -19,17 +20,17 @@ PC helper- accesses screen and helps with problems you are having
 Restaurant inventory management
 Restaurant booking and management software.
 
-20/3 Tutorial Meeting
+20/3 Tutorial 2 hour Meeting
 All members present. Jacob brought in a MCDMM sheet to help us decide what the new project should be going forward.
 We had some debate over the the logistics and feasibility of some of the ideas.
 
-23/3 Drew up some simple user stories for the app. Hugo has made the repository on Github
+23/3 Meeting 30 mins. Drew up some simple user stories for the app. Hugo has made the repository on Github
 
-2/4 Meeting about Game-Logic branch
+2/4 Meeting 1 hour about Game-Logic branch
 Hugo and Jacob had a talk about the game logic structure, explained design choices and went over the process of merging respective branches into master. Set a goal for everyone to have their work ready for merging by the next meeting some time after Easter break.
 
 
-7/4 General progress meeting
+7/4 General progress meeting 1 hour
 Present- everyone
 Talked about progress
 Mitch- Started watching tutorials and testing API calls with open source models.
@@ -44,7 +45,7 @@ Outcome - Mitch and Bobby to work together on integrating AI models
 	- Dylan and Jacob work on UI
 	- Aim is to have more substantial progress by Friday (10/4)
 
-Meeting 12/4
+Meeting 30 mins 12/4
 Present Basilis, Ben, Bobby, Dylan, Jacob
 Discussed progress
 Basilis done register controller, working on login controller, almost done with login page
@@ -61,3 +62,78 @@ Dylan setting up notion management tool
 Jacob Continue on Game UI
 Bobby finish coaching branch
 Ben Troubleshoot imports
+
+Meeting 1 hour 20 minutes 24/4/26
+Present Basilis, Hugo, Bobby
+
+General discussion around the video assignment including asking the teacher questions & integrating authentication and gameplay together effectively
+
+Meeting 30 minutes 26/4/26
+Present Basilis, Ben, Bobby, Jacob, Mitch
+
+Progress is good heading into week 9 checkpoint. We have a working database, game UI, Login page, game logic and AI coaching and are making good progress on the UI. We will continue to work on integrating each new component. We will also start writing tests to ensure reliability and maintainability.
+
+Ben-
+Finished main structure of database system, awaiting further developments in features to continue implementing more functions. Will discuss with Hugo further.
+Basilis-
+Added a bunch of validation for username, email and password. I fixed the registercontroller initializing the database everytime. Also added checking for Existing Users in case someone tries to input a username that's already existing in the database.
+Mitchel
+Add AI features that can both take actions and react to changes with different personalities and integrate with the UI to print response and action.
+Bobby-
+Finished AI Coaching. It can be run in game.
+Jacob-
+Got the game working, integrated the game UI with game logic and fixed many bugs. To do: add more UI elements to the game window and write tests for HandEvaluation and PokerGameUI classes.
+
+To complete by checkpoint: User stories, Test cases for all sections, AI behaviour.
+Next meeting Wednesday after lecture.
+
+
+Meeting 30 minutes 29/4/26
+Present Basilis, Ben, Bobby, Jacob, Mitch
+
+Basilis- Edited meeting notes and fixed some of the issues and poor implementation for register controllers
+Ben- Clarified bug with UserBalance, started testing DB persistence, began writing script for video. To do: fix UserBalance bug.
+Bobby- Going to stitch together the video.
+Jacob- Finished UI elements. Cleaned up unused and unnecessary methods and across important files like Game and RoundController. Wrote Unit tests for HandEvaluation and PokerGameUI. ToDo: Menu UI assuming Dylan cant do it. Video section.
+Mitch- Got clarification on the required implementation of the AI actions, additionally provided timeline for completion. Aiming to have feature finished by end of day.
+
+Meeting 1 hour 1/5/26
+Present Basilis, Ben, Bobby, Hugo, Jacob, Mitch
+Discussed submission and video details. Decided on this structure for the video:
+
+Dylan / Basilis / Mitch 3m
+Brief introduction: project purpose and benefits
+Overview of user stories (prioritisation, estimate, acceptance criteria)
+Show planning artefacts (release plan, sprint plan, revisions)
+Low‑fidelity UI prototypes (if created)
+Show PM tool usage (boards, tasks, assignments)
+
+Jacob 3m
+Show version control workflow (commits, branches, authorship)
+Walk through relevant Java code
+JavaFX UI structure
+Demo the functional prototype (JavaFX UI + database persistence)
+
+Ben 1m
+Persistence layer (DB access, DAOs)
+
+Hugo 3m
+OO design elements
+Demonstrate the test suite
+Explain test purpose
+Show Red-Green-Refactor evidence
+Run tests
+
+Bobby will edit the video together when everyone has their sections done. We will aim to have it ready by Saturday.
+
+Tutorial meeting 8/05
+Present:
+Jacob, Ben, Mitchell.
+Discussed user testing. Created user testing document to add questions to questionnaire. Discussed that PokerApplication should be hardcoded to only 3 players to allow AI to respond quicker.
+Discussed presentation, only five people should be speaking because the presentation is only 5 mins. Currently speaking is Ben, Jacob, Mitchell. Need 2 more. Bobby already not talking. Most of the presentation will be NEED to be on the powerpoint due to time constraints.
+TO DO:
+user testing (add questions to online doc and interview users)
+potentially add leaderboard UI and database logic if time allows (Ben)
+finish UI (Dylan)
+finetuning AI (Mitchell)
+start final presentation script and powerpoint

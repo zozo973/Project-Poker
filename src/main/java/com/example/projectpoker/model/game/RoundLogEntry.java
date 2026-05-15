@@ -11,6 +11,13 @@ public class RoundLogEntry {
     private Pot currentPot;
     private String entryDescription;
 
+    // RoundLogEntry constructor for inputting end of round entry into the RoundLogEntry
+    public RoundLogEntry(String entryDescription) {
+        this.player = null;
+        this.betSize = 0;
+        this.entryDescription = entryDescription;
+    }
+
     // RoundLogEntry constructor for inputting specific entryDescriptions into the RoundLogEntry
     public RoundLogEntry(Player player, String entryDescription) {
 
@@ -51,8 +58,8 @@ public class RoundLogEntry {
 
     private void setEntryDescription() {
         String str;
-         if (action == Action.RAISE) str = " by " + Integer.toString(betSize - toCall) + "dollars.";
-         else if (action == Action.CALL) str = Integer.toString(toCall) + "dollars to play.";
+         if (action == Action.RAISE) str = " by " + Integer.toString(betSize - toCall) + " dollars.";
+         else if (action == Action.CALL) str = " " + Integer.toString(toCall) + " dollars to play.";
          else { str = "."; }
         this.entryDescription = (String) player.getName() + " decided to " + action.getDescription() + str + " The current Pot is now at " + currentPot.getPotSize() + " dollars.";
     }
@@ -61,11 +68,11 @@ public class RoundLogEntry {
 
     public String displayGameLogEntry(){
         String str;
-        if (action == Action.RAISE) str = " by " + Integer.toString(betSize - toCall) + "dollars.";
-        else if (action == Action.CALL) str = Integer.toString(toCall) + "dollars to play.";
+        if (action == Action.RAISE) str = " by " + Integer.toString(betSize - toCall) + " dollars.";
+        else if (action == Action.CALL) str = " " + Integer.toString(toCall) + " dollars to play.";
         else { str = "."; }
         String potDescription = currentPot == null ? "" : " The current Pot is now at " + currentPot.getPotSize() + " dollars.";
-        return (String) player.getName() + "decided to" + action.getDescription() + str + potDescription;
+        return (String) player.getName() + " decided to " + action.getDescription() + str + potDescription;
     }
 
     public String getPlayerName() {

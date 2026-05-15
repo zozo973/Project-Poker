@@ -2,20 +2,52 @@ package com.example.projectpoker;
 
 import com.example.projectpoker.model.game.Card;
 import com.example.projectpoker.model.game.TablePosition;
+import com.example.projectpoker.model.game.enums.Roles;
+import javafx.animation.FadeTransition;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.control.Label;
 import javafx.scene.layout.Pane;
+import javafx.util.Duration;
 
+import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static com.example.projectpoker.model.game.TablePosition.*;
 
 public class PokerGameUI {
 
     private static final double CARD_WIDTH = 50;
+    private static final double CHIP_WIDTH = 80;
+    private static final double POT_CHIP_WIDTH = 110;
+    private static final String GREY_NAMEPLATE_STYLE = "-fx-background-color: grey; -fx-text-fill: black; -fx-border-color: black; -fx-border-radius: 4; -fx-background-radius: 4; -fx-padding: 4 8 4 8; -fx-font-size: 11;";
+    private static final String YELLOW_NAMEPLATE_STYLE = "-fx-background-color: yellow; -fx-text-fill: black; -fx-border-color: black; -fx-border-radius: 4; -fx-background-radius: 4; -fx-padding: 4 8 4 8; -fx-font-size: 11;";
+    private static final String DEFAULT_BOARD_IMAGE = "/com/example/projectpoker/Images/Poker_Board.png";
+    private static final String DEFAULT_CARD_BACK_IMAGE = "/com/example/projectpoker/Images/Back1.png";
 
     private Pane tablePane;
+    private final Map<TablePosition, Label> nameplates = new HashMap<>();
+    private final Map<TablePosition, FadeTransition> activeNameplateAnimations = new HashMap<>();
+    private final List<ImageView> chipViews = new ArrayList<>();
+    private final Map<TablePosition, ImageView> playerChipStacks = new HashMap<>();
+    private ImageView potChipStack;
+    private String boardResourcePath = DEFAULT_BOARD_IMAGE;
+    private String cardBackResourcePath = DEFAULT_CARD_BACK_IMAGE;
+
+    public void setBoardResourcePath(String boardResourcePath) {
+        if (boardResourcePath != null && !boardResourcePath.isBlank()) {
+            this.boardResourcePath = boardResourcePath;
+        }
+    }
+
+    public void setCardBackResourcePath(String cardBackResourcePath) {
+        if (cardBackResourcePath != null && !cardBackResourcePath.isBlank()) {
+            this.cardBackResourcePath = cardBackResourcePath;
+        }
+    }
 
     public void setTablePane(Pane tablePane) {
         this.tablePane = tablePane;
@@ -27,33 +59,178 @@ public class PokerGameUI {
         var resource = PokerGameUI.class.getResource(path);
 
         if (resource == null) {
-            throw new RuntimeException(
-                    "Resource not found: " + path
-            );
+            throw new RuntimeException("Resource not found: " + path);
         }
 
         return new Image(resource.toExternalForm());
     }
 
-    private void initialiseTable() {
+    public void initialiseTable() {
 
         if (tablePane == null) return;
 
+        clearChips();
+        clearPlayerChipStacks();
+        clearPotChipStack();
         tablePane.getChildren().clear();
+        nameplates.clear();
 
         displayTable();
         displayDeck(DeckPos);
-        displayFolded(FoldedPos);
     }
 
-    public void clearCards() {
-        initialiseTable();
+    public void clearChips() {
+        if (tablePane == null) return;
+        for (ImageView chip : chipViews) {
+            tablePane.getChildren().remove(chip);
+        }
+        chipViews.clear();
+    }
+
+    public void clearPlayerChipStacks() {
+        if (tablePane == null) return;
+
+        for (ImageView view : playerChipStacks.values()) {
+            tablePane.getChildren().remove(view);
+        }
+
+        playerChipStacks.clear();
+    }
+
+    public void clearPotChipStack() {
+        if (tablePane == null) return;
+        if (potChipStack != null) {
+            tablePane.getChildren().remove(potChipStack);
+            potChipStack = null;
+        }
+    }
+
+    public void displayPlayerChipStack(int balance, TablePosition position) {
+        if (tablePane == null || position == null) return;
+
+        ImageView existing = playerChipStacks.remove(position);
+        if (existing != null) {
+            tablePane.getChildren().remove(existing);
+        }
+
+        if (balance <= 0) {
+            if (balance <0){throw new RuntimeException("Invalid chip size");}
+            return;
+        }
+
+        Image img = loadImage(chipImagePathForBalance(balance));
+        ImageView view = new ImageView(img);
+        view.setFitWidth(CHIP_WIDTH);
+        view.setPreserveRatio(true);
+        view.setLayoutX(position.x + position.chipOffsetX);
+        view.setLayoutY(position.y + position.chipOffsetY);
+
+        tablePane.getChildren().add(view);
+        view.toFront();
+        playerChipStacks.put(position, view);
+    }
+
+    public void displayPotChipStack(int potSize) {
+        if (tablePane == null) return;
+
+        clearPotChipStack();
+        if (potSize <= 0) {
+            return;
+        }
+
+        Image img = loadImage(chipImagePathForBalance(potSize));
+        ImageView view = new ImageView(img);
+        view.setFitWidth(POT_CHIP_WIDTH);
+        view.setPreserveRatio(true);
+        view.setLayoutX(PotPos.x);
+        view.setLayoutY(PotPos.y);
+        view.setRotate(PotPos.rotation);
+
+        tablePane.getChildren().add(view);
+        view.toFront();
+        potChipStack = view;
+    }
+
+    private String chipImagePathForBalance(int balance) {
+        if (balance <= 100) return "/com/example/projectpoker/Images/Chips1.png";
+        if (balance <= 500) return "/com/example/projectpoker/Images/Chips2.png";
+        if (balance <= 1000) return "/com/example/projectpoker/Images/Chips3.png";
+        return "/com/example/projectpoker/Images/Chips4.png";
+    }
+
+    public void clearNameplates() {
+        if (tablePane == null) return;
+
+        for (FadeTransition pulse : activeNameplateAnimations.values()) {
+            pulse.stop();
+        }
+        activeNameplateAnimations.clear();
+
+        for (Label label : nameplates.values()) {
+            tablePane.getChildren().remove(label);
+        }
+        nameplates.clear();
+    }
+
+    public void displayNameplate(String playerName, Roles role, TablePosition position, boolean isActiveTurn) {
+        if (tablePane == null || position == null) return;
+
+        //Rewrite if already exists
+        Label existing = nameplates.remove(position);
+        if (existing != null) {
+            tablePane.getChildren().remove(existing);
+        }
+
+        FadeTransition existingAnimation = activeNameplateAnimations.remove(position);
+        if (existingAnimation != null) {
+            existingAnimation.stop();
+        }
+
+        // Set non-existent players names to "Player"
+        String baseName = playerName == null || playerName.isBlank() ? "Player" : playerName;
+        Label label = new Label(baseName + roleBadge(role));
+
+        //Change label colour to show active players turn
+        label.setStyle(isActiveTurn ? YELLOW_NAMEPLATE_STYLE : GREY_NAMEPLATE_STYLE);
+
+        label.setLayoutX(position.x + position.nameplateOffsetX);
+        label.setLayoutY(position.y + position.nameplateOffsetY);
+        label.toFront();
+
+        if (isActiveTurn) {
+            FadeTransition pulse = new FadeTransition(Duration.millis(450), label);
+            pulse.setFromValue(1.0);
+            pulse.setToValue(0.6);
+            pulse.setCycleCount(FadeTransition.INDEFINITE);
+            pulse.setAutoReverse(true);
+            pulse.play();
+            activeNameplateAnimations.put(position, pulse);
+        }
+
+        //Render nameplate
+        tablePane.getChildren().add(label);
+        nameplates.put(position, label);
+    }
+
+    private String roleBadge(Roles role) {
+        if (role == null) {
+            return "";
+        }
+        switch (role) {
+            case DEALER:
+                return " [D]";
+            case SMALLBLIND:
+                return " [SB]";
+            case BIGBLIND:
+                return " [BB]";
+            default:
+                return "";
+        }
     }
 
     private void displayTable() {
 
-        Image tableImage =
-                loadImage("/com/example/projectpoker/Images/Poker_Board.png");
+        Image tableImage = loadImage(boardResourcePath);
 
         ImageView tableView = new ImageView(tableImage);
 
@@ -66,15 +243,8 @@ public class PokerGameUI {
 
     private void displayDeck(TablePosition position) {
 
-        ImageView deckBottom =
-                new ImageView(loadImage(
-                        "/com/example/projectpoker/Images/Deck_Blank.png"
-                ));
-
-        ImageView cardBack =
-                new ImageView(loadImage(
-                        "/com/example/projectpoker/Images/Back1.png"
-                ));
+        ImageView deckBottom = new ImageView(loadImage("/com/example/projectpoker/Images/Deck_Blank.png"));
+        ImageView cardBack = new ImageView(loadImage(cardBackResourcePath));
 
         deckBottom.setFitWidth(52);
         deckBottom.setPreserveRatio(true);
@@ -91,22 +261,17 @@ public class PokerGameUI {
         tablePane.getChildren().add(deckBottom);
         tablePane.getChildren().add(cardBack);
 
-
     }
 
-    private void displayFolded(TablePosition position) {
+    private void displayFolded() {
 
-        ImageView cardBack =
-                new ImageView(loadImage(
-                        "/com/example/projectpoker/Images/Back1.png"
-                ));
+        ImageView cardBack = new ImageView(loadImage(cardBackResourcePath));
 
         cardBack.setFitWidth(50);
         cardBack.setPreserveRatio(true);
-        cardBack.setLayoutX(position.x);
-        cardBack.setLayoutY(position.y);
-        cardBack.setRotate(position.rotation);
-
+        cardBack.setLayoutX(FoldedPos.x);
+        cardBack.setLayoutY(FoldedPos.y);
+        cardBack.setRotate(FoldedPos.rotation);
         tablePane.getChildren().add(cardBack);
     }
 
@@ -116,48 +281,28 @@ public class PokerGameUI {
         for (int i = 0; i < cards.size(); i++) {
 
             Card card = cards.get(i);
-
             Image img;
-
-            if (revealed) {
-                img = loadImage(card.getCardImagePath());
-            }
-            else {
-                img = loadImage(
-                        "/com/example/projectpoker/Images/Back1.png"
-                );
-            }
+            if (revealed) {img = loadImage(card.getCardImagePath());}
+            else {img = loadImage(cardBackResourcePath);}
 
             ImageView view = new ImageView(img);
-
             double width = img.getWidth();
             double height = img.getHeight();
 
-            view.setViewport(
-                    new Rectangle2D(
-                            0,
-                            0,
-                            width,
-                            height * position.vScale
-                    )
-            );
-
+            view.setViewport(new Rectangle2D(0,0,width,height * position.vScale));
             view.setFitWidth(CARD_WIDTH);
             view.setPreserveRatio(true);
-
-            view.setLayoutX(
-                    position.x + i * position.spacingX
-            );
-
-            view.setLayoutY(
-                    position.y + i * position.spacingY
-            );
-
+            view.setLayoutX(position.x + i * position.spacingX);
+            view.setLayoutY(position.y + i * position.spacingY);
             view.setRotate(position.rotation);
             view.toFront();
+
             tablePane.getChildren().add(view);
-
-
         }
     }
+
+
+
+
 }
+

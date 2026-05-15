@@ -1,6 +1,7 @@
 package com.example.projectpoker.controller;
 
 import com.example.projectpoker.AiCoaching;
+import com.example.projectpoker.model.GamePreferences;
 import com.example.projectpoker.model.game.enums.AiAdviceMode;
 
 import com.example.projectpoker.PokerGameUI;
@@ -8,22 +9,33 @@ import com.example.projectpoker.model.game.*;
 import com.example.projectpoker.model.game.TablePosition;
 import com.example.projectpoker.model.game.enums.Action;
 import com.example.projectpoker.model.game.enums.GameStatus;
-import com.example.projectpoker.model.game.enums.Roles;
 import com.example.projectpoker.model.game.enums.RoundStatus;
+import com.example.projectpoker.service.GamePreferencesService;
 import javafx.concurrent.Task;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
+import javafx.stage.Stage;
 
 
+import java.io.IOException;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
-public class RoundController implements RoundViewUpdater {
+
+public class RoundController {
+    private static final int BET_STEP = 5;
+    private static final String DARK_MODE_CLASS = "game-dark";
+    private static final String DARK_THEME_STYLESHEET = "/com/example/projectpoker/poker-round-dark.css";
+
 
     public BorderPane mainBorderPane;
     @FXML private Label roundCounterLabel;
@@ -31,7 +43,7 @@ public class RoundController implements RoundViewUpdater {
     @FXML private Label potLabel;
     @FXML private Label phaseLabel;
     @FXML private Label toCallLabel;
-    @FXML private Slider betSlider;
+    @FXML private Spinner<Integer> betSpinner;
     @FXML private Button betButton;
     @FXML private Button toCallButton;
     @FXML private Button allInButton;
@@ -39,6 +51,8 @@ public class RoundController implements RoundViewUpdater {
     @FXML private Button foldButton;
     @FXML private Button startGameButton;
     @FXML private Pane tablePane;
+    @FXML private CheckMenuItem fullscreenToggle;
+    @FXML private CheckMenuItem darkModeToggle;
 
     // For Ai Coaching
     @FXML private ToggleButton btnSafe;
@@ -48,15 +62,18 @@ public class RoundController implements RoundViewUpdater {
     @FXML private Label aiActionLabel;
     @FXML private Label aiReasonLabel;
     @FXML private Label aiStatusLabel;
+    @FXML private TextArea gameLogTextArea;
 
-    private volatile boolean actionInProgress = false;
     private final AiCoaching aiCoaching = new AiCoaching();
+    private final GamePreferencesService preferencesService = new GamePreferencesService();
     private AiAdviceMode currentAiMode = AiAdviceMode.NORMAL;
     private PokerGameUI pokerUI;
     private Game game;
     private Round round;
     private Player userPlayer;
+    private Player activeTurnPlayer;
     private volatile boolean roundTransitionInProgress;
+    private boolean preferredDarkMode;
     private final ArrayList<Player> observedPlayers = new ArrayList<>();
     private final PropertyChangeListener gameListener = this::handleGameEvent;
     private final PropertyChangeListener roundListener = this::handleRoundEvent;
@@ -66,6 +83,25 @@ public class RoundController implements RoundViewUpdater {
         this.pokerUI = pokerUI;
         pokerUI.setTablePane(tablePane);
         disableActionButtons();
+
+        if (mainBorderPane != null) {
+            mainBorderPane.sceneProperty().addListener((obs, oldScene, newScene) -> {
+                if (newScene != null) {
+                    if (darkModeToggle != null) {
+                        darkModeToggle.setSelected(preferredDarkMode);
+                    }
+                    applyDarkMode(preferredDarkMode);
+                }
+            });
+        }
+    }
+
+    public void setPreferredDarkMode(boolean enabled) {
+        preferredDarkMode = enabled;
+        if (darkModeToggle != null) {
+            darkModeToggle.setSelected(enabled);
+        }
+        applyDarkMode(enabled);
     }
 
     public void setGame(Game game) {
@@ -82,8 +118,7 @@ public class RoundController implements RoundViewUpdater {
         registerPlayerListeners(game.getPlayers());
     }
 
-    @Override
-    public void onDealCards() {
+    private void onDealCards() {
         runOnFxThread(() -> renderHoleCardsNow(false, true));
     }
 
@@ -97,7 +132,7 @@ public class RoundController implements RoundViewUpdater {
         }
 
         if (clearBeforeRender) {
-            pokerUI.clearCards();
+            pokerUI.initialiseTable();
         }
 
         ArrayList<Player> players = game.getPlayers();
@@ -108,14 +143,19 @@ public class RoundController implements RoundViewUpdater {
         int seatIndex = 1;
         for (Player player : players) {
             if (player == userPlayer) {continue;}
-            if (player.getAction() == Action.FOLD) {continue;}
             if (seatIndex >= TablePosition.PosList.size()) {break;}
 
-            // At showdown this draws face-up cards over previously drawn card backs.
-            pokerUI.displayCards(player.getPlayerHand().getCards(), TablePosition.PosList.get(seatIndex), revealOpponents);
+            if (player.getAction() != Action.FOLD) {
+                // At showdown this draws face-up cards over previously drawn card backs.
+                pokerUI.displayCards(player.getPlayerHand().getCards(), TablePosition.PosList.get(seatIndex), revealOpponents);
+            }
             seatIndex++;
         }
+
+        renderNameplatesNow();
+        renderChipStacksNow();
     }
+
     public void setRound(Round round, Player userPlayer) {
         if (this.round != null) {
             this.round.removePropertyChangeListener(roundListener);
@@ -125,16 +165,9 @@ public class RoundController implements RoundViewUpdater {
         this.userPlayer = userPlayer;
         if (round != null) {
             round.addPropertyChangeListener(roundListener);
+            appendGameLog("--- Round " + round.getRoundNumber() + " ---");
         }
         runOnFxThread(this::refreshAll);
-    }
-
-    @Override
-    public void onRoundStarted() {
-        Platform.runLater(() -> pokerUI.clearCards());
-        disableActionButtons();
-        roundTransitionInProgress = false;
-        setStartRoundButtonEnabled(false);
     }
 
     private void updateRoundCounterLabel() {
@@ -146,74 +179,49 @@ public class RoundController implements RoundViewUpdater {
         );
     }
 
-    @Override
-    public void onUserTurnStarted() {
-        actionInProgress = false;
+    private void onUserTurnStarted() {
         Platform.runLater(() -> {
             toCallButton.setDisable(false);
             betButton.setDisable(false);
             allInButton.setDisable(false);
+            // TODO User should not be able to fold if they can check
             foldButton.setDisable(false);
-            updateBetSlider();
+            updateBetInput();
         });
     }
 
-    @Override
-    public void onAiTurnStarted() {
-        Platform.runLater(this::disableActionButtons);
-    }
-
-    @Override
-    public void onBalanceChanged(Player player, int oldBalance, int newBalance) {
+    private void onBalanceChanged(Player player, int oldBalance, int newBalance) {
         Platform.runLater(() -> {
+            renderChipStacksNow();
             if (player == userPlayer) {
                 balanceLabel.setText("Balance: " + newBalance);
                 updateCallDisplay();
-                updateBetSlider();
+                updateBetInput();
 
                 if (newBalance > oldBalance) {
                     int winnings = newBalance - oldBalance;
-                    System.out.println("You just won the round congratulations you won " + winnings + " from that round");
+                    appendGameLog("You won " + winnings + " chips this round.");
                 }
             }
         });
     }
 
-    @Override
-    public void onBlindSizeChanged(int newBlindSize) {
-        Platform.runLater(this::updateBetSlider);
-    }
-
-    @Override
-    public void onPotChanged(int newPot) {
+    private void onPotChanged(int newPot) {
         Platform.runLater(() -> {
             potLabel.setText("Pot: " + newPot);
+                pokerUI.displayPotChipStack(newPot);
             updateCallDisplay();
         });
     }
 
-    @Override
-    public void onRoundStatusChanged(String phase) {
-        Platform.runLater(() ->
-                phaseLabel.setText("Phase: " + phase)
-        );
-    }
-
-    @Override
-    public void onCommunityCardsChanged(ArrayList<Card> newCC,ArrayList<Card> oldCC) {
+    private void onCommunityCardsChanged(ArrayList<Card> newCC) {
         if (pokerUI == null || newCC == null) {
             return;
         }
         Platform.runLater(() -> pokerUI.displayCards(newCC, TablePosition.BoardPos, true));
     }
 
-    @Override
-    public void onToPlayChange(int toPlay) {
-        Platform.runLater(this::updateCallDisplay);
-    }
-
-    @Override
-    public void onGameStatusChanged(GameStatus gameStatus) {
+    private void onGameStatusChanged(GameStatus gameStatus) {
 
         switch (gameStatus) {
 
@@ -233,26 +241,24 @@ public class RoundController implements RoundViewUpdater {
                         .equals(RoundStatus.UNINITIALISED)) {
 
                     throw new IllegalArgumentException(
-                            "Round must be unInitialised when game is uninitialised"
+                            "Round must be uninitialised when game is uninitialised"
                     );
                 }
 
                 reset();
                 break;
 
-            case RUNNING:
-                // Animation for blinds
-                break;
-
             case ENDED:
                 //var gameLog = game.getGameLog();
                 // TODO post-game UI
                 break;
+
+            default:
+                break;
         }
     }
 
-    @Override
-    public void onRoundCreation(Round round) {
+    private void onRoundCreation(Round round) {
         Player currentUser = userPlayer;
         if (currentUser == null && game != null) {
             currentUser = game.getUser();
@@ -260,16 +266,12 @@ public class RoundController implements RoundViewUpdater {
         setRound(round, currentUser);
     }
 
-    @Override
-    public void onPlayerChange(ArrayList<Player> newPlayers, ArrayList<Player> oldPlayers) {
+    private void onPlayerChange(ArrayList<Player> newPlayers) {
         registerPlayerListeners(newPlayers);
-    }
-
-    @Override
-    public void onPlayerActionChange(Action action) {
-        if (Action.hasFolded(action)) {
-            redrawTableState();
-        }
+        runOnFxThread(() -> {
+            renderNameplatesNow();
+            renderChipStacksNow();
+        });
     }
 
     private void redrawTableState() {
@@ -277,30 +279,95 @@ public class RoundController implements RoundViewUpdater {
             return;
         }
 
-        runOnFxThread(() -> {
-            boolean revealOpponents = round.getRoundStatus() == RoundStatus.SHOWDOWN;
-            pokerUI.clearCards();
-
-            if (round.getCommunityCards() != null && !round.getCommunityCards().isEmpty()) {
-                pokerUI.displayCards(round.getCommunityCards(), TablePosition.BoardPos, true);
-            }
-            renderHoleCardsNow(revealOpponents, false);
-        });
+        runOnFxThread(this::redrawTableStateNow);
     }
 
-    @Override
-    public void onPlayerRoleUpdate(Roles role) {
-        // Each Role should have some differentiable visual and textual feature to differentiate them in the ui.
-        switch(role) {
-            case PLAYER:
-            case DEALER:
-            case SMALLBLIND:
-            case BIGBLIND:
-                break;
+    private void redrawTableStateNow() {
+        boolean revealOpponents = round.getRoundStatus() == RoundStatus.SHOWDOWN;
+        pokerUI.initialiseTable();
+
+        if (round.getCommunityCards() != null && !round.getCommunityCards().isEmpty()) {
+            pokerUI.displayCards(round.getCommunityCards(), TablePosition.BoardPos, true);
+        }
+        renderHoleCardsNow(revealOpponents, false);
+    }
+
+    private void renderCardsBeforeBetting() {
+        if (round == null || game == null || pokerUI == null) {
+            return;
+        }
+
+        if (Platform.isFxApplicationThread()) {
+            redrawTableStateNow();
+            return;
+        }
+
+        CountDownLatch latch = new CountDownLatch(1);
+        Platform.runLater(() -> {
+            try {
+                redrawTableStateNow();
+            } finally {
+                latch.countDown();
+            }
+        });
+
+        try {
+            latch.await();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
         }
     }
 
-    public void reset() {
+    private void renderNameplatesNow() {
+        if (game == null || pokerUI == null || userPlayer == null) {
+            return;
+        }
+
+        pokerUI.clearNameplates();
+        pokerUI.displayNameplate(userPlayer.getName(), userPlayer.getRole(), TablePosition.PlayerPos, userPlayer == activeTurnPlayer);
+
+        int seatIndex = 1;
+        for (Player player : game.getPlayers()) {
+            if (player == userPlayer) {
+                continue;
+            }
+            if (seatIndex >= TablePosition.PosList.size()) {
+                break;
+            }
+
+            pokerUI.displayNameplate(
+                    player.getName(),
+                    player.getRole(),
+                    TablePosition.PosList.get(seatIndex),
+                    player == activeTurnPlayer
+            );
+            seatIndex++;
+        }
+    }
+
+    private void renderChipStacksNow() {
+        if (game == null || pokerUI == null || userPlayer == null) {
+            return;
+        }
+
+        pokerUI.clearPlayerChipStacks();
+        pokerUI.displayPlayerChipStack(userPlayer.getBalance(), TablePosition.PlayerPos);
+
+        int seatIndex = 1;
+        for (Player player : game.getPlayers()) {
+            if (player == userPlayer) {
+                continue;
+            }
+            if (seatIndex >= TablePosition.PosList.size()) {
+                break;
+            }
+
+            pokerUI.displayPlayerChipStack(player.getBalance(), TablePosition.PosList.get(seatIndex));
+            seatIndex++;
+        }
+    }
+
+    private void reset() {
         runOnFxThread(() -> {
             updateCallDisplay();
             phaseLabel.setText("Status" + RoundStatus.UNINITIALISED);
@@ -317,11 +384,15 @@ public class RoundController implements RoundViewUpdater {
         }
         if (round != null) {
             potLabel.setText("Pot: " + getTotalPotSize());
+            pokerUI.displayPotChipStack(getTotalPotSize());
+
             phaseLabel.setText("Phase: " + round.getRoundStatus());
         }
+        renderNameplatesNow();
+        renderChipStacksNow();
         updateCallDisplay();
         updateRoundCounterLabel();
-        updateBetSlider();
+        updateBetInput();
     }
 
     private void updateCallDisplay() {
@@ -349,45 +420,26 @@ public class RoundController implements RoundViewUpdater {
             Platform.runLater(action);
         }
     }
-    private void updateBetSlider() {
+
+    private void updateBetInput() {
         if (userPlayer == null || round == null) return;
 
         int balance = userPlayer.getBalance();
         int amountToCall = getAmountToCall();
-        int blind = game != null ? game.getBlindSize() : 0;
-        int minBetUnit = Math.max(blind, 1);
+        int maxRaise = Math.max(0, (balance / BET_STEP) * BET_STEP);
 
         toCallButton.setText(amountToCall > 0 ? "Call" : "Check");
 
-        if (balance <= 0) {
-            betSlider.setDisable(true);
-            betSlider.setMin(0);
-            betSlider.setMax(0);
-            betSlider.setValue(0);
+        SpinnerValueFactory.IntegerSpinnerValueFactory valueFactory =
+                new SpinnerValueFactory.IntegerSpinnerValueFactory(0, maxRaise, 0, BET_STEP);
+        betSpinner.setValueFactory(valueFactory);
+        betSpinner.setEditable(true);
+
+        if (maxRaise <= 0) {
+            betSpinner.setDisable(true);
             return;
         }
-
-        int minBet = Math.min(minBetUnit, balance);
-        int maxBet = Math.max(minBet, (balance / minBetUnit) * minBetUnit);
-
-        if (maxBet < minBet) {
-            betSlider.setDisable(true);
-            betSlider.setMin(0);
-            betSlider.setMax(0);
-            betSlider.setValue(0);
-            return;
-        }
-
-        betSlider.setDisable(false);
-        betSlider.setMin(minBet);
-        betSlider.setMax(maxBet);
-        betSlider.setMajorTickUnit(minBetUnit);
-        betSlider.setBlockIncrement(minBetUnit);
-
-        double current = betSlider.getValue();
-        if (current < minBet) current = minBet;
-        if (current > maxBet) current = maxBet;
-        betSlider.setValue(current);
+        betSpinner.setDisable(false);
     }
 
     @FXML
@@ -418,37 +470,119 @@ public class RoundController implements RoundViewUpdater {
     }
 
     @FXML
+    private void quitToMainMenu() {
+        if (game != null) {
+            game.closeSession();
+        }
+
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/projectpoker/MainMenu.fxml"));
+            Parent root = loader.load();
+
+            Stage stage = (Stage) mainBorderPane.getScene().getWindow();
+            stage.setScene(new Scene(root, 350, 400));
+            stage.setTitle("PokerPro+");
+            stage.setFullScreen(false);
+            stage.show();
+        } catch (IOException ex) {
+            aiStatusLabel.setText("Error: Could not return to main menu.");
+        }
+    }
+
+    @FXML
+    private void toggleFullscreen() {
+        if (mainBorderPane == null || mainBorderPane.getScene() == null) {
+            return;
+        }
+        Stage stage = (Stage) mainBorderPane.getScene().getWindow();
+        stage.setFullScreen(fullscreenToggle != null && fullscreenToggle.isSelected());
+    }
+
+    @FXML
+    private void toggleDarkMode() {
+        boolean enabled = darkModeToggle != null && darkModeToggle.isSelected();
+        preferredDarkMode = enabled;
+        applyDarkMode(enabled);
+        saveDarkModePreference(enabled);
+    }
+
+    private void applyDarkMode(boolean enabled) {
+        if (mainBorderPane == null || mainBorderPane.getScene() == null) {
+            return;
+        }
+
+        Scene scene = mainBorderPane.getScene();
+        String stylesheet = getClass().getResource(DARK_THEME_STYLESHEET).toExternalForm();
+        if (!scene.getStylesheets().contains(stylesheet)) {
+            scene.getStylesheets().add(stylesheet);
+        }
+
+        if (enabled) {
+            if (!scene.getRoot().getStyleClass().contains(DARK_MODE_CLASS)) {
+                scene.getRoot().getStyleClass().add(DARK_MODE_CLASS);
+            }
+        } else {
+            scene.getRoot().getStyleClass().remove(DARK_MODE_CLASS);
+        }
+    }
+
+    private void saveDarkModePreference(boolean enabled) {
+        GamePreferences current = preferencesService.loadForCurrentUser();
+        GamePreferences updated = new GamePreferences(
+                current.getOpponentCount(),
+                current.getDifficulty(),
+                current.getCardBackKey(),
+                current.getBoardKey(),
+                enabled
+        );
+        preferencesService.saveForCurrentUser(updated);
+    }
+
+    @FXML
     private void handleCall() {
-        disableActionButtons();
         int amountToCall = getAmountToCall();
         if (amountToCall > 0) {
             submitPlayerAction(Action.CALL, amountToCall);
         } else {
             submitPlayerAction(Action.CHECK, 0);
         }
+        disableActionButtons();
     }
     @FXML
     private void handleRaise() {
-        disableActionButtons();
-        int raiseAmount = (int) betSlider.getValue();
+        Integer selected = betSpinner.getValue();
+        int raiseAmount = selected == null ? 0 : selected;
+        if (raiseAmount <= 0) {
+            return;
+        }
+        int maxRaise = Math.max(0, (userPlayer.getBalance() / BET_STEP) * BET_STEP);
+        raiseAmount = Math.min(raiseAmount, maxRaise);
+        raiseAmount = (raiseAmount / BET_STEP) * BET_STEP;
+        if (raiseAmount <= 0) {
+            return;
+        }
         submitPlayerAction(Action.RAISE, raiseAmount);
+        disableActionButtons();
     }
     @FXML
     private void handleFold() {
-        disableActionButtons();
         submitPlayerAction(Action.FOLD,0);
+        disableActionButtons();
     }
     @FXML
     private void handleAllIn() {
-        disableActionButtons();
         userPlayer.setActiveBet(userPlayer.getBalance());
         submitPlayerAction(Action.ALLIN, userPlayer.getBalance());
+        disableActionButtons();
     }
 
     private void disableActionButtons() {
 
         toCallButton.setDisable(true);
         betButton.setDisable(true);
+        if (betSpinner != null) {
+            betSpinner.setDisable(true);
+        }
         foldButton.setDisable(true);
         allInButton.setDisable(true);
     }
@@ -456,15 +590,22 @@ public class RoundController implements RoundViewUpdater {
     private void submitPlayerAction(Action action, int amount) {
 
         if (userPlayer == null) return;
-        // prevent double action
-        if (actionInProgress) return;
-        actionInProgress = true;
 
         userPlayer.setAction(action);
         userPlayer.setActiveBet(amount);
 
-        System.out.println("Action submitted: " + action + " amount=" + amount
-        );
+        if (action == Action.CALL && amount > 0) {
+            appendGameLog("You call " + amount + ".");
+        } else if (action == Action.RAISE && amount > 0) {
+            appendGameLog("You raise to " + amount + ".");
+        } else if (action == Action.ALLIN) {
+            appendGameLog("You go all-in for " + amount + ".");
+        } else if (action == Action.CHECK) {
+            appendGameLog("You check.");
+        } else if (action == Action.FOLD) {
+            appendGameLog("You fold.");
+        }
+
 
         // Release the betting loop
         userPlayer.setIsTurn(false);
@@ -474,7 +615,7 @@ public class RoundController implements RoundViewUpdater {
         if (round == null || userPlayer == null) {
             return 0;
         }
-        return Math.max(0, round.getToPlay() - userPlayer.getTotalInvestment());
+        return Math.max(0, round.getTotalToPlay() - userPlayer.getTotalInvestment());
     }
 
     private void handleGameEvent(PropertyChangeEvent evt) {
@@ -484,13 +625,15 @@ public class RoundController implements RoundViewUpdater {
                 onGameStatusChanged((GameStatus) evt.getNewValue());
                 break;
             case "blindSize":
-                onBlindSizeChanged((int) evt.getNewValue());
+                Platform.runLater(this::updateBetInput);
                 break;
             case "round":
                 onRoundCreation((Round) evt.getNewValue());
                 break;
             case "players":
-                onPlayerChange(castPlayers(evt.getNewValue()), castPlayers(evt.getOldValue()));
+                @SuppressWarnings("unchecked")
+                ArrayList<Player> newPlayers = (ArrayList<Player>) evt.getNewValue();
+                onPlayerChange(newPlayers);
                 break;
             default:
                 break;
@@ -508,14 +651,37 @@ public class RoundController implements RoundViewUpdater {
                 executeRoundStateUpdate((RoundStatus) evt.getNewValue());
                 break;
             case "communityCards":
-                onCommunityCardsChanged(castCards(evt.getNewValue()), castCards(evt.getOldValue()));
+                @SuppressWarnings("unchecked")
+                ArrayList<Card> newCC = (ArrayList<Card>) evt.getNewValue();
+                onCommunityCardsChanged(newCC);
                 break;
             case "toPlay":
-                onToPlayChange((int) evt.getNewValue());
+                Platform.runLater(this::updateCallDisplay);
+                break;
+            case "logEntry":
+                appendGameLog(String.valueOf(evt.getNewValue()));
                 break;
             default:
                 break;
         }
+    }
+
+    private void appendGameLog(String message) {
+        if (message == null || message.isBlank()) {
+            return;
+        }
+        runOnFxThread(() -> {
+            if (gameLogTextArea == null) {
+                return;
+            }
+            if (!gameLogTextArea.getText().isEmpty()) {
+                gameLogTextArea.appendText("\n");
+            }
+            gameLogTextArea.appendText(message);
+            int endPosition = gameLogTextArea.getLength();
+            gameLogTextArea.positionCaret(endPosition);
+            Platform.runLater(() -> gameLogTextArea.positionCaret(gameLogTextArea.getLength()));
+        });
     }
 
     private void handlePlayerEvent(PropertyChangeEvent evt) {
@@ -527,10 +693,15 @@ public class RoundController implements RoundViewUpdater {
                 handleBalanceChange(evt);
                 break;
             case "action":
-                onPlayerActionChange((Action) evt.getNewValue());
+                if (Action.hasFolded((Action) evt.getNewValue())) {
+                    redrawTableState();
+                }
                 break;
             case "role":
-                onPlayerRoleUpdate((Roles) evt.getNewValue());
+                runOnFxThread(() -> {
+                    renderNameplatesNow();
+                    renderChipStacksNow();
+                });
                 break;
             default:
                 break;
@@ -539,19 +710,36 @@ public class RoundController implements RoundViewUpdater {
 
     private void handleTurnChange(PropertyChangeEvent evt) {
         boolean isTurn = (boolean) evt.getNewValue();
-        if (!isTurn) {
+        if (!(evt.getSource() instanceof Player turnPlayer)) {
             return;
         }
 
-        if (evt.getSource() instanceof AiPlayer) {
-            onAiTurnStarted();
-        } else if (evt.getSource() instanceof Player) {
-            onUserTurnStarted();
+        if (isTurn) {
+            activeTurnPlayer = turnPlayer;
+            runOnFxThread(() -> {
+                renderNameplatesNow();
+                renderChipStacksNow();
+            });
+
+            if (turnPlayer instanceof AiPlayer) {
+                Platform.runLater(this::disableActionButtons);
+            } else {
+                onUserTurnStarted();
+            }
+            return;
+        }
+
+        if (turnPlayer == activeTurnPlayer) {
+            activeTurnPlayer = null;
+            runOnFxThread(() -> {
+                renderNameplatesNow();
+                renderChipStacksNow();
+            });
         }
     }
 
     private void handleBalanceChange(PropertyChangeEvent evt) {
-        if (!(evt.getSource() instanceof Player player) || evt.getSource() instanceof AiPlayer) {
+        if (!(evt.getSource() instanceof Player player)) {
             return;
         }
 
@@ -559,28 +747,28 @@ public class RoundController implements RoundViewUpdater {
     }
 
     private void executeRoundStateUpdate(RoundStatus status) {
-        onRoundStatusChanged(status.name());
+        Platform.runLater(() ->phaseLabel.setText("Phase: " + status.name()));
         if (status != RoundStatus.END) {
             roundTransitionInProgress = false;
         }
         setStartRoundButtonEnabled(status == RoundStatus.END);
         switch (status) {
             case UNINITIALISED:
-                onRoundStarted();
                 break;
             case DEAL:
                 onDealCards();
                 break;
-            case FLOP:
-            case TURN:
-            case RIVER:
+            case BETTING1, BETTING2, BETTING3, BETTING4:
+                renderCardsBeforeBetting();
+                break;
+            case FLOP, TURN, RIVER:
                 if (round != null) {
-                    onCommunityCardsChanged(round.getCommunityCards(), null);
+                    onCommunityCardsChanged(round.getCommunityCards());
                 }
                 break;
             case SHOWDOWN:
                 if (round != null) {
-                    onCommunityCardsChanged(round.getCommunityCards(), null);
+                    onCommunityCardsChanged(round.getCommunityCards());
                     revealOpponentCardsAtShowdown();
                 }
                 break;
@@ -612,58 +800,61 @@ public class RoundController implements RoundViewUpdater {
         }
     }
 
-    @SuppressWarnings("unchecked")
-    private ArrayList<Player> castPlayers(Object value) {
-        return value == null ? null : (ArrayList<Player>) value;
+
+    @FXML
+    private void handleAiMode() {
+        if (btnSafe.isSelected())       currentAiMode = AiAdviceMode.SAFE;
+        else if (btnRisky.isSelected()) currentAiMode = AiAdviceMode.RISKY;
+        else                            currentAiMode = AiAdviceMode.NORMAL;
     }
 
-    @SuppressWarnings("unchecked")
-    private ArrayList<Card> castCards(Object value) {
-        return value == null ? null : (ArrayList<Card>) value;
+    @FXML
+    private void handleAiGenerate() {
+        btnGenerate.setDisable(true);
+        aiStatusLabel.setText("Asking AI...");
+        aiActionLabel.setText("Action: -");
+        aiReasonLabel.setText("Reason: -");
+
+            if (userPlayer == null || userPlayer.getPlayerHand() == null || userPlayer.getPlayerHand().getCards() == null) {
+                aiStatusLabel.setText("AI unavailable: player hand not ready yet.");
+                btnGenerate.setDisable(false);
+                return;
+            }
+
+            if (round == null || round.getCommunityCards() == null) {
+                aiStatusLabel.setText("AI unavailable: round not ready yet.");
+                btnGenerate.setDisable(false);
+                return;
+            }
+
+        Card[] hand  = userPlayer.getPlayerHand().getCards().toArray(new Card[0]);
+        Card[] board = round.getCommunityCards().toArray(new Card[0]);
+        RoundStatus status = round.getRoundStatus();
+
+
+        Task<AiCoaching.AiAdvice> task = new Task<>() {
+            @Override protected AiCoaching.AiAdvice call() {
+                return aiCoaching.getAdvice(hand, board, status, currentAiMode);
+            }
+        };
+        task.setOnSucceeded(e -> Platform.runLater(() -> {
+            AiCoaching.AiAdvice advice = task.getValue();
+            if (advice.errormsg != null) {
+                aiActionLabel.setText("Action: -");
+                aiReasonLabel.setText("Reason: -");
+                aiStatusLabel.setText("Error: " + advice.errormsg);
+            } else {
+                aiActionLabel.setText("Action: " + advice.action + " (" + advice.confidence + "%)");
+                aiReasonLabel.setText("Reason: " + advice.reason);
+                aiStatusLabel.setText("Done.");
+            }
+            btnGenerate.setDisable(false);
+        }));
+        task.setOnFailed(e -> Platform.runLater(() -> {
+            aiStatusLabel.setText("Error: Connection failed.");
+            btnGenerate.setDisable(false);
+        }));
+        new Thread(task, "AiCoach-Thread").start();
     }
-
-@FXML
-private void handleAiMode() {
-    if (btnSafe.isSelected())       currentAiMode = AiAdviceMode.SAFE;
-    else if (btnRisky.isSelected()) currentAiMode = AiAdviceMode.RISKY;
-    else                            currentAiMode = AiAdviceMode.NORMAL;
-}
-
-@FXML
-private void handleAiGenerate() {
-    btnGenerate.setDisable(true);
-    aiStatusLabel.setText("Asking AI...");
-    aiActionLabel.setText("Action: -");
-    aiReasonLabel.setText("Reason: -");
-
-    Card[] hand  = userPlayer.getPlayerHand().getCards().toArray(new Card[0]);
-    Card[] board = round.getCommunityCards().toArray(new Card[0]);
-    RoundStatus status = round.getRoundStatus();
-
-
-    Task<AiCoaching.AiAdvice> task = new Task<>() {
-        @Override protected AiCoaching.AiAdvice call() {
-            return aiCoaching.getAdvice(hand, board, status, currentAiMode);
-        }
-    };
-    task.setOnSucceeded(e -> Platform.runLater(() -> {
-        AiCoaching.AiAdvice advice = task.getValue();
-        if (advice.errormsg != null) {
-            aiActionLabel.setText("Action: -");
-            aiReasonLabel.setText("Reason: -");
-            aiStatusLabel.setText("Error: " + advice.errormsg);
-        } else {
-            aiActionLabel.setText("Action: " + advice.action + " (" + advice.confidence + "%)");
-            aiReasonLabel.setText("Reason: " + advice.reason);
-            aiStatusLabel.setText("Done.");
-        }
-        btnGenerate.setDisable(false);
-    }));
-    task.setOnFailed(e -> Platform.runLater(() -> {
-        aiStatusLabel.setText("Error: Connection failed.");
-        btnGenerate.setDisable(false);
-    }));
-    new Thread(task, "AiCoach-Thread").start();
-}
 }
 

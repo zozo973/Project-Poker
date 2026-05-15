@@ -3,142 +3,112 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.control.*?>
 
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.example.projectpoker.controller.RoundController"
+            fx:id="mainBorderPane"
+            prefWidth="1110"
+            prefHeight="620">
 
-<StackPane xmlns="http://javafx.com/javafx"
-        xmlns:fx="http://javafx.com/fxml"
-        fx:controller="com.example.projectpoker.controller.RoundController"
-        prefWidth="1000"
-        prefHeight="700">
+    <top>
+        <HBox spacing="20" alignment="CENTER_LEFT" style="-fx-padding: 8 10 8 10;">
+            <Label text="App Name"/>
+            <Label text="Profile Name"/>
+            <MenuButton text="Settings / Options">
+                <items>
+                    <MenuItem text="Quit to Main Menu" onAction="#quitToMainMenu"/>
+                    <CheckMenuItem fx:id="fullscreenToggle" text="Fullscreen" onAction="#toggleFullscreen"/>
+                    <CheckMenuItem fx:id="darkModeToggle" text="Dark Mode" onAction="#toggleDarkMode"/>
+                </items>
+            </MenuButton>
+        </HBox>
+    </top>
 
-    <BorderPane fx:id="mainBorderPane">
+    <center>
+        <VBox alignment="TOP_CENTER">
 
-        <top>
-            <HBox spacing="20" alignment="CENTER_LEFT" style="-fx-padding: 10;">
-                <Label text="App Name"/>
-                <Label text="Profile Name"/>
-                <Label text="Settings / Options"/>
-            </HBox>
-        </top>
-
-        <center>
-
-            <StackPane>
-
+            <StackPane VBox.vgrow="NEVER">
                 <AnchorPane fx:id="tablePane"
-                            minWidth="600"
-                            minHeight="400"/>
+                            minWidth="820"
+                            prefWidth="820"
+                            minHeight="390"
+                            prefHeight="390"/>
 
-                <VBox alignment="TOP_LEFT"
-                      spacing="5"
-                      style="-fx-padding: 10;">
-
-                    <Label fx:id="roundCounterLabel"
-                           text="Rounds Left"/>
-
-                    <Label fx:id="phaseLabel"
-                           text="Phase"/>
-
-                    <Label fx:id="potLabel"
-                           text="Pot"/>
-
-                    <Label fx:id="toCallLabel"
-                           text="To Call"/>
-
-                    <Label fx:id="balanceLabel"
-                           text="Balance"/>
-
-                </VBox>
-
+                <Button fx:id="startGameButton"
+                        text="Start Game"
+                        StackPane.alignment="CENTER"
+                        prefWidth="120"
+                        onAction="#onStartGameButton"/>
             </StackPane>
 
-        </center>
-
-
-        <right>
-
-            <!--Window box of AI Coaching -->
-            <VBox spacing="10" prefWidth="240" style="-fx-padding: 10;" VBox.vgrow="ALWAYS">
-                <Label text="AI Coach"/>
-
-                <HBox spacing="4">
-                    <ToggleButton fx:id="btnSafe" text="SAFE" onAction="#handleAiMode"/>
-                    <ToggleButton fx:id="btnNormal" text="NORMAL" onAction="#handleAiMode" selected="true"/>
-                    <ToggleButton fx:id="btnRisky" text="RISKY" onAction="#handleAiMode"/>
-                </HBox>
-
-                <Button fx:id="btnGenerate" text="Get AI Advice" maxWidth="Infinity" onAction="#handleAiGenerate"/>
-                <Label text="Result:"/>
-
-                <VBox spacing="6" prefHeight="220" VBox.vgrow="ALWAYS" style="-fx-border-color: grey; -fx-border-width: 1; -fx-padding: 8;">
-                    <Label fx:id="aiActionLabel" text="Action: -" style="-fx-font-weight: bold; -fx-font-size: 18;"/>
-                    <Label fx:id="aiReasonLabel" text="Reason: -" wrapText="true" style="-fx-font-size: 18;"/>
-                    <Label fx:id="aiStatusLabel" text="Press the button to get advice." style="-fx-text-fill: grey; -fx-font-size: 14;" wrapText="true"/>
-                    <Separator/>
-
-                    <Label text="⚠ AI advice is for reference only. Use your own judgement." wrapText="true" style="-fx-text-fill: grey; -fx-font-size: 12; -fx-font-style: italic;"/>
+            <HBox spacing="30" alignment="CENTER" style="-fx-padding: 6 15 4 15;" VBox.vgrow="NEVER">
+                <VBox spacing="2" alignment="CENTER_LEFT">
+                    <Label fx:id="balanceLabel" text="Balance"/>
+                    <Label fx:id="toCallLabel" text="To Call"/>
                 </VBox>
+                <VBox spacing="2" alignment="CENTER_LEFT">
+                    <Label fx:id="phaseLabel" text="Phase"/>
+                    <Label fx:id="roundCounterLabel" text="Rounds Left"/>
+                    <Label fx:id="potLabel" text="Pot"/>
+                </VBox>
+                <Spinner fx:id="betSpinner" prefWidth="160"/>
+            </HBox>
+
+            <HBox spacing="12" alignment="CENTER" style="-fx-padding: 0 15 8 15;" VBox.vgrow="NEVER">
+                <Button fx:id="startRoundButton"
+                        text="Start Round"
+                        prefWidth="110"
+                        disable="true"
+                        onAction="#onStartRoundButton"/>
+                <Button fx:id="toCallButton"
+                        text="Check / Call"
+                        prefWidth="110"
+                        onAction="#handleCall"/>
+                <Button fx:id="betButton"
+                        text="Raise"
+                        prefWidth="110"
+                        onAction="#handleRaise"/>
+                <Button fx:id="foldButton"
+                        text="Fold"
+                        prefWidth="110"
+                        onAction="#handleFold"/>
+                <Button fx:id="allInButton"
+                        text="All In"
+                        prefWidth="110"
+                        onAction="#handleAllIn"/>
+            </HBox>
+
+        </VBox>
+    </center>
+
+    <right>
+        <VBox spacing="8" prefWidth="280" style="-fx-padding: 10;">
+            <Label text="AI Coach" style="-fx-font-weight: bold;"/>
+
+            <HBox spacing="4">
+                <ToggleButton fx:id="btnSafe" text="SAFE" onAction="#handleAiMode"/>
+                <ToggleButton fx:id="btnNormal" text="NORMAL" onAction="#handleAiMode" selected="true"/>
+                <ToggleButton fx:id="btnRisky" text="RISKY" onAction="#handleAiMode"/>
+            </HBox>
+
+            <Button fx:id="btnGenerate" text="Get AI Advice" maxWidth="Infinity" onAction="#handleAiGenerate"/>
+            <Label text="Result:"/>
+
+            <VBox spacing="6" style="-fx-border-color: grey; -fx-border-width: 1; -fx-padding: 8;" VBox.vgrow="NEVER">
+                <Label fx:id="aiActionLabel" text="Action: -" style="-fx-font-weight: bold;"/>
+                <Label fx:id="aiReasonLabel" text="Reason: -" wrapText="true"/>
+                <Label fx:id="aiStatusLabel" text="Press the button to get advice." style="-fx-text-fill: grey; -fx-font-size: 11;" wrapText="true"/>
+                <Separator/>
+                <Label text="⚠ AI advice is for reference only. Use your own judgement." wrapText="true" style="-fx-text-fill: grey; -fx-font-size: 11; -fx-font-style: italic;"/>
             </VBox>
 
-        </right>
+            <Label text="Game Actions"/>
+            <TextArea fx:id="gameLogTextArea"
+                      editable="false"
+                      wrapText="true"
+                      focusTraversable="false"
+                      VBox.vgrow="ALWAYS"/>
+        </VBox>
+    </right>
 
-
-        <bottom>
-
-            <VBox spacing="10"
-                  alignment="CENTER"
-                  style="-fx-padding: 15;">
-
-
-                <Slider fx:id="betSlider"
-                        prefWidth="400"
-                        showTickMarks="true"
-                        showTickLabels="true"/>
-
-
-                <HBox spacing="20"
-                      alignment="CENTER">
-
-                    <Button fx:id="startRoundButton"
-                            text="Start Round"
-                            prefWidth="120"
-                            disable="true"
-                            onAction="#onStartRoundButton"
-                    />
-
-                    <Button fx:id="toCallButton"
-                            text="Check / Call"
-                            prefWidth="120"
-                            onAction="#handleCall"/>
-
-                    <Button fx:id="betButton"
-                            text="Raise"
-                            prefWidth="120"
-                            onAction="#handleRaise"/>
-
-                    <Button fx:id="foldButton"
-                            text="Fold"
-                            prefWidth="120"
-                            onAction="#handleFold"/>
-
-                    <Button fx:id="allInButton"
-                            text="All In"
-                            prefWidth="120"
-                            onAction="#handleAllIn"
-                    />
-
-                </HBox>
-
-            </VBox>
-
-        </bottom>
-
-    </BorderPane>
-
-    <Button fx:id="startGameButton"
-            text="Start Game"
-            StackPane.alignment="CENTER"
-            prefWidth="120"
-            onAction="#onStartGameButton"
-    />
-
-</StackPane>
+</BorderPane>

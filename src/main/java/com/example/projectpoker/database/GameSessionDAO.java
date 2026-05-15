@@ -13,10 +13,12 @@ import java.sql.Statement;
 public class GameSessionDAO {
     private final Connection connection;
 
+    // Uses the shared SQLite connection for game session queries.
     public GameSessionDAO() {
         this.connection = DatabaseConnection.getInstance();
     }
 
+    // Creates the table that tracks each poker game from start to finish.
     public void createTable() {
         String sql = """
                 CREATE TABLE IF NOT EXISTS game_sessions (
@@ -43,6 +45,7 @@ public class GameSessionDAO {
         }
     }
 
+    // Inserts a new game session and returns the generated session id.
     public int insert(User user, Game game, Player player) {
         String sql = """
                 INSERT INTO game_sessions (
@@ -63,6 +66,7 @@ public class GameSessionDAO {
             statement.setString(9, game.getGameStatus() == null ? "CREATED" : game.getGameStatus().name());
             statement.executeUpdate();
 
+            // The id links later round logs and final results to this session.
             try (ResultSet keys = statement.getGeneratedKeys()) {
                 if (keys.next()) {
                     return keys.getInt(1);
@@ -74,6 +78,7 @@ public class GameSessionDAO {
         return -1;
     }
 
+    // Marks a session as finished and records the user's ending balance.
     public void finish(int sessionId, int endingBalance, String status) {
         String sql = """
                 UPDATE game_sessions

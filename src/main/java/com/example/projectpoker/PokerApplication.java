@@ -17,8 +17,8 @@ import java.io.IOException;
 import static com.example.projectpoker.model.statistics.SkewNormalSampler.safeRoundToInt;
 
 public class PokerApplication extends Application {
-    private static final int AUTH_WIDTH = 350;
-    private static final int AUTH_HEIGHT = 480;
+    private static final int AUTH_WIDTH = 400;
+    private static final int AUTH_HEIGHT = 525;
     private static final int GAME_WIDTH = 1050;
     private static final int GAME_HEIGHT = 525;
 
@@ -30,7 +30,6 @@ public class PokerApplication extends Application {
 
         stage.setTitle("PokerPro+");
         stage.setScene(scene);
-//        stage.setMaximized(false);
         stage.show();
     }
     public void createPokerGame(Stage gameStage) throws IOException {
@@ -67,7 +66,6 @@ public class PokerApplication extends Application {
         gameStage.setOnCloseRequest(event -> game.closeSession());
         gameStage.setScene(new Scene(root, GAME_WIDTH, GAME_HEIGHT));
         gameStage.setTitle("PokerPro+");
-//        gameStage.setMaximized(false);
         gameStage.centerOnScreen();
         gameStage.show();
     }

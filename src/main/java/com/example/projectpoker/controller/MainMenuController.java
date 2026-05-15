@@ -11,9 +11,6 @@ import javafx.stage.Stage;
 import javafx.scene.control.Label;
 
 public class MainMenuController {
-    private static final int WINDOW_WIDTH = 1050;
-    private static final int WINDOW_HEIGHT = 525;
-
     @FXML private Label messageLabel;
 
     @FXML
@@ -33,15 +30,10 @@ public class MainMenuController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(
                     "/com/example/projectpoker/Account & Profile UI/profile.fxml"));
             Parent root = loader.load();
-            Stage stage = (Stage) messageLabel.getScene().getWindow();
-            Scene ProfileScene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT);
-            stage.setScene(ProfileScene);
-            stage.setTitle("PokerPro+");
-//            stage.setMaximized(false);
-            stage.show();
-
+            messageLabel.getScene().setRoot(root);
         } catch (IOException e) {
             messageLabel.setText("Could not load Profile Menu.");
+            e.printStackTrace();
         }
     }
 
@@ -51,14 +43,21 @@ public class MainMenuController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(
                     "/com/example/projectpoker/OptionsMenu.fxml"));
             Parent root = loader.load();
-            Stage stage = (Stage) (messageLabel).getScene().getWindow();
-            Scene optionsScene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT);
-            stage.setScene(optionsScene);
-            stage.setTitle("PokerPro+");
-//            stage.setMaximized(false);
-            stage.show();
+            messageLabel.getScene().setRoot(root);
         } catch (IOException e) {
             messageLabel.setText("Could not load Options Menu.");
+        }
+    }
+
+    @FXML
+    private void goToLogin() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(
+                    "/com/example/projectpoker/Account & Profile UI/login.fxml"));
+            Parent root = loader.load();
+            messageLabel.getScene().setRoot(root);
+        } catch (IOException e) {
+            messageLabel.setText("Could not load login screen.");
         }
     }
 

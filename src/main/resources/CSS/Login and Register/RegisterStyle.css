@@ -1,0 +1,97 @@
+.root {
+    -fx-background-color:
+        /* 1. Square Black (Fills the window/corners) */
+            #111111,
+                /* 2. Curved Black (The "Outer Rail") */
+            #111111,
+                /* 3. The Yellow Shape (The floating border) */
+            #d4af37,
+                /* 4. The Green Felt (The inner table) */
+            radial-gradient(center 50% 50%, radius 60%, #1c6044, #0d3b2a);
+
+    -fx-background-insets:
+            0,
+            5,
+            35,
+            37;
+
+    -fx-background-radius:
+            0,
+            40,
+            15,
+            13;
+
+    -fx-font-family: "Segoe UI", Helvetica, Arial, sans-serif;
+    -fx-padding: 60;
+}
+
+/* Pearl White Labels */
+.label {
+    -fx-text-fill: #F0EAD6;
+    -fx-font-weight: bold;
+}
+
+.button {
+    -fx-background-radius: 0;
+    -fx-border-radius: 0;
+}
+
+/* Register button — Gold theme to distinguish from Login */
+.rounded-button {
+    -fx-background-color: #b61547;
+    -fx-text-fill: #F0EAD6;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8;
+    -fx-border-color: #d4af37;
+    -fx-border-radius: 8;
+    -fx-border-width: 1;
+    -fx-cursor: hand;
+    -fx-padding: 10 25 10 25;
+}
+
+.rounded-button:hover {
+    -fx-background-color: #d41a54;
+}
+
+.button:hover {
+    -fx-background-color: #d41a54;
+    -fx-translate-y: -1;
+}
+
+.text-field, .password-field {
+    -fx-background-color: rgba(0, 0, 0, 0.6);
+    -fx-text-fill: #F0EAD6;
+    -fx-prompt-text-fill: #bdc3c7;
+    -fx-background-radius: 0;
+    -fx-border-color: #b61547;
+    -fx-border-width: 0 0 2 0;
+}
+
+/* Title styling — slightly smaller since register has more fields */
+.title-label {
+    -fx-font-weight: bold;
+    -fx-text-fill: #d4af37;
+}
+
+/* Subtle separator between form sections */
+.section-label {
+    -fx-text-fill: #bdc3c7;
+    -fx-font-size: 11px;
+    -fx-font-weight: normal;
+}
+
+/* Message label for errors — red tint to stand out */
+.message-label {
+    -fx-text-fill: #e74c3c;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-wrap-text: true;
+}
+
+/* Already have account link styling */
+.link-label {
+    -fx-text-fill: #bdc3c7;
+    -fx-font-size: 12px;
+    -fx-font-weight: normal;
+}

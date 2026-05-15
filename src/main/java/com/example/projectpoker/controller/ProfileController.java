@@ -11,14 +11,16 @@ import javafx.stage.Stage;
 import javafx.scene.control.Label;
 
 public class ProfileController {
-    private static final int WINDOW_WIDTH = 350;
-    private static final int WINDOW_HEIGHT = 400;
-
-    @FXML private Label usernameLabel;
-    @FXML private Label totalHandsLabel;
-    @FXML private Label totalWinsLabel;
-    @FXML private Label balanceLabel;
-    @FXML private Label messageLabel;
+    @FXML
+    private Label usernameLabel;
+    @FXML
+    private Label totalHandsLabel;
+    @FXML
+    private Label totalWinsLabel;
+    @FXML
+    private Label balanceLabel;
+    @FXML
+    private Label messageLabel;
 
     @FXML
     public void initialize() {
@@ -41,13 +43,9 @@ public class ProfileController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(
                     "/com/example/projectpoker/MainMenu.fxml"));
             Parent root = loader.load();
-            Stage stage = (Stage) (messageLabel).getScene().getWindow();
-            Scene optionsScene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT);
-            stage.setScene(optionsScene);
-            stage.setTitle("PokerPro+");
-            stage.show();
+            messageLabel.getScene().setRoot(root);
         } catch (IOException e) {
-            messageLabel.setText("Could not load Options Menu.");
+            messageLabel.setText("Could not load Main Menu.");
         }
     }
 
@@ -58,10 +56,7 @@ public class ProfileController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(
                     "/com/example/projectpoker/Account & Profile UI/login.fxml"));
             Parent root = loader.load();
-            Stage stage = (Stage) usernameLabel.getScene().getWindow();
-            stage.setScene(new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT));
-            stage.setTitle("PokerPro+");
-            stage.show();
+            usernameLabel.getScene().setRoot(root);
         } catch (IOException e) {
             messageLabel.setText("Could not load login screen.");
         }

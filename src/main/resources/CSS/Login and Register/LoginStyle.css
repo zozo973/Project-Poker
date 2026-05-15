@@ -1,0 +1,68 @@
+.root {
+    -fx-background-color:
+        /* 1. Square Black (Fills the window/corners) */
+            #111111,
+                /* 2. Curved Black (The "Outer Rail") */
+            #111111,
+                /* 3. The Yellow Shape (The floating border) */
+            #d4af37,
+                /* 4. The Green Felt (The inner table) */
+            radial-gradient(center 50% 50%, radius 60%, #1c6044, #0d3b2a);
+
+    -fx-background-insets:
+            0,       /* Layer 1: Hits every corner of the window */
+            5,       /* Layer 2: Starts slightly in to show the "outer edge" */
+            35,      /* Layer 3: The Yellow Shape (30px gap from the rail) */
+            37;      /* Layer 4: Felt starts 2px after yellow (creates a 2px line) */
+
+    -fx-background-radius:
+            0,       /* Layer 1: Keep square to hide the white window corners */
+            40,      /* Layer 2: The actual curve of your poker table */
+            15,      /* Layer 3: Curves the yellow shape to match */
+            13;      /* Layer 4: Curves the green felt */
+
+    -fx-font-family: "Segoe UI", Helvetica, Arial, sans-serif;
+    -fx-padding: 60; /* Keeps your text inside the green felt area */
+}
+
+/* Pearl White Labels */
+.label {
+    -fx-text-fill: #F0EAD6; /* Pearl White */
+    -fx-font-weight: bold;
+}
+
+.button {
+    -fx-background-radius: 0;
+    -fx-border-radius: 0;
+}
+
+/* Specific style for the Login and Register buttons */
+.rounded-button {
+    -fx-background-color: #b61547;
+    -fx-text-fill: #F0EAD6;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8; /* "Lightly rounded" */
+    -fx-border-color: #d4af37;
+    -fx-border-radius: 8;
+    -fx-border-width: 1;
+    -fx-cursor: hand;
+    -fx-padding: 10 25 10 25;
+}
+
+.rounded-button:hover {
+    -fx-background-color: #d41a54;
+}
+.button:hover {
+    -fx-background-color: #d41a54; /* Slightly lighter red on hover */
+    -fx-translate-y: -1;
+}
+
+.text-field, .password-field {
+    -fx-background-color: rgba(0, 0, 0, 0.6);
+    -fx-text-fill: #F0EAD6;
+    -fx-prompt-text-fill: #bdc3c7;
+    -fx-background-radius: 0;
+    -fx-border-color: #b61547;
+    -fx-border-width: 0 0 2 0;
+}

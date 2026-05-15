@@ -7,43 +7,39 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.geometry.Insets?>
 
-<VBox alignment="CENTER" spacing="15.0"
+<VBox alignment="CENTER" spacing="20.0"
       xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
       fx:controller="com.example.projectpoker.controller.RegisterController"
-      prefHeight="400.0" prefWidth="350.0">
+      stylesheets="@/CSS/Login and Register/RegisterStyle.css">
 
     <padding>
         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
     </padding>
 
     <!-- Title -->
-    <Label text="Create Account" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+    <Label text="Create Account" style="-fx-font-size: 33px; -fx-font-weight: bold;"/>
 
     <!-- Username field -->
-    <Label text="Username"/>
     <TextField fx:id="usernameField" promptText="Enter username"/>
 
     <!-- Email field -->
-    <Label text="Email"/>
     <TextField fx:id="emailField" promptText="Enter email"/>
 
     <!-- Password field -->
-    <Label text="Password"/>
     <PasswordField fx:id="passwordField" promptText="Enter password"/>
 
     <!-- Confirm password field -->
-    <Label text="Confirm Password"/>
     <PasswordField fx:id="confirmPasswordField" promptText="Confirm password"/>
 
     <!-- Register button -->
-    <Button text="Register" onAction="#handleRegister"/>
+    <Button onAction="#handleRegister" styleClass="rounded-button" text="Register" />
 
     <!-- Message label for errors/success -->
     <Label fx:id="messageLabel" text=""/>
 
     <!-- Log out button -->
     <Label text="Already have an account?"/>
-    <Button text="Go to Login" onAction="#goToLogin"/>
+    <Button onAction="#goToLogin" styleClass="rounded-button" text="Go to Login" />
 
 </VBox>

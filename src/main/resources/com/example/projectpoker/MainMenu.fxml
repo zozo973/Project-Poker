@@ -8,28 +8,34 @@
       xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
       fx:controller="com.example.projectpoker.controller.MainMenuController"
-      prefHeight="400.0" prefWidth="350.0">
+      stylesheets="@/CSS/Menu's/MainMenuStyle.css"
+      styleClass="root">
 
     <padding>
         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
     </padding>
 
     <!-- Title -->
-    <Label text="Main Menu" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+    <Label text="Main Menu" styleClass="menu-title">
+<!--        <VBox.margin>-->
+<!--            <Insets bottom="20.0" top="30.0"/>-->
+<!--        </VBox.margin>-->
+    </Label>
 
     <!-- Message label for errors/success -->
-    <Label fx:id="messageLabel"/>
+    <Label fx:id="messageLabel" style="-fx-text-fill: #e74c3c;"/>
 
-    <!-- Link to Game -->
-    <Button text="Start Game" onAction="#goToGame"/>
+    <!-- Navigation Buttons -->
+    <Button text="Start Game" onAction="#goToGame" styleClass="start-button"/>
+    <Button text="Profile" onAction="#goToProfile" styleClass="menu-button"/>
+    <Button text="Options" onAction="#goToOptions" styleClass="menu-button"/>
 
-    <!-- Link to Profile menu -->
-    <Button text="Profile" onAction="#goToProfile"/>
-
-    <!-- Link to Options menu -->
-    <Button text="Options" onAction="#goToOptions"/>
-
-    <!-- Link to Exit -->
-    <Button text="Exit" onAction="#exitGame"/>
-
+    <!-- Log Out and Exit Buttons -->
+    <HBox alignment="CENTER" spacing="15">
+        <VBox.margin>
+            <Insets top="10.0"/>
+        </VBox.margin>
+        <Button text="Log Out" onAction="#goToLogin" styleClass="small-menu-button"/>
+        <Button text="Exit" onAction="#exitGame" styleClass="small-menu-button"/>
+    </HBox>
 </VBox>

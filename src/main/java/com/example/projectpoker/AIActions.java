@@ -79,7 +79,7 @@ public class AIActions {
     }
 
     // Gemini API configuration
-    private static final String GEMINI_API_KEY = "api";
+    private static final String GEMINI_API_KEY = "API";
     // gemini-3.1-flash-lite-preview / gemma-4-31b-it / gemini-2.5-flash
     private static final String API_URL =
             "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite-preview:generateContent?key="

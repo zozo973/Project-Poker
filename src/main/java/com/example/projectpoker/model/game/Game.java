@@ -5,6 +5,7 @@ import com.example.projectpoker.model.User;
 import com.example.projectpoker.model.game.enums.Action;
 import com.example.projectpoker.model.game.enums.Difficulty;
 import com.example.projectpoker.model.game.enums.GameStatus;
+import com.example.projectpoker.model.game.enums.RoundStatus;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
@@ -117,7 +118,7 @@ public class Game {
 
     public void createNextRound() {
         for (Player p : this.players) p.setMinBet((int) Math.round (this.blindSize*0.5));
-        Round round = new Round(players,blindSize);
+        Round round = new Round(players, blindSize, gameSessionId, handsPlayed + 1);
         pcs.firePropertyChange("round",this.round,round);
         setRound(round);
     }
@@ -223,13 +224,13 @@ public class Game {
 
     public synchronized void onRoundEnded() {
 
-        if (round == null || round.getRoundStatus() != com.example.projectpoker.model.game.enums.RoundStatus.END) {
+        if (round == null || round.getRoundStatus() != RoundStatus.END) {
             return;
         }
 
-        clearPlayerHands();
 
         GameLog.add(round.getFinalLog());
+        countCompletedRound();
 
         nextRoundInitialisation();
 
@@ -261,8 +262,21 @@ public class Game {
 
         // Guard against double-saving if the game ends normally and the window also closes.
         sessionFinalized = true;
+        countCompletedRound();
         setGameStatus(GameStatus.ENDED);
         DatabaseManager.finalizeGameSession(gameSessionId, userProfile, this, getUser());
+    }
+
+    private void countCompletedRound() {
+        if (round == null
+                || round.isPersisted()
+                || round.getRoundStatus() != RoundStatus.END) {
+            return;
+        }
+
+        handsPlayed++;
+        DatabaseManager.recordRound(gameSessionId, round);
+        round.markPersisted();
     }
 
     private void nextRoundInitialisation() {

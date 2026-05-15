@@ -20,6 +20,7 @@ import static com.example.projectpoker.model.game.PotUtil.*;
 public class Round {
     private static final int MAX_BETTING_PASSES = 100;
     private static final long HUMAN_DECISION_POLL_MS = 25L;
+    private static final long BETTING_ENTRY_UI_DELAY_MS = 25L;
 
     // Round Events
     //      roundStatus Change
@@ -97,6 +98,7 @@ public class Round {
         switch (roundStatus) {
             case DEAL -> {
                 dealCards();
+                pauseForUiRender();
                 pcs.firePropertyChange("state",oldVal,this.roundStatus);
             }
             case BETTING1, BETTING2, BETTING3, BETTING4 -> {
@@ -105,6 +107,7 @@ public class Round {
             }
             case RIVER, TURN, FLOP, SHOWDOWN -> {
                 deal2Table();
+                pauseForUiRender();
                 pcs.firePropertyChange("state",oldVal,this.roundStatus);
                 setRoundStatus(RoundStatus.stepRoundStatus(this.roundStatus));
             }
@@ -127,6 +130,14 @@ public class Round {
     public ArrayList<RoundLogEntry> getRoundLog() { return roundLog; }
 
     public RoundLog getFinalLog() { return this.finalLog; }
+
+    public boolean isPersisted() {
+        return persisted;
+    }
+
+    public void markPersisted() {
+        this.persisted = true;
+    }
 
     public void setBetType(BetType betType) {
         var oldVal = this.betType;
@@ -213,6 +224,14 @@ public class Round {
     private void addRoundLogEntry(RoundLogEntry entry) {
         this.roundLog.add(entry);
         emitLog(entry.getEntryDescription());
+    }
+
+    private void pauseForUiRender() {
+        try {
+            Thread.sleep(BETTING_ENTRY_UI_DELAY_MS);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
     }
 
     private void payBlinds() {
@@ -493,10 +512,10 @@ public class Round {
 
     private void waitForPlayerDecision(Player activePlayer) {
         if (activePlayer instanceof AiPlayer) {
-            Random random = new Random();
-            int thinkTime = random.nextInt((2000-500)+1) + 500;
+            //Random random = new Random();
+            //int thinkTime = random.nextInt((2000-500)+1) + 500;
             try {
-                Thread.sleep(thinkTime);
+                Thread.sleep(25);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 throw new IllegalStateException("Interrupted while Ai Player is thinking", e);
@@ -723,7 +742,7 @@ public class Round {
         announceShowdownResults();
 
         try {
-            Thread.sleep(5000);
+            Thread.sleep(25);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new IllegalStateException("Interrupted while displaying Winner.", e);

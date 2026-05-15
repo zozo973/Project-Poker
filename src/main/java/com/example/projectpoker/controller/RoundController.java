@@ -648,7 +648,7 @@ public class RoundController {
                 }
                 break;
             case "state":
-                executeRoundStateUpdate((RoundStatus) evt.getNewValue());
+                executeRoundStateUpdate((RoundStatus) evt.getNewValue(), (RoundStatus) evt.getOldValue());
                 break;
             case "communityCards":
                 @SuppressWarnings("unchecked")
@@ -746,7 +746,7 @@ public class RoundController {
         onBalanceChanged(player, (int) evt.getOldValue(), (int) evt.getNewValue());
     }
 
-    private void executeRoundStateUpdate(RoundStatus status) {
+    private void executeRoundStateUpdate(RoundStatus status, RoundStatus previousStatus) {
         Platform.runLater(() ->phaseLabel.setText("Phase: " + status.name()));
         if (status != RoundStatus.END) {
             roundTransitionInProgress = false;
@@ -769,6 +769,12 @@ public class RoundController {
             case SHOWDOWN:
                 if (round != null) {
                     onCommunityCardsChanged(round.getCommunityCards());
+                    revealOpponentCardsAtShowdown();
+                }
+                break;
+            case END:
+                // Round can advance SHOWDOWN -> END before the UI processes SHOWDOWN; reveal here as a fallback.
+                if (previousStatus == RoundStatus.SHOWDOWN && round != null) {
                     revealOpponentCardsAtShowdown();
                 }
                 break;

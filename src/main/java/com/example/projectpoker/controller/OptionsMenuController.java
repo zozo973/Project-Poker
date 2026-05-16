@@ -15,6 +15,8 @@ import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.animation.FadeTransition;
+import javafx.util.Duration;
 
 import java.util.List;
 
@@ -26,6 +28,7 @@ public class OptionsMenuController {
     private final List<GamePreferences.AssetOption> boardOptions = GamePreferences.BOARD_OPTIONS;
     private int cardBackIndex;
     private int boardIndex;
+    private FadeTransition fadeTransition;
 
     @FXML private Label messageLabel;
     @FXML private Spinner<Integer> opponentsSpinner;
@@ -109,7 +112,14 @@ public class OptionsMenuController {
         );
 
         preferencesService.saveForCurrentUser(preferences);
-        messageLabel.setText("Preferences saved.");
+        messageLabel.setOpacity(1.0);
+        messageLabel.setText("Preferences Saved!");
+        fadeTransition = new FadeTransition(Duration.seconds(1), messageLabel);
+        fadeTransition.setDelay(Duration.seconds(5));
+        fadeTransition.setFromValue(1.0);
+        fadeTransition.setToValue(0.0);
+        fadeTransition.setOnFinished(e -> messageLabel.setText(""));
+        fadeTransition.play();
     }
 
     @FXML
@@ -120,7 +130,7 @@ public class OptionsMenuController {
             Parent root = loader.load();
             messageLabel.getScene().setRoot(root);
         } catch (IOException e) {
-            messageLabel.setText("Could not load Options Menu.");
+            messageLabel.setText("Couldn't Load Main Menu");
         }
     }
 
@@ -148,7 +158,7 @@ public class OptionsMenuController {
     private Image loadImage(String path) {
         var resource = getClass().getResource(path);
         if (resource == null) {
-            throw new IllegalStateException("Missing preview image: " + path);
+            throw new IllegalStateException("Missing Preview Image: " + path);
         }
         return new Image(resource.toExternalForm());
     }

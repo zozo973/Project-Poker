@@ -49,7 +49,7 @@ public class ProfileController {
 
         // Update the UI
         balanceLabel.setText(Integer.toString(user.getCurrentBalance()));
-        messageLabel.setText("Successfully added $1000! New balance: $" + user.getCurrentBalance());
+//        messageLabel.setText("Successfully added $1000! New balance: $" + user.getCurrentBalance());
     }
 
     @FXML

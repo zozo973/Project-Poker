@@ -12,8 +12,8 @@
       prefWidth="350.0"
       spacing="30.0"
       stylesheets="@/CSS/Login and Register/LoginStyle.css"
-      xmlns="http://javafx.com/javafx/26"
-      xmlns:fx="http://javafx.com/fxml/1"
+      xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
       fx:controller="com.example.projectpoker.controller.LoginController">
 
     <padding>

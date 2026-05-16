@@ -58,7 +58,6 @@ public class MainMenuController {
             messageLabel.setText("Could not load login screen.");
         }
     }
-
     @FXML
     private void exitGame() {
         Platform.exit();

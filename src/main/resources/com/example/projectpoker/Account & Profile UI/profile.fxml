@@ -7,7 +7,7 @@
 <?import javafx.geometry.Insets?>
 
 <VBox alignment="CENTER" spacing="15.0"
-      xmlns="http://javafx.com/javafx"
+      xmlns="http://javafx.com/javafx/26"
       xmlns:fx="http://javafx.com/fxml"
       fx:controller="com.example.projectpoker.controller.ProfileController"
       stylesheets="@/CSS/Menu's/ProfileStyle.css"

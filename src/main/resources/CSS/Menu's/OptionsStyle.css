@@ -135,3 +135,9 @@
     -fx-scale-y: 1.05;
     -fx-effect: dropshadow(gaussian, rgba(182, 21, 71, 0.5), 10, 0, 0, 0);
 }
+
+.message-label {
+    -fx-text-fill: #F0EAD6;
+    -fx-font-weight: bold;
+    -fx-font-size: 13px;
+}

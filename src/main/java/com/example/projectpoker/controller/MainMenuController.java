@@ -48,6 +48,18 @@ public class MainMenuController {
     }
 
     @FXML
+    private void goToTutorial() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(
+                    "/com/example/projectpoker/TutorialMenu.fxml"));
+            Parent root = loader.load();
+            messageLabel.getScene().setRoot(root);
+        } catch (IOException e) {
+            messageLabel.setText("Could not load Tutorial Menu.");
+        }
+    }
+
+    @FXML
     private void goToLogin() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(

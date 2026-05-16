@@ -20,7 +20,6 @@ import javafx.util.Duration;
 
 import java.util.List;
 
-
 public class OptionsMenuController {
 
     private final GamePreferencesService preferencesService = new GamePreferencesService();

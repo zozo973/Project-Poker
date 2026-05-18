@@ -13,7 +13,7 @@ class AiPlayerTest {
 
     @Test
     void fallbackPlayNeverCreatesRaiseAboveBalance() {
-        AiPlayer aiPlayer = new AiPlayer(Difficulty.BABY, 1000);
+        AiPlayer aiPlayer = new AiPlayer(Difficulty.Baby, 1000);
         aiPlayer.setBalance(7170);
 
         Player opponent = new Player("Opponent", 10000);

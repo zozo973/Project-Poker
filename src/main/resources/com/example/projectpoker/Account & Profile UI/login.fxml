@@ -46,6 +46,6 @@
     <Label fx:id="messageLabel" text="" />
 
     <!-- Link to Register -->
-    <Label text="Already have an account?" />
+    <Label text="Register an account?" />
     <Button onAction="#goToRegister" styleClass="rounded-button" text="Go to Register" />
 </VBox>

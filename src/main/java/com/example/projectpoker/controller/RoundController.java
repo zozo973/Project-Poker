@@ -33,6 +33,8 @@ import java.util.concurrent.CountDownLatch;
 
 public class RoundController {
     private static final int BET_STEP = 5;
+    private static final int MENU_WIDTH = 420;
+    private static final int MENU_HEIGHT = 550;
     private static final String DARK_MODE_CLASS = "game-dark";
     private static final String DARK_THEME_STYLESHEET = "/com/example/projectpoker/poker-round-dark.css";
 
@@ -471,16 +473,30 @@ public class RoundController {
 
     @FXML
     private void quitToMainMenu() {
-        if (game != null) {
-            game.closeSession();
+        if (game == null) {
+            navigateToMainMenu();
+            return;
         }
 
+        Thread closeThread = new Thread(() -> {
+            try {
+                game.closeSession();
+                Platform.runLater(this::navigateToMainMenu);
+            } catch (Exception ex) {
+                Platform.runLater(() -> aiStatusLabel.setText("Error: Could not close game session."));
+            }
+        }, "poker-close-session");
+        closeThread.setDaemon(true);
+        closeThread.start();
+    }
+
+    private void navigateToMainMenu() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/projectpoker/MainMenu.fxml"));
             Parent root = loader.load();
 
             Stage stage = (Stage) mainBorderPane.getScene().getWindow();
-            stage.setScene(new Scene(root, 350, 400));
+            stage.setScene(new Scene(root, MENU_WIDTH, MENU_HEIGHT));
             stage.setTitle("PokerPro+");
             stage.setFullScreen(false);
             stage.show();
@@ -675,7 +691,7 @@ public class RoundController {
                 return;
             }
             if (!gameLogTextArea.getText().isEmpty()) {
-                gameLogTextArea.appendText("\n");
+                gameLogTextArea.appendText("\n---------\n");
             }
             gameLogTextArea.appendText(message);
             int endPosition = gameLogTextArea.getLength();
@@ -828,7 +844,7 @@ public class RoundController {
             }
 
             if (round == null || round.getCommunityCards() == null) {
-                aiStatusLabel.setText("AI unavailable: round not ready yet.");
+                aiStatusLabel.setText("Advice unavailable: Please start the game 1st.");
                 btnGenerate.setDisable(false);
                 return;
             }

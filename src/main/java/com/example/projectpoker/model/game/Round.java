@@ -46,6 +46,7 @@ public class Round {
     private final int gameSessionId;
     private final int roundNumber;
     private boolean persisted;
+    private volatile boolean stopRequested;
 
     // Constructor called for unit tests the Round class
 
@@ -76,6 +77,7 @@ public class Round {
         this.gameSessionId = gameSessionId;
         this.roundNumber = roundNumber;
         this.persisted = false;
+        this.stopRequested = false;
         setRoundStatus(RoundStatus.UNINITIALISED); // Possibly change
     }
 
@@ -409,6 +411,9 @@ public class Round {
     }
 
     private void betting() {
+        if (stopRequested) {
+            return;
+        }
         Player activePlayer;
         int bettingPasses = 0;
         boolean bettingEnded;
@@ -423,6 +428,10 @@ public class Round {
             }
             bettingEnded = false;
             for (Integer i : turnOrder) {
+                if (stopRequested) {
+                    bettingEnded = true;
+                    break;
+                }
                 activePlayer = players.get(i);
                 // Check if Action.Undecided is right.
                 setToPlay(getToCall(this.pots,activePlayer));
@@ -437,7 +446,7 @@ public class Round {
                     }
 
                     activePlayer.setIsTurn(true);
-                    while (activePlayer.getIsTurn()) {
+                    while (activePlayer.getIsTurn() && !stopRequested) {
                         processActivePlayer(activePlayer);
 
                         if (!activePlayer.getAction().equals(Action.UNDECIDED)) {
@@ -457,7 +466,7 @@ public class Round {
                 }
             }
         } while (!bettingEnded);
-        if (roundStatus == RoundStatus.END) {
+        if (stopRequested || roundStatus == RoundStatus.END) {
             return;
         }
         postBetting();
@@ -511,6 +520,9 @@ public class Round {
     }
 
     private void waitForPlayerDecision(Player activePlayer) {
+        if (stopRequested) {
+            return;
+        }
         if (activePlayer instanceof AiPlayer) {
             //Random random = new Random();
             //int thinkTime = random.nextInt((2000-500)+1) + 500;
@@ -521,7 +533,7 @@ public class Round {
                 throw new IllegalStateException("Interrupted while Ai Player is thinking", e);
             }
         } else {
-            while (activePlayer.getIsTurn() && activePlayer.getAction() == Action.UNDECIDED) {
+            while (!stopRequested && activePlayer.getIsTurn() && activePlayer.getAction() == Action.UNDECIDED) {
                 try {
                     // need to pause to wait for the active player's action.
                     Thread.sleep(HUMAN_DECISION_POLL_MS);
@@ -708,6 +720,9 @@ public class Round {
     }
 
     public void checkBetType() {
+        if (stopRequested) {
+            return;
+        }
         BetTypeLogic.executeBets(BetType.NORMAL);
         betting();
 
@@ -808,5 +823,16 @@ public class Round {
         return players.stream()
                 .map(Player::getName)
                 .collect(Collectors.joining(","));
+    }
+
+    public void requestStop() {
+        this.stopRequested = true;
+        for (Player p : players) {
+            p.setIsTurn(false);
+            if (p.getAction() == Action.UNDECIDED) {
+                p.setAction(Action.FOLD);
+            }
+            p.setActiveBet(0);
+        }
     }
 }

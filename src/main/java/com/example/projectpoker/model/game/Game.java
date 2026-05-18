@@ -185,13 +185,15 @@ public class Game {
         startNextRound();
     }
 
-    public synchronized void startNextRound() {
+    public void startNextRound() {
 
-        // Guarding behaviour so that multiple rounds cant be started simultaneously
-        if (roundAdvanceInProgress) {
-            return;
+        synchronized (this) {
+            // Guarding behaviour so that multiple rounds cant be started simultaneously
+            if (roundAdvanceInProgress) {
+                return;
+            }
+            roundAdvanceInProgress = true;
         }
-        roundAdvanceInProgress = true;
 
         try {
             if (gameStatus != GameStatus.RUNNING) {return;}
@@ -218,11 +220,13 @@ public class Game {
             round.init();
             round.start();
         } finally {
-            roundAdvanceInProgress = false;
+            synchronized (this) {
+                roundAdvanceInProgress = false;
+            }
         }
     }
 
-    public synchronized void onRoundEnded() {
+    public void onRoundEnded() {
 
         if (round == null || round.getRoundStatus() != RoundStatus.END) {
             return;
@@ -262,6 +266,9 @@ public class Game {
 
         // Guard against double-saving if the game ends normally and the window also closes.
         sessionFinalized = true;
+        if (round != null) {
+            round.requestStop();
+        }
         countCompletedRound();
         setGameStatus(GameStatus.ENDED);
         DatabaseManager.finalizeGameSession(gameSessionId, userProfile, this, getUser());

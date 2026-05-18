@@ -20,8 +20,8 @@ import java.io.IOException;
 public class PokerApplication extends Application {
     private static final int AUTH_WIDTH = 420;
     private static final int AUTH_HEIGHT = 550;
-    private static final int GAME_WIDTH = 1110;
-    private static final int GAME_HEIGHT = 550;
+    private static final int GAME_WIDTH = 1130;
+    private static final int GAME_HEIGHT = 570;
 
     @Override
     public void start(Stage stage) throws IOException {
@@ -34,16 +34,6 @@ public class PokerApplication extends Application {
         stage.show();
     }
     public void createPokerGame(Stage gameStage) throws IOException {
-        //  Call this method to create a new poker game.
-
-        // TODO add methods in createPokerGame controller to get all fields required to make an instance of a game
-        //      Player user: should be retrieved from database,
-        //      int userBalance: User will interact to choose an amount, if they don't have enough it defaults to 1000,
-        //      int numPlayers: min 3 max 8 - estimate,
-        //      int initBlind: default if 0.03 times the user balance,
-        //      int whenIncreaseBlinds: how many rounds until blinds increase, default 10,
-        //      int gameLength: num of rounds game goes for, default 30,
-        //      Difficulty difficulty: HBox of buttons, can only select one, on hover shows display for difficulty
 
         // change to retire user data from database and other vars can be retrieved from user input into ui
         FXMLLoader loader = new FXMLLoader(PokerApplication.class.getResource("poker-round-view.fxml"));

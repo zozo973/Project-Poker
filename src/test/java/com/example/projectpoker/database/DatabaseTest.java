@@ -120,13 +120,13 @@ class DatabaseTest {
         userDAO.insert(user);
 
         UserPreferencesDAO preferencesDAO = new UserPreferencesDAO();
-        GamePreferences preferences = new GamePreferences(3, Difficulty.PROFESSIONAL, "back4", "classic3");
+        GamePreferences preferences = new GamePreferences(3, Difficulty.Professional, "back4", "classic3");
 
         preferencesDAO.saveForUserId(user.getId(), preferences);
         GamePreferences loadedPreferences = preferencesDAO.getByUserId(user.getId());
 
         assertEquals(3, loadedPreferences.getOpponentCount());
-        assertEquals(Difficulty.PROFESSIONAL, loadedPreferences.getDifficulty());
+        assertEquals(Difficulty.Professional, loadedPreferences.getDifficulty());
         assertEquals("back4", loadedPreferences.getCardBackKey());
         assertEquals("classic3", loadedPreferences.getBoardKey());
     }
@@ -162,7 +162,7 @@ class DatabaseTest {
         players.add(aiTwo);
         RoleUtil.delegateRoles(players, new int[]{0, 1, 2});
 
-        Game game = new Game(userPlayer, user, 1000, 3, 50, 5, 10, Difficulty.BABY);
+        Game game = new Game(userPlayer, user, 1000, 3, 50, 5, 10, Difficulty.Baby);
         int gameSessionId = DatabaseManager.createGameSession(user, game, userPlayer);
 
         Round round = new Round(players, 50, gameSessionId, 1);

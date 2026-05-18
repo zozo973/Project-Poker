@@ -38,6 +38,14 @@
     -fx-effect: dropshadow(gaussian, rgba(182, 21, 71, 0.5), 10, 0, 0, 0);
 }
 
+.toggle-button:selected {
+    -fx-background-color: #8f1036;
+}
+
+.toggle-button:selected:hover {
+    -fx-background-color: #9f1240;
+}
+
 .start-button {
     -fx-background-color: #04a12b;
     -fx-text-fill: #F0EAD6;

@@ -41,16 +41,22 @@ public class ProfileController {
             return;
         }
 
-        // Add 1000 to the user's balance
-        user.setCurrentBalance(user.getCurrentBalance() + 1000);
+        if(user.getCurrentBalance()<=10000) {
 
-        // Persist to database
-        new UserDAO().update(user);
+            // Add 1000 to the user's balance
+            user.setCurrentBalance(user.getCurrentBalance() + 1000);
 
-        // Update the UI
-        balanceLabel.setText(Integer.toString(user.getCurrentBalance()));
+            // Persist to database
+            new UserDAO().update(user);
+
+            // Update the UI
+            balanceLabel.setText(Integer.toString(user.getCurrentBalance()));
 //        messageLabel.setText("Successfully added $1000! New balance: $" + user.getCurrentBalance());
-    }
+        }
+        if(user.getCurrentBalance()>10000) {
+            messageLabel.setText("Whoa there buddy, I think you've got enough.");
+
+        }}
 
     @FXML
     private void goToMain() {

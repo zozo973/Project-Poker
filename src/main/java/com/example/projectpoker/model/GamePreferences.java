@@ -8,7 +8,7 @@ public class GamePreferences {
     public static final int MIN_OPPONENTS = 1;
     public static final int MAX_OPPONENTS = 5;
     public static final int DEFAULT_OPPONENTS = 5;
-    public static final Difficulty DEFAULT_DIFFICULTY = Difficulty.GAMBLING_ADDICT;
+    public static final Difficulty DEFAULT_DIFFICULTY = Difficulty.Addict;
     public static final String DEFAULT_CARD_BACK_KEY = "back1";
     public static final String DEFAULT_BOARD_KEY = "classic1";
     public static final boolean DEFAULT_DARK_MODE = false;

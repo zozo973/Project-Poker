@@ -10,7 +10,6 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
-import java.util.List;
 
 public class TutorialController {
 
@@ -25,25 +24,51 @@ public class TutorialController {
 
     // Illustrations/Screenshots of how to use UI, how to play poker, etc. for Tutorial
     private final String[] tutorialImages = {
-            // please add the actual screenshots/illustrations
-            "/images/back1.png",
-            "images/back2.png",
-            "/images/tutorial/randomExample.png"
+            "/com/example/projectpoker/Images/Tutorial2.png",
+            "/com/example/projectpoker/Images/Tutorial3.png",
+            "/com/example/projectpoker/Images/Tutorial4.png",
+            "/com/example/projectpoker/Images/Tutorial5.png",
+            "/com/example/projectpoker/Images/Tutorial6.png"
     };
     // Tutorial Captions
     private final String[] tutorialCaptions = {
             // please add the actual screenshots/illustrations
-            "Blah Blah Blah.",
-            "Blah Blah Blah2",
-            "Blah Blah Blah 3."
+            "Welcome to PokerPro+",
+            "This is the game screen",
+            "Your user profile",
+            "Customise your experience",
+            "The main menu"
     }; // NOTE MAKE SURE TO KEEP BOTH ARRAYS SAME SIZE SO THEY MATCH 1:1
 
     @FXML
     public void initialize() {
+        if (tutorialImages.length != tutorialCaptions.length) {
+            messageLabel.setText("Tutorial content mismatch: slides and captions are out of sync.");
+            previousButton.setDisable(true);
+            nextButton.setDisable(true);
+            return;
+        }
         showSlide(currentIndex);
     }
 
     private void showSlide(int index) {
+        if (tutorialImages.length == 0) {
+            tutorialImageView.setImage(null);
+            imageCaptionLabel.setText("");
+            pageIndicatorLabel.setText("0 / 0");
+            messageLabel.setText("No tutorial slides available.");
+            previousButton.setDisable(true);
+            nextButton.setDisable(true);
+            return;
+        }
+
+        if (index < 0) {
+            index = 0;
+        } else if (index >= tutorialImages.length) {
+            index = tutorialImages.length - 1;
+        }
+        currentIndex = index;
+
         // Update captions
         if (index < tutorialCaptions.length) {
             imageCaptionLabel.setText(tutorialCaptions[index]);
@@ -62,7 +87,7 @@ public class TutorialController {
         } else {
             // Placeholder if image not yet added by teammate
             tutorialImageView.setImage(null);
-            messageLabel.setText("Slide " + (index + 1) + " image coming soon.");
+            messageLabel.setText("Missing image: " + tutorialImages[index]);
         }
 
         // Update navigation button states

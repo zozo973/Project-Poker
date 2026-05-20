@@ -497,7 +497,7 @@ public class RoundController {
 
             Stage stage = (Stage) mainBorderPane.getScene().getWindow();
             stage.setScene(new Scene(root, MENU_WIDTH, MENU_HEIGHT));
-            stage.setTitle("PokerPro+");
+                stage.setTitle("PokerPro+");
             stage.setFullScreen(false);
             stage.show();
         } catch (IOException ex) {

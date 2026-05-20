@@ -314,8 +314,6 @@ public class Round {
         }
     }
 
-    // TODO Attach to the game controller
-    // On click method depending on player choice
     public void recordPlayerAction(Player player) {
         Integer activeBetValue = player.getActiveBet();
         int betSize = activeBetValue != null ? activeBetValue : 0;
@@ -531,7 +529,7 @@ public class Round {
             //Random random = new Random();
             //int thinkTime = random.nextInt((2000-500)+1) + 500;
             try {
-                Thread.sleep(25);
+                Thread.sleep(500);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 throw new IllegalStateException("Interrupted while Ai Player is thinking", e);
@@ -572,9 +570,6 @@ public class Round {
 
         waitForPlayerDecision(activePlayer);
 
-        if (activePlayer instanceof AiPlayer) {
-            ((AiPlayer) activePlayer).setResponse(aiDecisions.get(activePlayer));
-        }
         activePlayer.play(this.pots);
         if (activePlayer.getAction() == Action.UNDECIDED) {
             autoResolvePlayerDecision(activePlayer, false);

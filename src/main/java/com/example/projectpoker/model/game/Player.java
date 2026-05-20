@@ -2,7 +2,6 @@ package com.example.projectpoker.model.game;
 
 import com.example.projectpoker.model.Hand;
 import com.example.projectpoker.model.game.enums.Action;
-import com.example.projectpoker.model.game.enums.BetType;
 import com.example.projectpoker.model.game.enums.Roles;
 
 import java.beans.PropertyChangeListener;
@@ -10,7 +9,6 @@ import java.beans.PropertyChangeSupport;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import static com.example.projectpoker.model.game.PotUtil.handlePlayerBet;
 import static com.example.projectpoker.model.statistics.SkewNormalSampler.safeRoundToInt;
 
 public class Player {
@@ -228,7 +226,12 @@ public class Player {
         }
 
         if (betSize > this.balance) {
-            if (!this.action.equals(Action.ALLIN)) throw new IllegalArgumentException("Bet must be equal to or less than the players balance.");
+            if (!this.action.equals(Action.ALLIN)) throw new IllegalArgumentException(
+                    "Bet must be <= balance | betSize=" + betSize +
+                            " balance=" + this.balance +
+                            " action=" + this.action +
+                            " activeBet=" + this.activeBet
+            );
             else betSize = this.balance;
         }
 
@@ -242,7 +245,6 @@ public class Player {
         }
         this.activeBet = betSize;
         this.roundInvestment.add2Bets(betSize,pot);
-        System.out.println(name + " is " + action + " " + betSize);
         return betSize;
     }
 
@@ -270,9 +272,6 @@ public class Player {
         // Send current balance to database and exit game.
         if (this.action.equals(Action.FOLD)) {
             setAction(Action.FORFEIT);
-        } else {
-            System.out.println("Do you wish to forfeit all invested money in the round and exit?");
-
         }
 
     }

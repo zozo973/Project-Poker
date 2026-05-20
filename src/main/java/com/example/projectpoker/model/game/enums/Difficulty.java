@@ -2,11 +2,11 @@ package com.example.projectpoker.model.game.enums;
 
 
 public enum Difficulty {
-    BABY("Like playing with a bunch of infant children"),
-    WHATISPOKER("Someone who has never played the game before"),
-    GAMBLINGADDICT("Has taken another mortgage out on there house to play"),
-    PROFESSIONAL("You will be robbed"),
-    WSOPTABLE("You will never financially, physically and emotionally recover");
+    Baby("Like playing with a bunch of infant children."),
+    Beginner("Someone who has never played the game before."),
+    Addict("Has taken another mortgage out on their house to play"),
+    Professional("You will be robbed."),
+    Sadist("You will never financially, physically or emotionally recover.");
 
     private final String description;
 

@@ -8,9 +8,10 @@ public class GamePreferences {
     public static final int MIN_OPPONENTS = 1;
     public static final int MAX_OPPONENTS = 5;
     public static final int DEFAULT_OPPONENTS = 5;
-    public static final Difficulty DEFAULT_DIFFICULTY = Difficulty.GAMBLINGADDICT;
+    public static final Difficulty DEFAULT_DIFFICULTY = Difficulty.Addict;
     public static final String DEFAULT_CARD_BACK_KEY = "back1";
-    public static final String DEFAULT_BOARD_KEY = "classic";
+    public static final String DEFAULT_BOARD_KEY = "classic1";
+    public static final boolean DEFAULT_DARK_MODE = false;
 
     public record AssetOption(String key, String displayName, String resourcePath) {}
 
@@ -22,6 +23,7 @@ public class GamePreferences {
             new AssetOption("back5", "Brutal", "/com/example/projectpoker/Images/Back5.png"),
             new AssetOption("back6", "Decor", "/com/example/projectpoker/Images/Back6.png"),
             new AssetOption("back7", "Necra", "/com/example/projectpoker/Images/Back7.png"),
+            new AssetOption("back13", "Pokemon", "/com/example/projectpoker/Images/Back13.png"),
             new AssetOption("back8", "Yugioh", "/com/example/projectpoker/Images/Back8.png"),
             new AssetOption("back9", "Yugioh Anime", "/com/example/projectpoker/Images/Back9.png"),
             new AssetOption("back10", "Magic the Gathering", "/com/example/projectpoker/Images/Back10.png"),
@@ -45,16 +47,22 @@ public class GamePreferences {
     private final Difficulty difficulty;
     private final String cardBackKey;
     private final String boardKey;
+    private final boolean darkModeEnabled;
 
     public GamePreferences(int opponentCount, Difficulty difficulty, String cardBackKey, String boardKey) {
+        this(opponentCount, difficulty, cardBackKey, boardKey, DEFAULT_DARK_MODE);
+    }
+
+    public GamePreferences(int opponentCount, Difficulty difficulty, String cardBackKey, String boardKey, boolean darkModeEnabled) {
         this.opponentCount = clampOpponents(opponentCount);
         this.difficulty = difficulty == null ? DEFAULT_DIFFICULTY : difficulty;
         this.cardBackKey = containsOption(CARD_BACK_OPTIONS, cardBackKey) ? cardBackKey : DEFAULT_CARD_BACK_KEY;
         this.boardKey = containsOption(BOARD_OPTIONS, boardKey) ? boardKey : DEFAULT_BOARD_KEY;
+        this.darkModeEnabled = darkModeEnabled;
     }
 
     public static GamePreferences defaults() {
-        return new GamePreferences(DEFAULT_OPPONENTS, DEFAULT_DIFFICULTY, DEFAULT_CARD_BACK_KEY, DEFAULT_BOARD_KEY);
+        return new GamePreferences(DEFAULT_OPPONENTS, DEFAULT_DIFFICULTY, DEFAULT_CARD_BACK_KEY, DEFAULT_BOARD_KEY, DEFAULT_DARK_MODE);
     }
 
     public int getOpponentCount() {
@@ -71,6 +79,10 @@ public class GamePreferences {
 
     public String getBoardKey() {
         return boardKey;
+    }
+
+    public boolean isDarkModeEnabled() {
+        return darkModeEnabled;
     }
 
     public String getCardBackResourcePath() {
@@ -111,4 +123,3 @@ public class GamePreferences {
         return options.getFirst().resourcePath();
     }
 }
-

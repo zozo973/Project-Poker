@@ -23,17 +23,6 @@ public class LoginController {
         String username = usernameField.getText();
         String password = passwordField.getText();
 
-//        // variables to check if the user has inputted something in the fields
-//        boolean checkedUsername = username.isBlank();
-//        boolean checkedPassword = password.isBlank();
-//
-//        // if statement to check if a user has inputted something correctly in the fields
-//        if (checkedUsername || checkedPassword) {
-//            usernameField.setText("");
-//            passwordField.setText("");
-//            messageLabel.setText("Invalid Username or Password! Please fill all fields.");
-//        }
-
         List<ValidationResult> checkedLoginResults = List.of(
                 UsernameValidation.checkUsernameBlank(username),
                 PasswordValidation.checkPasswordBlank(password)
@@ -74,15 +63,6 @@ public class LoginController {
             }
 
             SessionManager.setCurrentUser(user);
-//            try {
-//                FXMLLoader loader = new FXMLLoader(getClass().getResource(
-//                        "/com/example/projectpoker/MainMenu.fxml"));
-//                Parent root = loader.load();
-//                Stage stage = (Stage) usernameField.getScene().getWindow();
-//                stage.setScene(new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT));
-//                stage.setTitle("PokerPro+");
-//                stage.setMaximized(false);
-//                stage.show();
             try {
                 FXMLLoader loader = new FXMLLoader(getClass().getResource(
                         "/com/example/projectpoker/MainMenu.fxml"));
@@ -94,21 +74,6 @@ public class LoginController {
         }
     }
 
-//    @FXML
-//    private void goToRegister() {
-//        try {
-//            FXMLLoader loader = new FXMLLoader(getClass().getResource(
-//                    "/com/example/projectpoker/Account & Profile UI/register.fxml"));
-//            Parent root = loader.load();
-//            Stage stage = (Stage) usernameField.getScene().getWindow();
-//            stage.setScene(new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT));
-//            stage.setTitle("PokerPro+");
-//            stage.setMaximized(false);
-//            stage.show();
-//        } catch (IOException e) {
-//            messageLabel.setText("Could not load register screen.");
-//        }
-//    }
 
     @FXML
     private void goToRegister() {
@@ -121,19 +86,4 @@ public class LoginController {
             messageLabel.setText("Could not load register screen.");
         }
     }
-
-//    // temp method that is used for unit tests
-//    String getLoginValidationMessage(User user, String username, String password) {
-//        if (username.isBlank() || password.isBlank()) {
-//            return "Invalid Username or Password! Please fill all fields.";
-//        }
-//        if (user == null) {
-//            return "Username not found.";
-//        }
-//        boolean verifiedPassword = PasswordHasher.verify(password, user.getPassword());
-//        if (!verifiedPassword) {
-//            return "Incorrect password.";
-//        }
-//        return "SUCCESS";
-//    }
 }

@@ -21,7 +21,7 @@ import static com.example.projectpoker.model.game.Card.*;
 public class AiCoaching {
 
     //API Key in here
-    private static final String GEMINI_API_KEY = "AIzaSyC5sM8Mj_AuIcoR5fKhRP3sj4POdAn_edc";
+    private static final String GEMINI_API_KEY = "";
     private static final String API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" + GEMINI_API_KEY;
 
     public static class AiAdvice {
@@ -112,6 +112,8 @@ public class AiCoaching {
                    - "action": Must be exactly one of the following: "FOLD", "CHECK", "CALL", "RAISE", "ALLIN".
                    - "confidence": An integer between 0 and 100 representing your confidence level.
                    - "reasoning": A brief, one-sentence explanation for your decision.
+                4. If your reasoning uses acronyms or advanced language that a begginer might not understand, please include a short description of it in parenthesis.
+                5. Reasoning should be scripted as though you are advising the player, not playing the game yourself.
                 """;
     }
 

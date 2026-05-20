@@ -2,6 +2,7 @@ package com.example.projectpoker.model.game;
 
 import com.example.projectpoker.model.game.enums.Difficulty;
 import com.example.projectpoker.model.game.enums.GameStatus;
+import com.example.projectpoker.model.game.enums.RoundStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -25,7 +26,7 @@ class GameTest {
     @BeforeEach
     void setUp() {
         user = new Player("User", 1000);
-        game = new Game(user, 1000, 3, 100, 3, 10, Difficulty.BABY);
+        game = new Game(user, 1000, 3, 100, 3, 10, Difficulty.Baby);
     }
 
     // Constructor Tests
@@ -39,7 +40,7 @@ class GameTest {
     @Test
     void testConstructorWithDifferentParameters() {
         Player customUser = new Player("Custom", 500);
-        Game customGame = new Game(customUser, 500, 5, 200, 5, 20, Difficulty.PROFESSIONAL);
+        Game customGame = new Game(customUser, 500, 5, 200, 5, 20, Difficulty.Professional);
         assertEquals(1, customGame.getPlayers().size());
         assertEquals(200, customGame.getBlindSize());
     }
@@ -155,7 +156,7 @@ class GameTest {
 
     @Test
     void testIncreaseBlindSize() {
-        this.game = new Game(user, 1000, 3, 100, 5, 10, Difficulty.BABY);
+        this.game = new Game(user, 1000, 3, 100, 5, 10, Difficulty.Baby);
         game.setBlindSize(100);
         game.setNumRoundsLeft(5);
 
@@ -195,6 +196,17 @@ class GameTest {
         assertEquals(GameStatus.ENDED, game.getGameStatus());
     }
 
+    @Test
+    void testCloseSessionCountsCompletedRoundOnce() {
+        game.createNextRound();
+        game.getRound().setRoundStatus(RoundStatus.END);
+
+        game.closeSession();
+        game.closeSession();
+
+        assertEquals(1, game.getHandsPlayed());
+    }
+
     // Test players are initialized with user
     @Test
     void testUserIsFirstPlayer() {
@@ -205,7 +217,7 @@ class GameTest {
     @Test
     void testGameConfiguration() {
         Player newUser = new Player("Test", 2000);
-        Game configuredGame = new Game(newUser, 2000, 6, 50, 2, 15, Difficulty.PROFESSIONAL);
+        Game configuredGame = new Game(newUser, 2000, 6, 50, 2, 15, Difficulty.Professional);
         assertEquals(1, configuredGame.getPlayers().size());
         assertEquals(50, configuredGame.getBlindSize());
     }

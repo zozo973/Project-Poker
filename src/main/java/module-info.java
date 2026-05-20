@@ -3,7 +3,6 @@ module com.example.projectpoker {
     requires javafx.fxml;
     requires javafx.web;
     requires java.sql;
-    requires java.prefs;
 
 
     requires org.controlsfx.controls;

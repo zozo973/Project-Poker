@@ -210,8 +210,8 @@ class RoundTest {
     @Test
     void testGetUserIndexNoHumanPlayer() {
         ArrayList<Player> aiPlayers = new ArrayList<>();
-        aiPlayers.add(new AiPlayer(com.example.projectpoker.model.game.enums.Difficulty.BABY, 1000));
-        aiPlayers.add(new AiPlayer(com.example.projectpoker.model.game.enums.Difficulty.BABY, 1000));
+        aiPlayers.add(new AiPlayer(com.example.projectpoker.model.game.enums.Difficulty.Baby, 1000));
+        aiPlayers.add(new AiPlayer(com.example.projectpoker.model.game.enums.Difficulty.Baby, 1000));
         Round aiRound = new Round(aiPlayers, 100);
         assertEquals(-1, aiRound.getUserIndex());
     }

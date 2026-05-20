@@ -1,0 +1,110 @@
+.root {
+    -fx-background-color:
+            #111111,
+            #111111,
+            #d4af37,
+            radial-gradient(center 50% 50%, radius 60%, #1c6044, #0d3b2a);
+
+    -fx-background-insets:
+            0,
+            5,
+            35,
+            37;
+
+    -fx-background-radius:
+            0,
+            40,
+            15,
+            13;
+
+    -fx-font-family: "Segoe UI", Helvetica, Arial, sans-serif;
+    -fx-padding: 60;
+}
+
+.label {
+    -fx-text-fill: #F0EAD6;
+    -fx-font-weight: bold;
+}
+
+.stat-label {
+    -fx-text-fill: #F0EAD6;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-padding: 10 0 0 0;
+}
+
+.stat-value {
+    -fx-text-fill: #b61547;
+    -fx-font-size: 26px;
+    -fx-font-weight: bold;
+    -fx-transition: 0.3s;
+}
+
+.stat-value:hover {
+    -fx-text-fill: #e74c3c;
+    -fx-scale-x: 1.1;
+    -fx-scale-y: 1.1;
+    /* Red glow effect */
+    -fx-effect: dropshadow(three-pass-box, rgba(182, 21, 71, 0.8), 15, 0, 0, 0);
+    -fx-cursor: hand;
+}
+
+.button {
+    -fx-background-radius: 0;
+    -fx-border-radius: 0;
+}
+
+.button:hover {
+    -fx-background-color: #d41a54;
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+    -fx-effect: dropshadow(gaussian, rgba(182, 21, 71, 0.5), 10, 0, 0, 0);
+}
+
+.rounded-button {
+    -fx-background-color: #b61547;
+    -fx-text-fill: #F0EAD6;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8;
+    -fx-border-color: #d4af37;
+    -fx-border-radius: 8;
+    -fx-border-width: 1;
+    -fx-cursor: hand;
+    -fx-padding: 10 25 10 25;
+}
+
+.rounded-button:hover {
+    -fx-background-color: #d41a54;
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+    -fx-effect: dropshadow(gaussian, rgba(182, 21, 71, 0.5), 10, 0, 0, 0);
+}
+
+.message-label {
+    -fx-text-fill: #e74c3c;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-wrap-text: true;
+}
+
+.buyin-button {
+    -fx-background-color: #04a12b;
+    -fx-text-fill: #F0EAD6;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8;
+    -fx-border-color: #d4af37;
+    -fx-border-radius: 8;
+    -fx-border-width: 1;
+    -fx-cursor: hand;
+    -fx-padding: 10 30 10 30;
+    -fx-min-width: 200px;
+}
+
+.buyin-button:hover {
+    -fx-background-color: #00cc33;
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+    -fx-effect: dropshadow(gaussian, rgba(182, 21, 71, 0.5), 10, 0, 0, 0);
+}

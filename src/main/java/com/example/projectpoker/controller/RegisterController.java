@@ -21,14 +21,6 @@ public class RegisterController {
     @FXML private PasswordField confirmPasswordField;
     @FXML private Label messageLabel;
 
-    // Common illegal characters for usernames and passwords (from google search)
-    //      Spaces: Often forbidden, especially in usernames, as they can break systems that parse input.
-    //      Backs lash (\): Frequently disallowed in passwords because it acts as an escape character.
-    //      Quotes (" and '): Double and single quotes are often blocked to prevent SQL injection attacks.
-    //          Angle Brackets (<, >): Often restricted to prevent HTML/scripting injection (XSS).
-    //      Control Characters: Any non-printable characters (ASCII 0-31).
-    //      Other Special Characters: Semicolon (;), colon (:), comma (,), slash (/), pipe (|), and brackets ([, ])
-
     public static final Pattern WEAK_CHARS = Pattern.compile(".*[0-9!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>\\/?].*");
     public static final Pattern ILLEGAL_CHARS = Pattern.compile("[\\s\\\\\"'<>\\u0000-\\u001F;:,/| \\[\\]]");
     public static final Pattern EMAIL_CHARS = Pattern.compile("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
@@ -90,24 +82,8 @@ public class RegisterController {
         }
         userDAO.insert(newUser);
 
-        // set user as logged in
-//        SessionManager.setCurrentUser(newUser);
-//        try {
-//            PokerApplication app = new PokerApplication();
-//            app.createPokerGame();
-//        } catch (IOException e) {
-//            messageLabel.setText("Could not start game: " + e.getMessage());
-//        }
         SessionManager.setCurrentUser(newUser);
         try {
-//            FXMLLoader loader = new FXMLLoader(getClass().getResource(
-//                    "/com/example/projectpoker/MainMenu.fxml"));
-//            Parent root = loader.load();
-//            Stage stage = (Stage) usernameField.getScene().getWindow();
-//            stage.setScene(new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT));
-//            stage.setTitle("PokerPro+");
-//            stage.setMaximized(false);
-//            stage.show();
             FXMLLoader loader = new FXMLLoader(getClass().getResource(
                     "/com/example/projectpoker/MainMenu.fxml"));
             Parent root = loader.load();
@@ -120,14 +96,6 @@ public class RegisterController {
     @FXML
     private void goToLogin() {
         try {
-//            FXMLLoader loader = new FXMLLoader(getClass().getResource(
-//                    "/com/example/projectpoker/Account & Profile UI/login.fxml"));
-//            Parent root = loader.load();
-//            Stage stage = (Stage) usernameField.getScene().getWindow();
-//            stage.setScene(new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT));
-//            stage.setTitle("PokerPro+");
-//            stage.setMaximized(false);
-//            stage.show();
             FXMLLoader loader = new FXMLLoader(getClass().getResource(
                     "/com/example/projectpoker/Account & Profile UI/login.fxml"));
             Parent root = loader.load();

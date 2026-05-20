@@ -2,17 +2,14 @@ package com.example.projectpoker.controller;
 
 import com.example.projectpoker.service.SessionManager;
 import com.example.projectpoker.model.User;
+import com.example.projectpoker.database.UserDAO;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import java.io.IOException;
 import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.stage.Stage;
 import javafx.scene.control.Label;
 
 public class ProfileController {
-    private static final int WINDOW_WIDTH = 350;
-    private static final int WINDOW_HEIGHT = 400;
 
     @FXML private Label usernameLabel;
     @FXML private Label totalHandsLabel;
@@ -36,18 +33,40 @@ public class ProfileController {
     }
 
     @FXML
+    private void handleBuyIn() {
+        User user = SessionManager.getCurrentUser();
+
+        if (user == null) {
+            messageLabel.setText("No user logged in.");
+            return;
+        }
+
+        if(user.getCurrentBalance()<=10000) {
+
+            // Add 1000 to the user's balance
+            user.setCurrentBalance(user.getCurrentBalance() + 1000);
+
+            // Persist to database
+            new UserDAO().update(user);
+
+            // Update the UI
+            balanceLabel.setText(Integer.toString(user.getCurrentBalance()));
+//        messageLabel.setText("Successfully added $1000! New balance: $" + user.getCurrentBalance());
+        }
+        if(user.getCurrentBalance()>10000) {
+            messageLabel.setText("Whoa there buddy, I think you've got enough.");
+
+        }}
+
+    @FXML
     private void goToMain() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(
                     "/com/example/projectpoker/MainMenu.fxml"));
             Parent root = loader.load();
-            Stage stage = (Stage) (messageLabel).getScene().getWindow();
-            Scene optionsScene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT);
-            stage.setScene(optionsScene);
-            stage.setTitle("PokerPro+");
-            stage.show();
+            messageLabel.getScene().setRoot(root);
         } catch (IOException e) {
-            messageLabel.setText("Could not load Options Menu.");
+            messageLabel.setText("Could not load Main Menu.");
         }
     }
 
@@ -58,10 +77,7 @@ public class ProfileController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(
                     "/com/example/projectpoker/Account & Profile UI/login.fxml"));
             Parent root = loader.load();
-            Stage stage = (Stage) usernameLabel.getScene().getWindow();
-            stage.setScene(new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT));
-            stage.setTitle("PokerPro+");
-            stage.show();
+            usernameLabel.getScene().setRoot(root);
         } catch (IOException e) {
             messageLabel.setText("Could not load login screen.");
         }

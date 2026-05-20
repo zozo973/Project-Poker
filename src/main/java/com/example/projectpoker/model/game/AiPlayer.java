@@ -6,8 +6,8 @@ import com.example.projectpoker.model.game.enums.Difficulty;
 import com.example.projectpoker.model.statistics.SkewNormalSampler;
 
 import java.util.ArrayList;
-
 import java.util.Random;
+
 import static com.example.projectpoker.model.game.PotUtil.getToCall;
 import static java.lang.Math.abs;
 
@@ -57,9 +57,8 @@ public class AiPlayer extends Player {
                     break;
                 case RAISE:
                     int raiseAmount = Math.max(response.amount, getMinBet());
-                    if (raiseAmount <= getBalance()) {
-                        setAction(Action.ALLIN);
-                        setActiveBet(getBalance());
+                    if (raiseAmount > getBalance()) {
+                        raiseAmount = getBalance();
                     }
                     if (raiseAmount <= toCall) {
                         int callAmt = Math.min(toCall, getBalance());
@@ -76,8 +75,13 @@ public class AiPlayer extends Player {
                             }
                         }
                     } else {
-                        setAction(Action.RAISE);
-                        setActiveBet(raiseAmount);
+                        if (raiseAmount == getBalance()) {
+                            setAction(Action.ALLIN);
+                            setActiveBet(raiseAmount);
+                        } else {
+                            setAction(Action.RAISE);
+                            setActiveBet(raiseAmount);
+                        }
                     }
                     break;
 
@@ -139,7 +143,9 @@ public class AiPlayer extends Player {
                 }
                 return;
             }
-            betAmount = getMinBet() + ((getBalance() - minBet) * (random.nextInt((int) ((Math.floor((double) (getBalance() - minBet) / getMinBet() + 1))))));
+            int raiseStep = Math.max(getMinBet(), 1);
+            int maxExtraSteps = Math.max(0, (getBalance() - minBet) / raiseStep);
+            betAmount = minBet + (raiseStep * random.nextInt(maxExtraSteps + 1));
         } else {
             if (betAmount == toCall) {
                 setAction(Action.CALL);

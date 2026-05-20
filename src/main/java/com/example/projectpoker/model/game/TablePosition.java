@@ -41,7 +41,7 @@ public class TablePosition {
 
     public static TablePosition DeckPos     = new TablePosition(150,85,0,2,90);
     public static TablePosition FoldedPos   = new TablePosition(150,150,0,0,90);
-    public static TablePosition PlayerPos   = new TablePosition(300,300,15,0,0, 0.3, -80, -10, 60, -40);
+    public static TablePosition PlayerPos   = new TablePosition(270,280,20,0,0, 0.41, -80, -10, 60, -50);
     public static TablePosition BoardPos    = new TablePosition(250,123,54,0,0, 1);
 
     public static TablePosition TopLeftPos   = new TablePosition(190, 0, -15, 0, 180, 0.3, -20, 25, 70, 10);

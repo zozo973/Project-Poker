@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.image.ImageView?>
+
+<VBox alignment="TOP_CENTER" spacing="12.0"
+      xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.example.projectpoker.controller.TutorialController"
+      stylesheets="@/CSS/Menu's/TutorialStyle.css"
+      styleClass="root">
+
+    <padding>
+        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
+    </padding>
+
+    <Label text="Tutorial Menu" style="-fx-font-size: 35px; -fx-font-weight: bold; -fx-text-fill: #d4af37;">
+        <VBox.margin>
+            <Insets top="30.0"/>
+        </VBox.margin>
+    </Label>
+
+    <!-- Tutorial Screenshot Selection -->
+    <VBox alignment="CENTER" spacing="5.0">
+        <!-- This is for extra captions for the screenshots -->
+        <Label fx:id="imageCaptionLabel" style="-fx-font-size: 14px; -fx-text-fill: #d4af37;"/>
+        <HBox alignment="CENTER" spacing="15.0">
+            <Button fx:id="previousButton" text="&lt;" onAction="#previousTutorialScreenshot" styleClass="nav-button"/>
+            <StackPane styleClass="image-frame">
+                <ImageView fx:id="tutorialImageView" fitHeight="200.0" preserveRatio="true"/>
+            </StackPane>
+            <Button fx:id="nextButton" text="&gt;" onAction="#nextTutorialScreenshot" styleClass="nav-button"/>
+        </HBox>
+        <Label fx:id="pageIndicatorLabel" styleClass="page-number"/>
+    </VBox>
+
+    <!-- Message label for errors/success -->
+    <Label fx:id="messageLabel" styleClass="message-label"/>
+
+    <!-- Action Buttons -->
+    <HBox alignment="CENTER" spacing="10.0">
+        <Button text="Back" onAction="#goToMain" styleClass="action-button"/>
+        <Button text="Start Game" onAction="#goToGame" styleClass="start-button"/>
+    </HBox>
+</VBox>

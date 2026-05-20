@@ -1,0 +1,83 @@
+.root {
+    -fx-background-color:
+            #111111, /* 1. Square Black (Corners) */
+            #111111, /* 2. Curved Rail */
+            #d4af37, /* 3. Yellow Inner Border */
+            radial-gradient(center 50% 50%, radius 60%, #1c6044, #0d3b2a); /* 4. Green Felt */
+
+    -fx-background-insets: 0, 5, 35, 37;
+    -fx-background-radius: 0, 40, 15, 13;
+
+    -fx-font-family: "Segoe UI", Helvetica, Arial, sans-serif;
+    -fx-padding: 40;
+}
+
+.menu-title {
+    -fx-font-size: 36px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #d4af37;
+}
+
+.menu-button {
+    -fx-background-color: #b61547;
+    -fx-text-fill: #F0EAD6;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8;
+    -fx-border-color: #d4af37;
+    -fx-border-radius: 8;
+    -fx-border-width: 1;
+    -fx-cursor: hand;
+    -fx-padding: 10 30 10 30;
+    -fx-min-width: 200px;
+}
+
+.menu-button:hover {
+    -fx-background-color: #d41a54;
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+    -fx-effect: dropshadow(gaussian, rgba(182, 21, 71, 0.5), 10, 0, 0, 0);
+}
+
+.small-menu-button {
+    -fx-background-color: #b61547;
+    -fx-text-fill: #F0EAD6;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8;
+    -fx-border-color: #d4af37;
+    -fx-border-radius: 8;
+    -fx-border-width: 1;
+    -fx-cursor: hand;
+    -fx-padding: 8 15 8 15;
+    -fx-min-width: 100px;
+    -fx-pref-width: 110px;
+}
+
+.small-menu-button:hover {
+    -fx-background-color: #d41a54;
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+    -fx-effect: dropshadow(gaussian, rgba(182, 21, 71, 0.5), 10, 0, 0, 0);
+}
+
+.start-button {
+    -fx-background-color: #04a12b;
+    -fx-text-fill: #F0EAD6;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8;
+    -fx-border-color: #d4af37;
+    -fx-border-radius: 8;
+    -fx-border-width: 1;
+    -fx-cursor: hand;
+    -fx-padding: 10 30 10 30;
+    -fx-min-width: 200px;
+}
+
+.start-button:hover {
+    -fx-background-color: #00cc33;
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+    -fx-effect: dropshadow(gaussian, rgba(182, 21, 71, 0.5), 10, 0, 0, 0);
+}

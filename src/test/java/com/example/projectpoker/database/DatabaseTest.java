@@ -1,5 +1,6 @@
 package com.example.projectpoker.database;
 
+import com.example.projectpoker.model.GamePreferences;
 import com.example.projectpoker.model.User;
 import com.example.projectpoker.model.game.Card;
 import com.example.projectpoker.model.game.Game;
@@ -60,7 +61,7 @@ class DatabaseTest {
             // This verifies the persistence layer creates the schema the application depends on.
             ResultSet resultSet = statement.executeQuery(
                     "SELECT name FROM sqlite_master WHERE type = 'table' AND name IN "
-                            + "('users', 'game_sessions', 'round_logs', 'round_actions')"
+                            + "('users', 'user_preferences', 'game_sessions', 'round_logs', 'round_actions')"
             );
 
             int tableCount = 0;
@@ -68,7 +69,7 @@ class DatabaseTest {
                 tableCount++;
             }
 
-            assertEquals(4, tableCount);
+            assertEquals(5, tableCount);
         }
     }
 
@@ -111,6 +112,40 @@ class DatabaseTest {
         assertEquals(8, loadedUser.getTotalHandsPlayed());
         assertEquals(3, loadedUser.getTotalWins());
     }
+
+    @Test
+    void saveAndLoadUserPreferencesPersistsOptions() {
+        UserDAO userDAO = new UserDAO();
+        User user = new User(DEMO_USERNAME, "hashed-password", DEMO_EMAIL);
+        userDAO.insert(user);
+
+        UserPreferencesDAO preferencesDAO = new UserPreferencesDAO();
+        GamePreferences preferences = new GamePreferences(3, Difficulty.Professional, "back4", "classic3");
+
+        preferencesDAO.saveForUserId(user.getId(), preferences);
+        GamePreferences loadedPreferences = preferencesDAO.getByUserId(user.getId());
+
+        assertEquals(3, loadedPreferences.getOpponentCount());
+        assertEquals(Difficulty.Professional, loadedPreferences.getDifficulty());
+        assertEquals("back4", loadedPreferences.getCardBackKey());
+        assertEquals("classic3", loadedPreferences.getBoardKey());
+    }
+
+    @Test
+    void initializeDatabaseCreatesDefaultPreferencesForExistingUsers() {
+        UserDAO userDAO = new UserDAO();
+        User user = new User(DEMO_USERNAME, "hashed-password", DEMO_EMAIL);
+        userDAO.insert(user);
+
+        DatabaseManager.initializeDatabase();
+        GamePreferences loadedPreferences = new UserPreferencesDAO().getByUserId(user.getId());
+
+        assertEquals(GamePreferences.DEFAULT_OPPONENTS, loadedPreferences.getOpponentCount());
+        assertEquals(GamePreferences.DEFAULT_DIFFICULTY, loadedPreferences.getDifficulty());
+        assertEquals(GamePreferences.DEFAULT_CARD_BACK_KEY, loadedPreferences.getCardBackKey());
+        assertEquals(GamePreferences.DEFAULT_BOARD_KEY, loadedPreferences.getBoardKey());
+    }
+
     @Test
     // forth test checks that a completed round writes both a round log row and action rows to the database.
     void recordRoundPersistsRoundLogsAndActions() throws SQLException {
@@ -127,7 +162,7 @@ class DatabaseTest {
         players.add(aiTwo);
         RoleUtil.delegateRoles(players, new int[]{0, 1, 2});
 
-        Game game = new Game(userPlayer, user, 1000, 3, 50, 5, 10, Difficulty.BABY);
+        Game game = new Game(userPlayer, user, 1000, 3, 50, 5, 10, Difficulty.Baby);
         int gameSessionId = DatabaseManager.createGameSession(user, game, userPlayer);
 
         Round round = new Round(players, 50, gameSessionId, 1);

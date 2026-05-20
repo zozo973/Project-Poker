@@ -314,8 +314,6 @@ public class Round {
         }
     }
 
-    // TODO Attach to the game controller
-    // On click method depending on player choice
     public void recordPlayerAction(Player player) {
         Integer activeBetValue = player.getActiveBet();
         int betSize = activeBetValue != null ? activeBetValue : 0;
@@ -438,6 +436,10 @@ public class Round {
                 emitLog(activePlayer.getName() + " to call: " + this.toPlay + ". Current action: " + activePlayer.getAction() + ".");
                 if (!Action.hasFolded(activePlayer.getAction()) && activePlayer.getAction().equals(Action.UNDECIDED)) {
                     if (testAllPlayersFolded(activePlayer)) {
+                        endBetting(activePlayer);
+                        break;
+                    }
+                    if (testAllPlayersFolded(activePlayer)) {
                         activePlayer.setAction(Action.CHECK);
                         activePlayer.setActiveBet(0);
                         recordPlayerAction(activePlayer);
@@ -527,7 +529,7 @@ public class Round {
             //Random random = new Random();
             //int thinkTime = random.nextInt((2000-500)+1) + 500;
             try {
-                Thread.sleep(25);
+                Thread.sleep(500);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 throw new IllegalStateException("Interrupted while Ai Player is thinking", e);
@@ -567,6 +569,7 @@ public class Round {
         }
 
         waitForPlayerDecision(activePlayer);
+
         activePlayer.play(this.pots);
     }
 
@@ -685,11 +688,12 @@ public class Round {
 
         System.out.println("Betting end conditions: c1=" + cond1 + ", c2=" + cond2 + ", c3=" + cond3 + ", c4=" + cond4 + ".");
 
-        if (numUndecided > 0 || numAllIn > 1 || numRaise > 1) {
-            return false;
-        } else if (cond3) {
+        if (cond3) {
             playShowdown();
-            return  true;
+            setBetType(BetType.ENDROUND);
+            return true;
+        } else if (numUndecided > 0 || numAllIn > 1 || numRaise > 1) {
+            return false;
         } else if(cond4) {
             if (numCall == 1) setBetType(BetType.SKIP2SHOWDOWN);
             else setBetType(BetType.NORMAL);

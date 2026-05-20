@@ -44,7 +44,7 @@ public class AiPlayer extends Player {
             switch (response.action) {
                 case CALL:
                     int callAmount = Math.min(toCall, getBalance());
-                    if (toCall >= getBalance()) {
+                    if (toCall < getBalance()) {
                         setAction(Action.ALLIN);
                         setActiveBet(getBalance());
                     } else if (callAmount <= 0) {

@@ -138,7 +138,7 @@ public class RoundLogDAO {
                 statement.setInt(1, roundLogId);
                 statement.setInt(2, actionOrder++);
                 statement.setString(3, entry.getPlayerName());
-                statement.setString(4, entry.getAction().name());
+                statement.setString(4, entry.getAction() == null ? "UNDECIDED" : entry.getAction().name());
                 statement.setInt(5, entry.getToCall());
                 statement.setInt(6, entry.getBetSize());
                 statement.setString(7, entry.displayGameLogEntry());

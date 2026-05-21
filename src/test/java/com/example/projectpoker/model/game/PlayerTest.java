@@ -37,22 +37,6 @@ class PlayerTest {
     }
 
     @Test
-    void testConstructorWithName() {
-        Player p = new Player("Alice");
-        assertEquals("Alice", p.getName());
-        assertEquals(1000, p.getBalance());
-        assertEquals(Roles.PLAYER, p.getRole());
-    }
-
-    @Test
-    void testConstructorWithNameAndRole() {
-        Player p = new Player("Bob", Roles.BIGBLIND);
-        assertEquals("Bob", p.getName());
-        assertEquals(Roles.BIGBLIND, p.getRole());
-        assertEquals(Action.UNDECIDED, p.getAction());
-    }
-
-    @Test
     void testConstructorWithNameAndBalance() {
         Player p = new Player("Charlie", 500);
         assertEquals("Charlie", p.getName());

@@ -9,9 +9,19 @@ public class PlayerId {
     private static final int length = 12;
     private String id;
 
+    /** No args constructor
+     *      Used when generating a player object without a unique identifier.
+     */
+
     public PlayerId() {
         this.id = generateRandomId();
     }
+
+    /** Main constructor
+     *      Used if a player object already has a unique identifier.
+     * @param id: players unique identifier
+     * @throws IOException: Input Output exception thrown from validateId if id is invalid.
+     */
 
     public PlayerId(String id) throws IOException {
         validateId(id);
@@ -27,7 +37,7 @@ public class PlayerId {
         }
         for (char ch : id.toCharArray()) {
             if (!CHARACTERS.contains(String.valueOf(ch))) {
-                throw new IOException("Id is invalid length");
+                throw new IOException("Id is invalid, it contains invalid characters");
             }
         }
         this.id = id;

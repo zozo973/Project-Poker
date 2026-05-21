@@ -11,7 +11,12 @@ public class Card {
     private Suit suit;
     private Rank rank;
 
-    // Constructor
+    /** Constructor
+     *
+     * @param suit: card suit (e.g. heart, diamond, spade, club).
+     * @param rank: card rank (e.g. 2,3,4,..., Queen, King, Ace).
+     */
+
     public Card(Suit suit, Rank rank) {
         this.suit = suit;
         this.rank = rank;

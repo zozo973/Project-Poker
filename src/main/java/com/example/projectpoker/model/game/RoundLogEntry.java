@@ -11,7 +11,12 @@ public class RoundLogEntry {
     private Pot currentPot;
     private String entryDescription;
 
-    // RoundLogEntry constructor for inputting end of round entry into the RoundLogEntry
+
+    /** End of Round Constructor
+     *      Creates RoundLogEntry for inputting end of round entry into the RoundLogEntry
+     * @param entryDescription: string description.
+     */
+
     public RoundLogEntry(String entryDescription) {
         this.player = null;
         this.action = null;
@@ -19,7 +24,12 @@ public class RoundLogEntry {
         this.entryDescription = entryDescription;
     }
 
-    // RoundLogEntry constructor for inputting specific entryDescriptions into the RoundLogEntry
+    /** Player specific Constructor
+     *      Creates RoundLogEntry for inputting specific entryDescriptions into the RoundLogEntry
+     * @param player: Player object related to the entry Description.
+     * @param entryDescription: String of the description.
+     */
+
     public RoundLogEntry(Player player, String entryDescription) {
 
         this.player = player;
@@ -28,7 +38,12 @@ public class RoundLogEntry {
         this.entryDescription = entryDescription;
     }
 
-    // Constructor for a new pot being created
+    /** New Pot Constructor
+     *      Creates RoundLogEntry for a new pot being created
+     * @param player: Player object that created the pot.
+     * @param currentPot: Open pot bet into prior to sidePot creation
+     */
+
     public RoundLogEntry(Player player, Pot currentPot) {
         this.player = player;
         this.betSize = 0;
@@ -36,7 +51,15 @@ public class RoundLogEntry {
         this.entryDescription = player.getName() + " has created a new side pot, with a priority of "+ currentPot.getPotPriority() +" and a value of " + currentPot.getPotSize();
     }
 
-    // Default constructor for calling, raising or all-in actions
+    /** Raising Bet Constructor
+     *      Creates RoundLogEntry for calling, raising or all-in actions
+     * @param player: Active player.
+     * @param toCall: Amount to call after players bet.
+     * @param betSize: The integer size of the players bet.
+     * @param action: The players action.
+     * @param currentPot: The size of the open pot after player bet.
+     */
+
     public RoundLogEntry(Player player, int toCall, int betSize, Action action, Pot currentPot) {
         this.player = player;
         this.action = action;
@@ -46,11 +69,16 @@ public class RoundLogEntry {
         setEntryDescription();
     }
 
-    // Constructor for checking or folding actions
-    public RoundLogEntry(Player player, int betSize) {
+
+    /** Non Betting Constructor
+     *      Creates RoundLogEntry for checking or folding actions
+     * @param player: Active player.
+     */
+
+    public RoundLogEntry(Player player) {
         this.player = player;
         this.action = player.getAction();
-        this.betSize = betSize;
+        this.betSize = 0;
         this.entryDescription = player.getName() + " decided to " + action.getDescription();
     }
 

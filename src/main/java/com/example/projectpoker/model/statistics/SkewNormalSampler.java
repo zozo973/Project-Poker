@@ -5,10 +5,18 @@ import java.util.Random;
 public class SkewNormalSampler {
     private final Random random;
 
+    /** No args Constructor
+     *      Sets a new random field
+     */
+
     public SkewNormalSampler() {
         this.random = new Random();
     }
 
+    /** Constructor
+     *      Creates an object of this class with a repeatable seed.
+     * @param seed: unique seed used to give the random field repeatability.
+     */
     public SkewNormalSampler(long seed) {
         this.random = new Random(seed);
     }

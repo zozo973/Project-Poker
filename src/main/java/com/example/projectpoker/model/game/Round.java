@@ -48,18 +48,13 @@ public class Round {
     private boolean persisted;
     private volatile boolean stopRequested;
 
-    // Constructor called for unit tests the Round class
-
-    public Round(ArrayList<Player> players, int blindSize) {
-        this(players, blindSize, -1, 0);
-    }
 
     /** Constructor called when starting a new round of poker
-     * @Params
-     *      players: A list of all players participating in the round
-     *      blindSize: Size of the blinds
-     *      gameSessionId: gameSessionId for data Base
-     *      roundNumber: Passed from the game class, to display the round number in the GUI
+     *
+     * @param players: A list of all players participating in the round
+     * @param blindSize: Size of the blinds
+     * @param gameSessionId: gameSessionId for data Base
+     * @param roundNumber: Passed from the game class, to display the round number in the GUI
      */
 
     public Round(ArrayList<Player> players, int blindSize, int gameSessionId, int roundNumber) {
@@ -79,6 +74,13 @@ public class Round {
         this.persisted = false;
         this.stopRequested = false;
         setRoundStatus(RoundStatus.UNINITIALISED); // Possibly change
+    }
+
+    /** Constructor called for unit tests the Round class
+     */
+
+    public Round(ArrayList<Player> players, int blindSize) {
+        this(players, blindSize, -1, 0);
     }
 
     public void addPropertyChangeListener(PropertyChangeListener listener) {
@@ -323,7 +325,7 @@ public class Round {
         } else if (Action.hasFolded(player.getAction())) {
             addRoundLogEntry(new RoundLogEntry(player,player.getName() + " has decided to fold."));
         } else {
-            addRoundLogEntry(new RoundLogEntry(player, betSize));
+            addRoundLogEntry(new RoundLogEntry(player));
         }
     }
 
@@ -727,7 +729,6 @@ public class Round {
         if (stopRequested) {
             return;
         }
-        BetTypeLogic.executeBets(BetType.NORMAL);
         betting();
 
         switch (betType) {

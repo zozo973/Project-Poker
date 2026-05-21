@@ -8,14 +8,11 @@ public class Bet {
     private int betSize;
     private Pot pot;
 
-    public Bet() {
-        this.betSize = 0;
-    }
-
-    public Bet(Pot pot) {
-        this.betSize = 0;
-        this.pot = pot;
-    }
+    /** Main Constructor
+     *      used to make a bet such that a players bets can be tracked and counted over multiple pots.
+     * @param betSize: integer amount quantifying the bet.
+     * @param pot: The Pot object the bet was made into.
+     */
 
     public Bet(int betSize, Pot pot) {
         this.betSize = betSize;

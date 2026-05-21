@@ -16,11 +16,18 @@ public class AiPlayer extends Player {
     private final Difficulty difficulty;
     private AIActions.AiPlayerResponse response;
 
+    /** Main Constructor
+     *
+     * @param difficulty: How good each AiPlayer, the higher the difficulty the better the player is.
+     * @param userBalance: AiPlayer object uses the userBalance and a skewed PDF,
+     *                  to sample a starting balance relative to the users and the difficulty.
+     */
 
-    public AiPlayer(Difficulty difficulty, int playerBalance) {
+
+    public AiPlayer(Difficulty difficulty, int userBalance) {
         super();
         this.difficulty = difficulty;
-        this.setBalance(generateAiPlayer(playerBalance));
+        this.setBalance(generateAiPlayer(userBalance));
     }
 
     public AIActions.AiPlayerResponse getResponse() { return response; }

@@ -10,6 +10,10 @@ public class CardDeck {
 
     private final ArrayList<Card> cardDeck;
 
+    /** No args Constructor
+     *      Creates a new deck of cards
+     */
+
     public CardDeck() {
         cardDeck = new ArrayList<>(52);
         reset();
@@ -31,9 +35,12 @@ public class CardDeck {
     }
 
     /**
-     * Get a random card from the deck, removing it from the deck
-     * @ return
+     * Draw
+     *      Selects the top card from the deck, removing it and returning.
+     * @return Card: randomly selected card
+     *
      */
+
     public Card draw() {
         if (cardDeck.isEmpty()) { return null; }
         Card c = cardDeck.getFirst();

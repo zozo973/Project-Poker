@@ -30,8 +30,11 @@ public class Player {
     private Roles role;
     private Integer activeBet;
 
-    // No args constructor, minimum balance a player starts a
-    // game with if they do not choose to use money they have won before.
+    /** No args constructor
+     *      Minimum balance a player starts a game with if they do not choose to use money they have won before.
+     *      Used in testing the Player class and in AiPlayer to set the main fields.
+     */
+
     public Player() {
         this.name = "";
         this.id = new PlayerId();
@@ -45,44 +48,13 @@ public class Player {
         this.activeBet = null;
     }
 
-    public Player(String name) {
-        this.name = name;
-        this.id = new PlayerId();
-        this.playerHand = new Hand();
-        this.isTurn = false;
-        this.action = Action.UNDECIDED;
-        this.balance = 1000;
-        this.minBet = 15;
-        this.role = Roles.PLAYER;
-        this.roundInvestment = new RoundInvestment();
-        this.activeBet = null;
-    }
-
-    public Player(String name, Roles role) {
-        this.name = name;
-        this.id = new PlayerId();
-        this.playerHand = new Hand();
-        this.isTurn = false;
-        this.balance = 1000;
-        this.minBet = 15;
-        this.action = Action.UNDECIDED;
-        this.role = role;
-        this.roundInvestment = new RoundInvestment();
-        this.activeBet = null;
-    }
-
-    public Player(String name, int balance) {
-        this.name = name;
-        this.id = new PlayerId();
-        this.playerHand = new Hand();
-        this.isTurn = false;
-        this.balance = balance;
-        this.minBet = 15;
-        this.action = Action.UNDECIDED;
-        this.role = Roles.PLAYER;
-        this.roundInvestment = new RoundInvestment();
-        this.activeBet = null;
-    }
+    /** Constructor called for testing other classes that use player objects
+     *
+     * @param name: Player's name, either users name from database or AiPlayer name.
+     * @param balance: Players starting balance
+     * @param id: Players unique identifier used to match hand evaluation winner to a player object
+     * @param blindSize: blindSize represents the smallest bet a player can make
+     */
 
     public Player(String name, int balance, String id, int blindSize) throws IOException {
         this.name = name;
@@ -91,6 +63,25 @@ public class Player {
         this.isTurn = false;
         this.balance = balance;
         this.minBet = blindSize;
+        this.action = Action.UNDECIDED;
+        this.role = Roles.PLAYER;
+        this.roundInvestment = new RoundInvestment();
+        this.activeBet = null;
+    }
+
+    /** Main constructor, used to instantiate a player outside of testing.
+     *
+     * @param name: Player's name, either users name from database or AiPlayer name.
+     * @param balance: Players starting balance
+     */
+
+    public Player(String name, int balance) {
+        this.name = name;
+        this.id = new PlayerId();
+        this.playerHand = new Hand();
+        this.isTurn = false;
+        this.balance = balance;
+        this.minBet = 15;
         this.action = Action.UNDECIDED;
         this.role = Roles.PLAYER;
         this.roundInvestment = new RoundInvestment();
@@ -131,7 +122,6 @@ public class Player {
         this.playerHand.addCard(c);
     }
 
-    // TODO implement validation for UI input
     public int getBalance() { return balance; }
 
     public void subtractBalance(int amount) { setBalance(this.balance - amount); }

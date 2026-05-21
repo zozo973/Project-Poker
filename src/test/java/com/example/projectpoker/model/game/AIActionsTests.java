@@ -69,7 +69,7 @@ public class AIActionsTests {
         RoundStatus status = RoundStatus.values()[0];
 
         List<AiPlayerResponse> result =
-                aiActions.getAllChoices(hands, boardCards, status);
+                callGetAllChoices(aiActions, hands, boardCards, status);
 
         assertNotNull(result);
         assertEquals(1, result.size());
@@ -92,6 +92,39 @@ public class AIActionsTests {
     private AiPersonality getRandomPersonality() {
         AiPersonality[] personalities = AiPersonality.values();
         return personalities[new Random().nextInt(personalities.length)];
+    }
+
+    private List<AiPlayerResponse> callGetAllChoices(
+            AIActions aiActions,
+            List<Card[]> hands,
+            Card[] boardCards,
+            RoundStatus status
+    ) {
+        int playerCount = hands.size();
+
+        List<Integer> stackSizes = new ArrayList<>();
+        List<Integer> requiredToCallList = new ArrayList<>();
+        List<Integer> alreadyInvestedList = new ArrayList<>();
+
+        for (int i = 0; i < playerCount; i++) {
+            stackSizes.add(1000);
+            requiredToCallList.add(0);
+            alreadyInvestedList.add(0);
+        }
+
+        int toPlay = 0;
+        int potSize = 100;
+
+        return aiActions.getAllChoices(
+                hands,
+                boardCards,
+                status,
+                toPlay,
+                potSize,
+                stackSizes,
+                requiredToCallList,
+                alreadyInvestedList
+        );
     }
 
     private Card createRandomCard() {
@@ -155,7 +188,7 @@ public class AIActionsTests {
         RoundStatus status = RoundStatus.values()[0];
 
         List<AiPlayerResponse> result =
-                aiActions.getAllChoices(hands, boardCards, status);
+                callGetAllChoices(aiActions, hands, boardCards, status);
 
         assertNotNull(result);
         assertEquals(3, result.size(), "Should return one AI response per player");

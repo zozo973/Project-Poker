@@ -552,24 +552,35 @@ public class Round {
     private void processActivePlayer(Player activePlayer) {
         int playerBalance = activePlayer.getBalance();
 
-        // If player is all-in (balance <= 0), they automatically check
+        // If player is all-in, they automatically check.
         if (playerBalance <= 0) {
             activePlayer.setAction(Action.CHECK);
             activePlayer.setActiveBet(0);
             return;
         }
 
-        // If player has balance but not enough to call, they automatically go all-in
-        else if (this.toPlay > playerBalance) {
-            // TODO: Ask all in or fold
+        // If player has balance but not enough to call, then all-in.
+        if (this.toPlay > playerBalance) {
             activePlayer.setAction(Action.ALLIN);
             activePlayer.setActiveBet(playerBalance);
+            return;
         }
 
         if (activePlayer instanceof AiPlayer aiPlayer) {
+            // Pre-flop: keep simple and do not call Gemini.
+            if (roundStatus == RoundStatus.BETTING1) {
+                int amountToCall = getToCall(this.pots, aiPlayer);
+                if (amountToCall <= 0) {
+                    aiPlayer.setAction(Action.CHECK);
+                    aiPlayer.setActiveBet(0);
+                } else {
+                    aiPlayer.setAction(Action.CALL);
+                    aiPlayer.setActiveBet(Math.min(amountToCall, aiPlayer.getBalance()));
+                }
+                return;
+            }
             aiPlayer.setResponse(getAiDecision(aiPlayer));
         }
-
         waitForPlayerDecision(activePlayer);
 
         activePlayer.play(this.pots);
@@ -579,21 +590,42 @@ public class Round {
     }
 
     private AIActions.AiPlayerResponse getAiDecision(AiPlayer aiPlayer) {
-        List<Card[]> aiHands = new ArrayList<>();
-        aiHands.add(aiPlayer.getPlayerHand().getCards().toArray(new Card[0]));
-        Card[] board = communityCards.toArray(new Card[0]);
-
+        AIActions.AiPlayerResponse fallback = new AIActions.AiPlayerResponse();
         try {
+            List<Card[]> aiHands = new ArrayList<>();
+            aiHands.add(aiPlayer.getPlayerHand().getCards().toArray(new Card[0]));
+            Card[] board = communityCards.toArray(new Card[0]);
+            int requiredToCall = getToCall(this.pots, aiPlayer);
+            int potSize = pots.stream().mapToInt(Pot::getPotSize).sum();
+            Pot activePot = tryGetOpenPot(aiPlayer);
+            int alreadyInvested = activePot == null ? 0 : aiPlayer.getTotalPotInvestment(activePot);
+
+            List<Integer> stackSizes = new ArrayList<>();
+            stackSizes.add(aiPlayer.getBalance());
+
+            List<Integer> requiredToCallList = new ArrayList<>();
+            requiredToCallList.add(requiredToCall);
+
+            List<Integer> alreadyInvestedList = new ArrayList<>();
+            alreadyInvestedList.add(alreadyInvested);
+
             List<AIActions.AiPlayerResponse> responses =
-                    new AIActions().getAllChoices(aiHands, board, roundStatus);
-            if (responses != null && !responses.isEmpty() && responses.getFirst() != null) {
-                return responses.getFirst();
+                    new AIActions().getAllChoices(
+                            aiHands,
+                            board,
+                            roundStatus,
+                            requiredToCall,
+                            potSize,
+                            stackSizes,
+                            requiredToCallList,
+                            alreadyInvestedList
+                    );
+            if (responses != null && !responses.isEmpty() && responses.get(0) != null) {
+                return responses.get(0);
             }
         } catch (Exception e) {
             System.err.println("Gemini API failed, using AI fallback: " + e.getMessage());
         }
-
-        AIActions.AiPlayerResponse fallback = new AIActions.AiPlayerResponse();
         fallback.errormsg = "No AI response available.";
         return fallback;
     }

@@ -10,9 +10,16 @@ public final class RoleUtil {
         for (Player p : players) {
             p.setRole(Roles.PLAYER);
         }
-        players.get(roleIndices[0]).setRole(Roles.DEALER);
-        players.get(roleIndices[1]).setRole(Roles.SMALLBLIND);
-        players.get(roleIndices[2]).setRole(Roles.BIGBLIND);
+
+        if (players.size() == 2) {
+            players.getFirst().setRole(Roles.SMALLBLIND);
+            players.getLast().setRole(Roles.BIGBLIND);
+        } else {
+            players.get(roleIndices[0]).setRole(Roles.DEALER);
+            players.get(roleIndices[1]).setRole(Roles.SMALLBLIND);
+            players.get(roleIndices[2]).setRole(Roles.BIGBLIND);
+        }
+
         return players;
     }
 

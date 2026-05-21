@@ -584,9 +584,6 @@ public class Round {
         waitForPlayerDecision(activePlayer);
 
         activePlayer.play(this.pots);
-        if (activePlayer.getAction() == Action.UNDECIDED) {
-            autoResolvePlayerDecision(activePlayer, false);
-        }
     }
 
     private AIActions.AiPlayerResponse getAiDecision(AiPlayer aiPlayer) {

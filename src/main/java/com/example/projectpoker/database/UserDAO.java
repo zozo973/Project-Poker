@@ -92,6 +92,33 @@ public class UserDAO {
         }
     }
 
+    // Updates only the balance so game progress cannot overwrite newer profile statistics.
+    public void updateCurrentBalance(int userId, int currentBalance) {
+        try {
+            PreparedStatement updateUser = connection.prepareStatement(
+                    "UPDATE users SET currentBalance = ? WHERE id = ?"
+            );
+            updateUser.setInt(1, currentBalance);
+            updateUser.setInt(2, userId);
+            updateUser.executeUpdate();
+        } catch (SQLException ex) {
+            System.err.println(ex);
+        }
+    }
+
+    // Increments wins from the stored value so stale in-memory users do not lose wins.
+    public void incrementTotalWins(int userId) {
+        try {
+            PreparedStatement updateUser = connection.prepareStatement(
+                    "UPDATE users SET totalWins = totalWins + 1 WHERE id = ?"
+            );
+            updateUser.setInt(1, userId);
+            updateUser.executeUpdate();
+        } catch (SQLException ex) {
+            System.err.println(ex);
+        }
+    }
+
     // Deletes one user by their database id.
     public void delete(int id) {
         try {

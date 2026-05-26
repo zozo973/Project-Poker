@@ -17,7 +17,9 @@ public enum Action {
 
     public String getDescription() { return description; }
 
-    public static boolean hasFolded(Action action) {return action.equals(FOLD); }
+    public static boolean hasFolded(Action action) { return action.equals(FOLD); }
+
+    public static boolean isInGame(Action action) { return !(action.equals(FOLD) || action.equals(FORFEIT)); }
 
     public static boolean isRaise(Action action) { return (action.equals(RAISE) ||  action.equals(ALLIN)); }
 

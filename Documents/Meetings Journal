@@ -137,3 +137,19 @@ potentially add leaderboard UI and database logic if time allows (Ben)
 finish UI (Dylan)
 finetuning AI (Mitchell)
 start final presentation script and powerpoint
+
+Tutorial meeting 22/05
+Present: Everyone
+Discussed feedback from user testing, most necessary changes are already implemented.
+Addressed game breaking bugs. Some fixes still needed due to AI actions, advice and pot logic.
+Need to implement integration JavaDocs and Maven CI (automated build server/ GitHub actions) lost half a mark due to no integration.
+Decided on roles for presentation: The Problem, the Users, and the Purpose (Mitchel); How You Worked as a Team (Ben); Development Approach and Key Technical Decisions (Hugo); Quality Across the System (Jacob); Key Lessons and Professional Insights (Basilis), Bobby to change slides and help with overall presentation; Final slide contribution (everyone)
+Script to be uploaded under slides and seperate document to clarify everyone is on the same page
+TO DO:
+Script and presentation
+Automated build server (JavaDocs)
+finish user testing
+implement final features
+prepare final submission (last priority)
+fix all in bug (Pot.java)
+fix game loop bug

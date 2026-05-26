@@ -97,6 +97,9 @@ public class RoundLogEntry {
     public String getEntryDescription() { return this.entryDescription; }
 
     public String displayGameLogEntry(){
+        if (player == null || action == null) {
+            return entryDescription;
+        }
         String str;
         if (action == Action.RAISE) str = " by " + Integer.toString(betSize - toCall) + " dollars.";
         else if (action == Action.CALL) str = " " + Integer.toString(toCall) + " dollars to play.";
@@ -106,6 +109,9 @@ public class RoundLogEntry {
     }
 
     public String getPlayerName() {
+        if (player == null) {
+            return "SYSTEM";
+        }
         return player.getName();
     }
 

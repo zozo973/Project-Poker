@@ -204,4 +204,87 @@ class PotTest {
         RoundStatus result = pot.removeFolded(RoundStatus.BETTING1);
         assertEquals(RoundStatus.SHOWDOWN, result); // unexpected Value
     }
+
+    // Adjust Pot Test
+
+    @Test
+    void testAdjustSidePotLowerPriority() {
+        Player player3 = new Player("Player3", 1000);
+        Player player4 = new Player("Player4", 1000);
+        players.add(player3);
+        players.add(player4);
+        pot.addPlayer(player3);
+        pot.addPlayer(player4);
+
+        player1.setAction(Action.CHECK);
+        player1.setActiveBet(30);
+        pot.addBet(player1,30);
+
+        player2.setAction(Action.RAISE);
+        player2.setActiveBet(120);
+        pot.addBet(player2,120);
+
+        player3.setAction(Action.CALL);
+        player3.setActiveBet(120);
+        pot.addBet(player3,120);
+
+        player4.setAction(Action.ALLIN);
+        player4.setActiveBet(80);
+
+
+        ArrayList<Pot> pots = new ArrayList<>();
+        pots.add(pot);
+        pots = PotUtil.addNewSidePot(pots,player4,80);
+
+
+        assertEquals(2,pots.size());
+        assertEquals(1,pots.getFirst().getPotPriority());
+        assertEquals(0,pots.getLast().getPotPriority());
+
+        assertEquals(270,pots.getLast().getPotSize());
+        assertEquals(80,pots.getLast().getInvestmentPP());
+
+        assertEquals(80,pots.getFirst().getPotSize());
+        assertEquals(40,pots.getFirst().getInvestmentPP());
+    }
+
+    @Test
+    void testAdjustSidePotHigherPriority() {
+        Player player3 = new Player("Player3", 1000);
+        Player player4 = new Player("Player4", 1000);
+        players.add(player3);
+        players.add(player4);
+        pot.addPlayer(player3);
+        pot.addPlayer(player4);
+
+        player1.setAction(Action.CHECK);
+        player1.setActiveBet(30);
+        pot.addBet(player1,30);
+
+        player2.setAction(Action.ALLIN);
+        player2.setActiveBet(80);
+        pot.addBet(player2,80);
+
+        player3.setAction(Action.CALL);
+        player3.setActiveBet(80);
+        pot.addBet(player3,80);
+
+        player4.setAction(Action.RAISE);
+        player4.setActiveBet(120);
+
+
+        ArrayList<Pot> pots = new ArrayList<>();
+        pots.add(pot);
+        pots = PotUtil.addNewSidePot(pots,player4,40);
+
+        assertEquals(2,pots.size());
+        assertEquals(0,pots.getFirst().getPotPriority());
+        assertEquals(1,pots.getLast().getPotPriority());
+
+        assertEquals(40,pots.getLast().getPotSize());
+        assertEquals(40,pots.getLast().getInvestmentPP());
+
+        assertEquals(270,pots.getFirst().getPotSize());
+        assertEquals(80,pots.getFirst().getInvestmentPP());
+    }
 }

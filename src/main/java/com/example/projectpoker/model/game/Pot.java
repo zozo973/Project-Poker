@@ -65,7 +65,7 @@ public class Pot {
 
     public void addPlayer(Player player) {
         this.players.add(player);
-        addPlayer2Table(player);
+        addPlayer2Table(player,0);
     }
 
     public void setPlayers(ArrayList<Player> players) { this.players = players; }
@@ -100,6 +100,8 @@ public class Pot {
 
     public void setPotSize(int potSize) { this.potSize = potSize; }
 
+    public void addToPotSize(int amount) { this.potSize += amount; }
+
     public boolean getIsOpen() { return isOpen; }
 
     public void setIsOpen(boolean status) {
@@ -126,6 +128,8 @@ public class Pot {
     public void addPlayer2Table(Player player, int bet) {
         this.betTable.put(player,bet);
     }
+
+    public int getBetFromTable(Player player) { return this.betTable.get(player); }
 
     private void addBet2Table(Player player, int bet) {
         if (!this.players.contains(player)) {
@@ -187,34 +191,36 @@ public class Pot {
     }
 
     public void adjustPot(Pot sidePot) {
-            if (sidePot.getPotPriority() < this.potPriority) {
-                int removeInvestmentPP = sidePot.getInvestmentPP() - this.investmentPP;
-                int removePotTotal = this.potSize - removeInvestmentPP*players.size();
-                if (this.potSize <= 0) throw new IllegalStateException("THe pot can't have 0 or negative amount of money in it");
-                if (removeInvestmentPP <= 0 ) throw new IllegalStateException("adjustPot Method has been implemented on the incorrect pot");
-                reInitPot(removeInvestmentPP,removePotTotal);
+        if (sidePot.getPotPriority() < this.potPriority) {
 
-                sidePot.initPot(this.players);
+            int removeInvestmentPP = sidePot.getInvestmentPP();
+            if (this.investmentPP - sidePot.getInvestmentPP() < 0 ) throw new IllegalStateException("adjustPot Method has been implemented on the incorrect pot");
+            this.investmentPP -= removeInvestmentPP;
+
+            for (Player p : this.players) {
+                int amountInvested = this.betTable.get(p);
+
+                if (Action.isInGame(p.getAction())) {
+                    if (!sidePot.getPlayers().contains(p)) sidePot.addPlayer(p);
+                    if (amountInvested <= removeInvestmentPP && amountInvested != 0) {
+                        this.potSize -= amountInvested;
+                        this.betTable.put(p, 0);
+
+                        sidePot.addBet2Table(p, amountInvested);
+                        sidePot.addToPotSize(amountInvested);
+
+                    } else if (amountInvested != 0) {
+                        this.potSize -= removeInvestmentPP;
+                        this.betTable.put(p, amountInvested - removeInvestmentPP);
+
+                        sidePot.addBet2Table(p, removeInvestmentPP);
+                        sidePot.addToPotSize(removeInvestmentPP);
+                    }
+                    p.getRoundInvestment().reInit(this);
+                    p.getRoundInvestment().reInit(sidePot);
+                }
             }
-    }
-
-    private void reInitPot(int removeToPlay,int removePotTotal) {
-        this.toPlay-= removeToPlay;
-        this.potSize-=removePotTotal;
-        for (Player p : players) {
-            int currentBets = this.betTable.get(p);
-            this.betTable.put(p,currentBets-removePotTotal);
-        }
-    }
-
-    private void initPot(ArrayList<Player> players) {
-        for (Player p : players) {
-            if (!this.players.contains(p)) {
-                addPlayer(p);
-                addPlayer2Table(p,this.investmentPP);
-                this.potSize += this.investmentPP;
-                p.getRoundInvestment().reInit(this);
-            }
+            if (this.potSize < 0) throw new IllegalStateException("THe pot can't have negative amount of money in it");
         }
     }
 }

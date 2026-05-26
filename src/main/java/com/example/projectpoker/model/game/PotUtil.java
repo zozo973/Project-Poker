@@ -1,5 +1,7 @@
 package com.example.projectpoker.model.game;
 
+import com.example.projectpoker.model.game.enums.Action;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 
@@ -14,21 +16,25 @@ public final class PotUtil {
             potPriority = bestPot.getPotPriority() + 1;
         } else {
             potPriority = bestPot.getPotPriority();
+            bestPot.stepPotPriority(1);
         }
 
-        if (bestPot.equals(findHighestPriorityPot(pots)) && bestPot.getInvestmentPP() <=
-                (p.getTotalPotInvestment(bestPot) + p.getBalance())) {
+        if (bestPot.equals(findHighestPriorityPot(pots)) && p.getAction().equals(Action.RAISE) && bestPot.getInvestmentPP() <=
+                (p.getTotalPotInvestment(bestPot)+p.getActiveBet())) {
             adjustPot = false;
         }
 
         Pot newSidePot = new Pot(p,potPriority);
-        newSidePot.addBet(p,newPotSize);
 
         if (adjustPot) {
-            newSidePot.setIsOpen(false);
+            newSidePot.addBet(p,newPotSize);
+            newSidePot.setIsOpen(true);
             return adjustMultiplePots(pots, newSidePot);
         }
         else {
+            bestPot.addBet(p,p.getActiveBet()-newPotSize);
+            newSidePot.addBet(p,newPotSize);
+
             newSidePot.setIsOpen(true);
             pots.add(newSidePot);
             return pots;
@@ -51,7 +57,6 @@ public final class PotUtil {
         return pots;
     }
 
-    // TODO: potentially remove or implement
     public static void setPotsToPlay(ArrayList<Pot> pots, int toPlay) {
         Integer openPotIndex = getOpenPotIndex(pots);
         if (openPotIndex != null) {

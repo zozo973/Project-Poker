@@ -42,7 +42,9 @@ public enum RoundStatus {
     }
 
     public static RoundStatus stepRoundStatus(RoundStatus status) {
-        if (status == END) throw new IllegalStateException("Cannot step the Round status as the round has ended");
-        return getRoundStatus(status.ordinal() + 1);
+        if (status == END) {
+            return END;
+        }
+            return getRoundStatus(status.ordinal() + 1);
     }
 }

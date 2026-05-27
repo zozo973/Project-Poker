@@ -118,6 +118,14 @@ public class Pot {
      */
     public int getInvestmentPP() { return investmentPP; }
 
+    private void setInvestmentPP() {
+        int largestInvestment = 0;
+        for (Player p : this.players) {
+            if (betTable.get(p) > largestInvestment) largestInvestment = betTable.get(p);
+        }
+        this.investmentPP = largestInvestment;
+    }
+
     /**
      * Manually overrides the investment-per-player value (used during side-pot adjustments).
      *
@@ -195,6 +203,13 @@ public class Pot {
         this.toPlay = 0;
     }
 
+    private void initBetTable() {
+        this.betTable = new Hashtable<>();
+        for (Player p : players) {
+            this.betTable.put(p,0);
+        }
+    }
+
     /**
      * Adds a player to the bet-tracking table without an existing contribution (initialised to zero).
      *
@@ -221,6 +236,16 @@ public class Pot {
      * @return the integer chip amount this player has contributed to this pot
      */
     public int getBetFromTable(Player player) { return this.betTable.get(player); }
+
+    private void addBet2Table(Player player, int bet) {
+        if (!this.players.contains(player)) {
+            addPlayer(player);
+            this.betTable.put(player,bet);
+        } else {
+            int currentBets = betTable.get(player);
+            this.betTable.put(player,currentBets+bet);
+        }
+    }
 
     /**
      * Records a bet from the given player into this pot.

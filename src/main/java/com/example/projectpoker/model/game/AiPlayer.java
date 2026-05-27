@@ -19,15 +19,57 @@ public class AiPlayer extends Player {
     /** Main Constructor
      *
      * @param difficulty: How good each AiPlayer, the higher the difficulty the better the player is.
-     * @param userBalance: AiPlayer object uses the userBalance and a skewed PDF,
+     * @param userBalance: AiPlayer object uses the userBalance and a skewed normal distribution with parameters tuned to the difficulty level,
      *                  to sample a starting balance relative to the users and the difficulty.
      */
-
-
     public AiPlayer(Difficulty difficulty, int userBalance) {
         super();
         this.difficulty = difficulty;
         this.setBalance(generateAiPlayer(userBalance));
+    }
+
+    private int generateAiPlayer(int userBalance) {
+        int baselineBalance = Math.max(userBalance, getMinBet() * 10);
+
+        double xi;
+        double omegaMultiplier;
+        double alpha;
+
+        switch (difficulty) {
+            case Baby:
+                xi = baselineBalance * 0.65;
+                omegaMultiplier = 0.18;
+                alpha = -4.0;
+                break;
+            case Beginner:
+                xi = baselineBalance * 0.85;
+                omegaMultiplier = 0.16;
+                alpha = -2.0;
+                break;
+            case Addict:
+                xi = baselineBalance;
+                omegaMultiplier = 0.15;
+                alpha = 0.0;
+                break;
+            case Professional:
+                xi = baselineBalance * 1.2;
+                omegaMultiplier = 0.16;
+                alpha = 2.0;
+                break;
+            case Sadist:
+                xi = baselineBalance * 1.45;
+                omegaMultiplier = 0.18;
+                alpha = 4.0;
+                break;
+            default:
+                xi = baselineBalance;
+                omegaMultiplier = 0.15;
+                alpha = 0.0;
+        }
+
+        SkewNormalSampler sampler = new SkewNormalSampler();
+        int sampledBalance = sampler.sample(xi, Math.max(1.0, baselineBalance * omegaMultiplier), alpha);
+        return Math.max(getMinBet(), abs(sampledBalance));
     }
 
     /**

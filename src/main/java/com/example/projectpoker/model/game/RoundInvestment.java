@@ -94,6 +94,8 @@ public class RoundInvestment {
         this.totalInvestment = totalInvestment;
     }
 
+    private void add2TotalInvestment(int val) { this.totalInvestment += val; }
+
     /**
      * Splits the bet record upon side-pot creation so that each investment is correctly
      * attributed to the right pot at the right priority level.

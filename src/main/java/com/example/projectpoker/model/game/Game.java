@@ -186,6 +186,8 @@ public class Game {
      */
     public Round getRound() { return this.round; }
 
+    private void setRound(Round round) { this.round = round; }
+
     /**
      * Returns the current blind size used to determine minimum bets.
      *

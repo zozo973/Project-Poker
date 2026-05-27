@@ -194,6 +194,12 @@ public class Player {
      */
     public void subtractBalance(int amount) { setBalance(this.balance - amount); }
 
+    protected void setBalance(int balance) {
+        var oldVal = this.balance;
+        this.balance = balance;
+        pcs.firePropertyChange("balance",oldVal,this.balance);
+    }
+
     /**
      * Returns the minimum bet size this player is required to place.
      * This is typically set to half the current blind.
@@ -238,6 +244,8 @@ public class Player {
         }
         return potInvestment;
     }
+
+    protected void setRoundInvestment(int totalInvested) { this.roundInvestment = new RoundInvestment(totalInvested); }
 
     /**
      * Returns the player's current action (e.g. CALL, RAISE, FOLD, UNDECIDED).

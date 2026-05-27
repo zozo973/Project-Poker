@@ -96,6 +96,14 @@ public class RoundLogEntry {
      */
     public void setCurrentPot(Pot currentPot) { this.currentPot = currentPot; }
 
+    private void setEntryDescription() {
+        String str;
+         if (action == Action.RAISE) str = " by " + Integer.toString(betSize - toCall) + " dollars.";
+         else if (action == Action.CALL) str = " " + Integer.toString(toCall) + " dollars to play.";
+         else { str = "."; }
+        this.entryDescription = (String) player.getName() + " decided to " + action.getDescription() + str + " The current Pot is now at " + currentPot.getPotSize() + " dollars.";
+    }
+
     /**
      * Returns the human-readable description of this log entry.
      *

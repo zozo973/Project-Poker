@@ -184,6 +184,15 @@ public final class PotUtil {
         return pots;
     }
 
+    private static ArrayList<Pot> payOpenPot(ArrayList<Pot> pots, Player p) {
+        Integer activeBet = p.getActiveBet();
+        int bet = activeBet != null ? activeBet : 0;
+        Integer i = getOpenPotIndex(pots);
+        if (i == null) throw new IllegalStateException("There multiple open pots, error in pot payment.");
+        pots.get(i).addBet(p,bet);
+        return pots;
+    }
+
     /**
      * Returns the pot with the lowest (highest-priority) {@code potPriority} value that is still open.
      * This is usually the main pot or the most recently created side pot that controls betting.

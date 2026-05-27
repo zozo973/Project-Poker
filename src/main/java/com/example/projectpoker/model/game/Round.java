@@ -243,6 +243,14 @@ public class Round {
         return this.pots.getFirst();
     }
 
+    private Pot getOpenPot() {
+        Integer i = getOpenPotIndex(pots);
+        if (i == null) {
+            return null;
+        }
+        return pots.get(i);
+    }
+
     /**
      * Returns the open pot for the given player.
      * Falls back to the best available pot if no single open pot exists.
@@ -323,6 +331,30 @@ public class Round {
         return roundLog;
     }
 
+    private void emitLog(String message) {
+        pcs.firePropertyChange("logEntry", null, message);
+    }
+
+    private void addRoundLogEntry(RoundLogEntry entry) {
+        this.roundLog.add(entry);
+        emitLog(entry.getEntryDescription());
+    }
+
+    private void pauseForUiRender() {
+        try {
+            Thread.sleep(BETTING_ENTRY_UI_DELAY_MS);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+    }
+
+    private void payBlinds() {
+        this.pots.getFirst().initBlinds(players, turnOrder, toPlay);
+        this.pots.getFirst().setPotPriority(0);
+        setToPlay(this.pots.getFirst().getToPlay());
+        setPots(new ArrayList<>(this.pots));
+    }
+
     /**
      * Initialises the round: resets all players, builds the turn order from role indices,
      * creates a blank round log, and sets the status to BLINDS.
@@ -365,6 +397,26 @@ public class Round {
         );
     }
 
+    private void createTurnOrder(int[] roleIndices) {
+        turnOrder.clear();
+
+        int smallBlindIndex = roleIndices[1];
+        int bigBlindIndex = roleIndices[2];
+
+        turnOrder.add(smallBlindIndex);
+        if (bigBlindIndex != smallBlindIndex) {
+            turnOrder.add(bigBlindIndex);
+        }
+
+        int seat = (bigBlindIndex + 1) % numPlayers;
+        while (turnOrder.size() < numPlayers) {
+            if (!turnOrder.contains(seat)) {
+                turnOrder.add(seat);
+            }
+            seat = (seat + 1) % numPlayers;
+        }
+    }
+
     /**
      * Returns the zero-based index of the human (non-AI) player within the players list.
      *
@@ -375,6 +427,16 @@ public class Round {
             if (!(players.get(i) instanceof AiPlayer)) return i;
         }
         return -1;
+    }
+
+    private void updateTurnOrder() {
+        for (int i = turnOrder.size() - 1; i >= 0; i--) {
+            Player playerInSeat = players.get(turnOrder.get(i));
+            Action action = playerInSeat.getAction();
+            if (Action.hasFolded(action) || action == Action.FORFEIT) {
+                turnOrder.remove(i);
+            }
+        }
     }
 
     /**
@@ -392,6 +454,154 @@ public class Round {
             addRoundLogEntry(new RoundLogEntry(player,player.getName() + " has decided to fold."));
         } else {
             addRoundLogEntry(new RoundLogEntry(player));
+        }
+    }
+
+    private void dealCards() {
+        if (holeCardsDealt) {
+            return;
+        }
+
+        for (Integer seat : turnOrder) {
+            players.get(seat).getPlayerHand().clear();
+        }
+
+        for (int repeat = 0; repeat < 2; repeat++) {
+            for (Integer integer : turnOrder) {
+                players.get(integer).addCardToHand(deck.draw());
+            }
+        }
+        holeCardsDealt = true;
+    }
+
+    private void deal2Table() {
+        if (betType.equals(BetType.SKIP2SHOWDOWN)) {
+            switch (communityCards.size()) {
+                case 0:
+                    deck.burnCard();
+                    this.communityCards.add(deck.draw());
+                    this.communityCards.add(deck.draw());
+                    this.communityCards.add(deck.draw());
+                    deck.burnCard();
+                    this.communityCards.add(deck.draw());
+                    deck.burnCard();
+                    this.communityCards.add(deck.draw());
+                    this.roundStatus = RoundStatus.SHOWDOWN;
+                    break;
+                case 3:
+                    deck.burnCard();
+                    this.communityCards.add(deck.draw());
+                    deck.burnCard();
+                    this.communityCards.add(deck.draw());
+                    this.roundStatus = RoundStatus.SHOWDOWN;
+                    break;
+                case 4:
+                    deck.burnCard();
+                    this.communityCards.add(deck.draw());
+                    this.roundStatus = RoundStatus.SHOWDOWN;
+                    break;
+                case 5:
+                    this.roundStatus = RoundStatus.SHOWDOWN;
+                    break;
+                default:
+                    throw new IllegalStateException("community cards has illegal amount of cards");
+            }
+            setCommunityCards(this.communityCards);
+            return;
+        }
+        if (roundStatus.equals(RoundStatus.SHOWDOWN)) {
+            setCommunityCards(this.communityCards);
+            playShowdown();
+            return;
+        }
+
+        deck.burnCard();
+        if (roundStatus.equals(RoundStatus.FLOP)) {
+            this.communityCards.add(deck.draw());
+            this.communityCards.add(deck.draw());
+            this.communityCards.add(deck.draw());
+        } else {
+            this.communityCards.add(deck.draw());
+        }
+        setCommunityCards(this.communityCards);
+    }
+
+    private void createSidePot(Player potCreator,int newPotSize) {
+        this.pots = addNewSidePot(this.pots,potCreator,newPotSize);
+        addRoundLogEntry(new RoundLogEntry(potCreator, pots.getLast()));
+    }
+
+    private void betting() {
+        if (stopRequested) {
+            return;
+        }
+        Player activePlayer;
+        int bettingPasses = 0;
+        boolean bettingEnded;
+        do {
+            bettingPasses++;
+            if (bettingPasses > MAX_BETTING_PASSES) {
+                System.err.println("Betting pass limit reached; auto-resolving remaining undecided players.");
+                emitLog("Betting took too long, so remaining undecided players were auto-resolved.");
+                resolveStalledBettingRound();
+                bettingEnded = true;
+                break;
+            }
+            bettingEnded = false;
+            for (Integer i : turnOrder) {
+                if (stopRequested) {
+                    bettingEnded = true;
+                    break;
+                }
+                activePlayer = players.get(i);
+                setToPlay(getToCall(this.pots,activePlayer));
+                emitLog(activePlayer.getName() + " to call: " + this.toPlay + ". Current action: " + activePlayer.getAction() + ".");
+                if (!Action.hasFolded(activePlayer.getAction()) && activePlayer.getAction().equals(Action.UNDECIDED)) {
+                    if (testAllPlayersFolded(activePlayer)) {
+                        endBetting(activePlayer);
+                        break;
+                    }
+                    if (testAllPlayersFolded(activePlayer)) {
+                        activePlayer.setAction(Action.CHECK);
+                        activePlayer.setActiveBet(0);
+                        recordPlayerAction(activePlayer);
+                        bettingEnded = endBetting(activePlayer);
+                        break;
+                    }
+
+                    activePlayer.setIsTurn(true);
+                    while (activePlayer.getIsTurn() && !stopRequested) {
+                        processActivePlayer(activePlayer);
+
+                        if (!activePlayer.getAction().equals(Action.UNDECIDED)) {
+                            activePlayer.setIsTurn(false);
+                        }
+                    }
+                    checkIfPlayerRaised(activePlayer);
+                    checkCreateNewPot(activePlayer);
+
+                    if (Action.isBet(activePlayer.getAction())) setPots(new ArrayList<>(handlePlayerBet(this.pots,activePlayer)));
+                }
+                recordPlayerAction(activePlayer);
+
+                if (endBetting(activePlayer)) {
+                    bettingEnded = true;
+                    break;
+                }
+            }
+        } while (!bettingEnded);
+        if (stopRequested || roundStatus == RoundStatus.END) {
+            return;
+        }
+        postBetting();
+    }
+
+    private void resolveStalledBettingRound() {
+        for (Player player : players) {
+            if (player.getAction() == Action.UNDECIDED && !Action.hasFolded(player.getAction())) {
+                autoResolvePlayerDecision(player, true);
+            }
+            player.setIsTurn(false);
         }
     }
 
@@ -447,6 +657,143 @@ public class Round {
             }
         }
         return true;
+    }
+
+    private void waitForPlayerDecision(Player activePlayer) {
+        if (stopRequested) {
+            return;
+        }
+        if (activePlayer instanceof AiPlayer) {
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                throw new IllegalStateException("Interrupted while Ai Player is thinking", e);
+            }
+        } else {
+            while (!stopRequested && activePlayer.getIsTurn() && activePlayer.getAction() == Action.UNDECIDED) {
+                try {
+                    Thread.sleep(HUMAN_DECISION_POLL_MS);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    throw new IllegalStateException("Interrupted while waiting for user input", e);
+                }
+            }
+        }
+    }
+
+    private void processActivePlayer(Player activePlayer) {
+        int playerBalance = activePlayer.getBalance();
+
+        if (playerBalance <= 0) {
+            activePlayer.setAction(Action.CHECK);
+            activePlayer.setActiveBet(0);
+            return;
+        }
+
+        if (this.toPlay > playerBalance) {
+            activePlayer.setAction(Action.ALLIN);
+            activePlayer.setActiveBet(playerBalance);
+            return;
+        }
+
+        if (activePlayer instanceof AiPlayer aiPlayer) {
+            if (roundStatus == RoundStatus.BETTING1) {
+                int amountToCall = getToCall(this.pots, aiPlayer);
+                if (amountToCall <= 0) {
+                    aiPlayer.setAction(Action.CHECK);
+                    aiPlayer.setActiveBet(0);
+                } else {
+                    aiPlayer.setAction(Action.CALL);
+                    aiPlayer.setActiveBet(Math.min(amountToCall, aiPlayer.getBalance()));
+                }
+                return;
+            }
+            aiPlayer.setResponse(getAiDecision(aiPlayer));
+        }
+        waitForPlayerDecision(activePlayer);
+
+        activePlayer.play(this.pots);
+    }
+
+    private AIActions.AiPlayerResponse getAiDecision(AiPlayer aiPlayer) {
+        AIActions.AiPlayerResponse fallback = new AIActions.AiPlayerResponse();
+        try {
+            List<Card[]> aiHands = new ArrayList<>();
+            aiHands.add(aiPlayer.getPlayerHand().getCards().toArray(new Card[0]));
+            Card[] board = communityCards.toArray(new Card[0]);
+            int requiredToCall = getToCall(this.pots, aiPlayer);
+            int potSize = pots.stream().mapToInt(Pot::getPotSize).sum();
+            Pot activePot = tryGetOpenPot(aiPlayer);
+            int alreadyInvested = activePot == null ? 0 : aiPlayer.getTotalPotInvestment(activePot);
+
+            List<Integer> stackSizes = new ArrayList<>();
+            stackSizes.add(aiPlayer.getBalance());
+
+            List<Integer> requiredToCallList = new ArrayList<>();
+            requiredToCallList.add(requiredToCall);
+
+            List<Integer> alreadyInvestedList = new ArrayList<>();
+            alreadyInvestedList.add(alreadyInvested);
+
+            List<AIActions.AiPlayerResponse> responses =
+                    new AIActions().getAllChoices(
+                            aiHands,
+                            board,
+                            roundStatus,
+                            requiredToCall,
+                            potSize,
+                            stackSizes,
+                            requiredToCallList,
+                            alreadyInvestedList
+                    );
+            if (responses != null && !responses.isEmpty() && responses.get(0) != null) {
+                return responses.get(0);
+            }
+        } catch (Exception e) {
+            System.err.println("Gemini API failed, using AI fallback: " + e.getMessage());
+        }
+        fallback.errormsg = "No AI response available.";
+        return fallback;
+    }
+
+    private void autoResolvePlayerDecision(Player activePlayer, boolean becauseRoundStalled) {
+        int amountToCall = getToCall(this.pots, activePlayer);
+        if (amountToCall <= 0 || activePlayer.getBalance() <= 0) {
+            activePlayer.setAction(Action.CHECK);
+            activePlayer.setActiveBet(0);
+            emitLog(activePlayer.getName() + (becauseRoundStalled
+                    ? " was auto-checked because betting stalled."
+                    : " took too long to act and was auto-checked."));
+        } else {
+            activePlayer.setAction(Action.FOLD);
+            activePlayer.setActiveBet(0);
+            emitLog(activePlayer.getName() + (becauseRoundStalled
+                    ? " was auto-folded because betting stalled."
+                    : " took too long to act and was auto-folded."));
+        }
+        activePlayer.setIsTurn(false);
+    }
+
+    private void postBetting() {
+        updateTurnOrder();
+        for (Player p : players) {
+            if (!Action.hasFolded(p.getAction()) && !p.getAction().equals(Action.FORFEIT)
+                    && !p.getAction().equals(Action.ALLIN)) {
+                p.setAction(Action.UNDECIDED);
+            }
+            p.setIsTurn(false);
+            p.setActiveBet(null);
+        }
+        if (pots.size()>1) {
+            for (int i = 0; i < pots.size()-1; i++) {
+                pots.get(i).setIsOpen(false);
+                pots.get(i).removeFolded(roundStatus);
+            }
+        }
+        addRoundLogEntry(new RoundLogEntry(this.roundStatus + " round has ended."));
+        setToPlay(0);
+        setRoundStatus(findHighestPriorityPot(this.pots).removeFolded(this.roundStatus));
     }
 
     /**
@@ -560,6 +907,67 @@ public class Round {
             case NORMAL, SIDEPOT -> {
                 // betting() already completed this phase once; do not re-enter it here.
             }
+        }
+    }
+
+    private void playShowdown() {
+        for (Pot pot : this.pots) {
+            if (this.roundStatus.equals(RoundStatus.SHOWDOWN)) {
+                int numWinners = pot.showDown(this.communityCards);
+
+                for (Player p : this.players) {
+                    if (p.getRole().equals(Roles.WINNER)) {
+                        String proNoun = "you";
+                        if (p instanceof AiPlayer) proNoun = "they";
+                        addRoundLogEntry(new RoundLogEntry(p,p.getName() + " is a winner, "
+                                + proNoun + " won " + Math.floor((double) pot.getPotSize()/numWinners) + "."));
+                    }
+                }
+            }
+        }
+        announceShowdownResults();
+
+        try {
+            Thread.sleep(25);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new IllegalStateException("Interrupted while displaying Winner.", e);
+        }
+
+        setRoundStatus(RoundStatus.END);
+    }
+
+    private void announceShowdownResults() {
+        int potNumber = 1;
+        for (Pot pot : pots) {
+            ArrayList<Player> eligiblePlayers = pot.getPlayers();
+            if (eligiblePlayers == null || eligiblePlayers.isEmpty()) {
+                potNumber++;
+                continue;
+            }
+
+            ArrayList<PlayerResult> winners = HandEvaluation.whoWins(this.communityCards, eligiblePlayers);
+            if (winners == null || winners.isEmpty()) {
+                potNumber++;
+                continue;
+            }
+
+            int potShare = winners.size() > 0 ? pot.getPotSize() / winners.size() : 0;
+            for (PlayerResult winner : winners) {
+                String winnerName = "Unknown";
+                for (Player player : eligiblePlayers) {
+                    if (player.matchId(winner.getPlayerId())) {
+                        winnerName = player.getName();
+                        break;
+                    }
+                }
+
+                emitLog(
+                        "Showdown: Pot " + potNumber + " winner " + winnerName
+                                + " wins " + potShare + " with " + winner.getResult()
+                );
+            }
+            potNumber++;
         }
     }
 

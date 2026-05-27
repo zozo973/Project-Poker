@@ -47,10 +47,15 @@ jobs:
       - name: Generate JavaDocs
         run: ./mvnw -B -ntp -DskipTests javadoc:javadoc
 
+      - name: Inspect JavaDocs output
+        run: |
+          echo "Listing generated documentation folders:"
+          find target -maxdepth 3 -type d | sort
+
       - name: Upload JavaDocs artifact
         uses: actions/upload-artifact@v4
         with:
           name: javadocs
-          path: target/site/apidocs
+          path: target/reports/apidocs
           if-no-files-found: error
 

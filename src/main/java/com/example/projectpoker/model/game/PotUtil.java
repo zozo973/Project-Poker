@@ -5,8 +5,21 @@ import com.example.projectpoker.model.game.enums.Action;
 import java.util.ArrayList;
 import java.util.Comparator;
 
+/**
+ * Utility class for pot management during a poker round.
+ * Handles side-pot creation, bet routing, and pot selection logic.
+ */
 public final class PotUtil {
 
+    /**
+     * Creates a new side pot for the given player at the appropriate priority level,
+     * redistributes existing pot chips, and adds the side pot to the list.
+     *
+     * @param pots       the current list of all {@link Pot} objects in play
+     * @param p          the {@link Player} who triggered the side-pot creation (typically by going all-in)
+     * @param newPotSize the chip amount that seeds the new side pot
+     * @return the updated list of pots including the newly created side pot
+     */
     public static ArrayList<Pot> addNewSidePot(ArrayList<Pot> pots, Player p, int newPotSize)   {
         int potPriority = -1;
         boolean adjustPot = true;
@@ -57,6 +70,13 @@ public final class PotUtil {
         return pots;
     }
 
+    /**
+     * Sets the amount-to-play on the correct open pot(s) so every player knows
+     * how much they must contribute in the current betting round.
+     *
+     * @param pots   the current list of {@link Pot} objects
+     * @param toPlay the total amount a player with no prior investment must pay
+     */
     public static void setPotsToPlay(ArrayList<Pot> pots, int toPlay) {
         Integer openPotIndex = getOpenPotIndex(pots);
         if (openPotIndex != null) {
@@ -76,7 +96,15 @@ public final class PotUtil {
         }
     }
 
-    // -- test --
+    /**
+     * Computes the exact chip amount a player must put in to remain in the hand.
+     * Accounts for multiple open pots and the player's existing contributions.
+     *
+     * @param pots the current list of {@link Pot} objects
+     * @param p    the {@link Player} whose call amount is calculated
+     * @return the positive integer number of chips the player still needs to contribute,
+     *         or {@code 0} if they are already matched or all amounts are settled
+     */
     public static int getToCall(ArrayList<Pot> pots, Player p) {
         Integer openPotIndex = getOpenPotIndex(pots);
         if (openPotIndex != null) {
@@ -95,6 +123,14 @@ public final class PotUtil {
         }
     }
 
+    /**
+     * Routes a player's active bet into the appropriate pot(s).
+     * Tries to distribute across multiple open pots first; falls back to the single open pot.
+     *
+     * @param pots the current list of {@link Pot} objects
+     * @param p    the {@link Player} whose {@code activeBet} amount should be placed
+     * @return the updated list of pots after the bet has been recorded
+     */
     public static ArrayList<Pot> handlePlayerBet(ArrayList<Pot> pots, Player p) {
         ArrayList<Pot> paidPots = tryPayMultiplePots(pots,p);
         return paidPots != null ? paidPots : payOpenPot(pots,p);
@@ -148,6 +184,14 @@ public final class PotUtil {
         return pots;
     }
 
+    /**
+     * Returns the pot with the lowest (highest-priority) {@code potPriority} value that is still open.
+     * This is usually the main pot or the most recently created side pot that controls betting.
+     *
+     * @param pots the current list of {@link Pot} objects; must not be empty
+     * @return the highest-priority open {@link Pot}
+     * @throws IllegalStateException if {@code pots} is empty
+     */
     public static Pot findHighestPriorityPot(ArrayList<Pot> pots) {
         if (pots.isEmpty()) throw new IllegalStateException("Pots should never be empty, Always at least one pot.");
         int priority = 0;
@@ -160,6 +204,15 @@ public final class PotUtil {
         return pots.getLast();
     }
 
+    /**
+     * Returns the most suitable open pot for a specific player to bet into,
+     * preferring pots the player is already registered in.
+     *
+     * @param pots   the current list of {@link Pot} objects; must not be empty
+     * @param player the {@link Player} looking for a pot to bet into
+     * @return the best available {@link Pot} for this player
+     * @throws IllegalStateException if {@code pots} is empty
+     */
     public static Pot findBestAvailablePot(ArrayList<Pot> pots, Player player) {
         if (pots.isEmpty()) throw new IllegalStateException("Pots should never be empty, Always at least one pot.");
         int priority = 0;
@@ -174,15 +227,13 @@ public final class PotUtil {
         return pots.getLast();
     }
 
-    private static ArrayList<Pot> payOpenPot(ArrayList<Pot> pots, Player p) {
-        Integer activeBet = p.getActiveBet();
-        int bet = activeBet != null ? activeBet : 0;
-        Integer i = getOpenPotIndex(pots);
-        if (i == null) throw new IllegalStateException("There multiple open pots, error in pot payment.");
-        pots.get(i).addBet(p,bet);
-        return pots;
-    }
-
+    /**
+     * Returns the index of the single open pot in the list, or {@code null} if there are multiple open pots.
+     *
+     * @param pots the current list of {@link Pot} objects
+     * @return the zero-based index of the sole open pot, or {@code null} if more than one pot is open
+     * @throws IllegalStateException if all pots are closed or if there is only one pot and it is closed
+     */
     public static Integer getOpenPotIndex(ArrayList<Pot> pots) {
         if (pots.size() == 1) {
             if (pots.getFirst().getIsOpen()) return 0;

@@ -22,7 +22,6 @@ public class TutorialController {
 
     private int currentIndex = 0;
 
-    // Illustrations/Screenshots of how to use UI, how to play poker, etc. for Tutorial
     private final String[] tutorialImages = {
             "/com/example/projectpoker/Images/Tutorial2.png",
             "/com/example/projectpoker/Images/Tutorial3.png",
@@ -30,7 +29,6 @@ public class TutorialController {
             "/com/example/projectpoker/Images/Tutorial5.png",
             "/com/example/projectpoker/Images/Tutorial6.png"
     };
-    // Tutorial Captions
     private final String[] tutorialCaptions = {
             // please add the actual screenshots/illustrations
             "Welcome to PokerPro+",
@@ -38,8 +36,11 @@ public class TutorialController {
             "Your user profile",
             "Customise your experience",
             "The main menu"
-    }; // NOTE MAKE SURE TO KEEP BOTH ARRAYS SAME SIZE SO THEY MATCH 1:1
+    };
 
+    /**
+     * Validates the tutorial content and displays the first slide.
+     */
     @FXML
     public void initialize() {
         if (tutorialImages.length != tutorialCaptions.length) {

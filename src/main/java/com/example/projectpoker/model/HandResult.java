@@ -10,6 +10,16 @@ public class HandResult {
     private final int kicker3;
     private final int kicker4;
 
+    /**
+     * Creates a complete hand result with all kicker values.
+     *
+     * @param handType type identifier for the poker hand (1-10, where 10 is a royal flush)
+     * @param value primary hand strength value (typically 2-14 for card ranks)
+     * @param kicker1 first tiebreaker card value
+     * @param kicker2 second tiebreaker card value
+     * @param kicker3 third tiebreaker card value
+     * @param kicker4 fourth tiebreaker card value
+     */
     public HandResult(int handType, int value, int kicker1, int kicker2, int kicker3, int kicker4 ) {
         this.handType = handType;
         this.value = value;
@@ -19,34 +29,104 @@ public class HandResult {
         this.kicker4 = kicker4;
     }
     // No kickers
+    /**
+     * Creates a hand result with no kickers.
+     *
+     * @param handType type identifier for the poker hand
+     * @param value primary hand strength value
+     */
     public HandResult(int handType, int value) {
         this(handType, value, 0, 0, 0, 0);
     }
 
     // 1 kicker
+    /**
+     * Creates a hand result with one kicker.
+     *
+     * @param handType type identifier for the poker hand
+     * @param value primary hand strength value
+     * @param kicker1 first tiebreaker card value
+     */
     public HandResult(int handType, int value, int kicker1) {
         this(handType, value, kicker1, 0, 0, 0);
     }
 
     // 2 kickers
+    /**
+     * Creates a hand result with two kickers.
+     *
+     * @param handType type identifier for the poker hand
+     * @param value primary hand strength value
+     * @param kicker1 first tiebreaker card value
+     * @param kicker2 second tiebreaker card value
+     */
     public HandResult(int handType, int value, int kicker1, int kicker2) {
         this(handType, value, kicker1, kicker2, 0, 0);
     }
 
     // 3 kickers
+    /**
+     * Creates a hand result with three kickers.
+     *
+     * @param handType type identifier for the poker hand
+     * @param value primary hand strength value
+     * @param kicker1 first tiebreaker card value
+     * @param kicker2 second tiebreaker card value
+     * @param kicker3 third tiebreaker card value
+     */
     public HandResult(int handType, int value, int kicker1, int kicker2, int kicker3) {
         this(handType, value, kicker1, kicker2, kicker3, 0);
     }
 
-
+    /**
+     * Returns the numeric hand type, where higher is better (1 = high card, 10 = royal flush).
+     *
+     * @return the hand type ordinal value
+     */
     public int getHandName() { return handType; }
+
+    /**
+     * Returns the primary rank value used when comparing two hands of the same type.
+     * For example, the rank of the pair in a one-pair hand, or the high card in a flush.
+     *
+     * @return the primary hand value integer (2–14)
+     */
     public int getValue() { return value; }
+
+    /**
+     * Returns the value of the first kicker card used to break ties.
+     *
+     * @return the first kicker value, or {@code 0} if not applicable
+     */
     public int getKicker1() { return kicker1; }
+
+    /**
+     * Returns the value of the second kicker card used to break ties.
+     *
+     * @return the second kicker value, or {@code 0} if not applicable
+     */
     public int getKicker2() { return kicker2; }
+
+    /**
+     * Returns the value of the third kicker card used to break ties.
+     *
+     * @return the third kicker value, or {@code 0} if not applicable
+     */
     public int getKicker3() { return kicker3; }
+
+    /**
+     * Returns the value of the fourth kicker card used to break ties.
+     *
+     * @return the fourth kicker value, or {@code 0} if not applicable
+     */
     public int getKicker4() { return kicker4; }
 
-    // Call for description of hand
+    /**
+     * Returns a human-readable description of this hand result
+     * (e.g. "Royal Flush", "Pair of Aces", "Two pairs: Kings and Jacks").
+     *
+     * @return descriptive string of the hand
+     */
     public @Override String toString()
     {
         switch (handType) {

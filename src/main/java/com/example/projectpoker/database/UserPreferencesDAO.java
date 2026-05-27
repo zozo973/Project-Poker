@@ -12,10 +12,16 @@ import java.sql.Statement;
 public class UserPreferencesDAO {
     private final Connection connection;
 
+    /**
+     * Creates a DAO instance backed by the shared SQLite connection.
+     */
     public UserPreferencesDAO() {
         connection = DatabaseConnection.getInstance();
     }
 
+    /**
+     * Creates the {@code user_preferences} table if it does not already exist.
+     */
     public void createTable() {
         try (Statement createTable = connection.createStatement()) {
             createTable.execute(
@@ -34,6 +40,10 @@ public class UserPreferencesDAO {
         }
     }
 
+    /**
+     * Inserts a default preferences row for every user who does not yet have one.
+     * Uses a single INSERT … SELECT … WHERE NOT EXISTS query for efficiency.
+     */
     public void createDefaultRowsForMissingUsers() {
         try (PreparedStatement insertDefaults = connection.prepareStatement(
                 "INSERT INTO user_preferences (user_id, opponent_count, difficulty, card_back_key, board_key) "
@@ -52,6 +62,13 @@ public class UserPreferencesDAO {
         }
     }
 
+    /**
+     * Returns the saved {@link GamePreferences} for the given user id.
+     * Falls back to {@link GamePreferences#defaults()} if no row is found.
+     *
+     * @param userId the primary key of the user whose preferences to load
+     * @return the user's {@link GamePreferences}, or default preferences if not found
+     */
     public GamePreferences getByUserId(int userId) {
         try (PreparedStatement getPreferences = connection.prepareStatement(
                 "SELECT opponent_count, difficulty, card_back_key, board_key FROM user_preferences WHERE user_id = ?"
@@ -72,6 +89,13 @@ public class UserPreferencesDAO {
         return GamePreferences.defaults();
     }
 
+    /**
+     * Inserts or updates the preferences row for the given user id using an
+     * UPSERT (INSERT … ON CONFLICT DO UPDATE) operation.
+     *
+     * @param userId      the primary key of the user whose preferences should be saved
+     * @param preferences the {@link GamePreferences} to persist; ignored if {@code null}
+     */
     public void saveForUserId(int userId, GamePreferences preferences) {
         if (preferences == null || userId <= 0) {
             return;

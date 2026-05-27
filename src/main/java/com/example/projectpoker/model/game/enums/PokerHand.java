@@ -19,10 +19,21 @@ public enum PokerHand {
         this.description = description;
     }
 
+    /**
+     * Returns the human-readable name of this poker hand category.
+     *
+     * @return the description string (e.g. "Pair", "Full house", "Royal flush")
+     */
     public String getDescription() {
         return description;
     }
 
+    /**
+     * Returns the numeric rank of this hand type used for comparison.
+     * Higher values beat lower values (1 = high card, 10 = royal flush).
+     *
+     * @return the rank value (ordinal + 1), in the range [1, 10]
+     */
     public int getValue() {
         return ordinal() + 1;
     }

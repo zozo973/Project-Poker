@@ -2,6 +2,10 @@ package com.example.projectpoker.model.game;
 
 import java.util.ArrayList;
 
+/**
+ * Final snapshot of a completed poker round, capturing all events and state.
+ * Created at the end of each round for persistence and review.
+ */
 public class RoundLog {
     private final ArrayList<RoundLogEntry> roundLog;
     private final ArrayList<Player> players;
@@ -25,4 +29,39 @@ public class RoundLog {
         this.pots = pots;
         this.roundNumber = roundNumber;
     }
+
+    /**
+     * Returns the sequence of actions and events that occurred during this round.
+     *
+     * @return the list of {@link RoundLogEntry} objects
+     */
+    public ArrayList<RoundLogEntry> getRoundLog() { return roundLog; }
+
+    /**
+     * Returns all players involved in this round, including their final hole cards.
+     *
+     * @return the list of {@link Player} objects
+     */
+    public ArrayList<Player> getPlayers() { return players; }
+
+    /**
+     * Returns the community cards that were on the board at the end of this round.
+     *
+     * @return the list of {@link Card} objects
+     */
+    public ArrayList<Card> getCommunityCards() { return communityCards; }
+
+    /**
+     * Returns all pots (main pot and side pots) that existed in this round.
+     *
+     * @return the list of {@link Pot} objects
+     */
+    public ArrayList<Pot> getPots() { return pots; }
+
+    /**
+     * Returns the sequence number of this round in the game.
+     *
+     * @return the round number, typically starting from 1
+     */
+    public int getRoundNumber() { return roundNumber; }
 }

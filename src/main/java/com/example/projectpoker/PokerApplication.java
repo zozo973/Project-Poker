@@ -23,6 +23,12 @@ public class PokerApplication extends Application {
     private static final int GAME_WIDTH = 1130;
     private static final int GAME_HEIGHT = 570;
 
+    /**
+     * Starts the authentication window and initializes required persistence state.
+     *
+     * @param stage primary JavaFX stage created by the runtime
+     * @throws IOException if the login FXML cannot be loaded
+     */
     @Override
     public void start(Stage stage) throws IOException {
         DatabaseManager.initializeDatabase();
@@ -33,6 +39,13 @@ public class PokerApplication extends Application {
         stage.setScene(scene);
         stage.show();
     }
+
+    /**
+     * Builds and shows the poker table scene, then starts a configured game session.
+     *
+     * @param gameStage stage that should host the in-game round UI
+     * @throws IOException if the round-view FXML cannot be loaded
+     */
     public void createPokerGame(Stage gameStage) throws IOException {
 
         // change to retire user data from database and other vars can be retrieved from user input into ui

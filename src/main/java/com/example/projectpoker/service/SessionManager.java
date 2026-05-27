@@ -14,15 +14,27 @@ public class SessionManager {
     // no constructor needed static variables belong to classes not objects
     // constructors initialise objects instead
 
-    // method to get variable to know who is logged in
+    /**
+     * Returns the currently logged-in user.
+     *
+     * @return the {@link User} who is logged in, or {@code null} if no user is authenticated
+     */
     public static User getCurrentUser() {
         return currentUser;
     }
-    // method to set variable when someone logs in
+
+    /**
+     * Stores the given user as the currently logged-in user.
+     *
+     * @param user the {@link User} who has just logged in
+     */
     public static void setCurrentUser(User user) {
         currentUser = user;
     }
-    // method to clear variable when someone logs out
+
+    /**
+     * Clears the current user, effectively logging them out of the application.
+     */
     public static void logout(){
         currentUser = null;
     }

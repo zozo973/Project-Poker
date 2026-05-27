@@ -22,14 +22,30 @@ public class Card {
         this.rank = rank;
     }
 
+    /**
+     * Returns the suit of this card.
+     *
+     * @return the {@link Suit} of this card (e.g. Hearts, Clubs, Diamonds, Spades)
+     */
     public Suit getSuit() {
         return suit;
     }
 
+    /**
+     * Returns the rank of this card.
+     *
+     * @return the {@link Rank} of this card (e.g. Two through Ace)
+     */
     public Rank getRank() {
         return rank;
     }
 
+    /**
+     * Returns the numeric value of this card's rank.
+     * Two = 2, Three = 3, ..., Ace = 14.
+     *
+     * @return integer card value in the range [2, 14]
+     */
     public int getValue() {
         return rank.ordinal() + 2;
     }
@@ -53,11 +69,24 @@ public class Card {
             );
     // Possibly recode or remove method as it may not be necessary
     // as there should never be the exact same card
+    /**
+     * Tests whether this card is equal to another card by comparing suit and rank.
+     *
+     * @param o object to compare to
+     * @return {@code true} if {@code o} is a {@link Card} with the same suit and rank
+     */
     @Override
     public boolean equals(Object o) {
         return (o instanceof Card && ((Card) o).rank == rank && ((Card) o).suit == suit);
     }
 
+    /**
+     * Returns the classpath resource path used to load this card's face image.
+     * The path is built from the suit's first letter and the rank symbol defined
+     * in {@code RANK_SYMBOLS}.
+     *
+     * @return resource path string, e.g. {@code "/com/example/projectpoker/Images/HA.png"}
+     */
     public String getCardImagePath() {
 
         String rank = RANK_SYMBOLS.get(this.getRank());
@@ -68,6 +97,11 @@ public class Card {
         return "/com/example/projectpoker/Images/" + suit + rank + ".png";
     }
 
+    /**
+     * Returns a human-readable description of this card.
+     *
+     * @return string in the format "{@code Rank of Suit}", e.g. "Ace of Hearts"
+     */
     public String toString(){
         return this.getRank() + " of " + this.getSuit().name();
     }

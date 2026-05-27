@@ -17,7 +17,13 @@ public class DatabaseConnection {
         }
     }
 
-    // Returns the shared connection, reopening it if it has not been created yet.
+    /**
+     * Returns the shared SQLite {@link Connection}, creating a new one if it does not yet exist
+     * or has been closed.
+     *
+     * @return the open shared {@link Connection}
+     * @throws IllegalStateException if the connection cannot be opened
+     */
     public static Connection getInstance() {
         try {
             if (instance == null || instance.isClosed()) {
@@ -29,7 +35,12 @@ public class DatabaseConnection {
         return instance;
     }
 
-    // Closes the shared connection so tests or shutdown code can clean up safely.
+    /**
+     * Closes the shared SQLite connection and releases all associated resources.
+     * Safe to call when the application shuts down or tests need to reset state.
+     *
+     * @throws IllegalStateException if the connection cannot be closed
+     */
     public static void closeConnection() {
         if (instance == null) {
             return;
@@ -44,7 +55,12 @@ public class DatabaseConnection {
         }
     }
 
-    // Builds the SQLite JDBC URL, using the test database path when one is provided.
+    /**
+     * Returns the JDBC URL for the active connection, or builds one from the system property
+     * {@code projectpoker.db.path} (defaulting to {@code "projectpoker.db"}) if no connection exists yet.
+     *
+     * @return the JDBC URL string, e.g. {@code "jdbc:sqlite:projectpoker.db"}
+     */
     public static String getUrl() {
         if (instance == null) {
             // Default to the real app database unless a test provides its own path.

@@ -24,6 +24,13 @@ public enum RoundStatus {
         this.step = step;
     }
 
+    /**
+     * Returns the human-readable description of this round status.
+     *
+     * @return the description string (e.g. "Set the blinds", "Deal the cards")
+     */
+    public String getDescription() { return description; }
+
     private static RoundStatus getRoundStatus(int i) {
         switch (i){
             case 0: return BLINDS;
@@ -41,6 +48,14 @@ public enum RoundStatus {
         }
     }
 
+    /**
+     * Advances the given round status by one step in the standard poker sequence.
+     * Returns {@link #END} unchanged if it has already reached that state.
+     * Sequence: BLINDS → DEAL → BETTING1 → FLOP → BETTING2 → TURN → BETTING3 → RIVER → BETTING4 → SHOWDOWN → END
+     *
+     * @param status the current {@link RoundStatus} to advance from
+     * @return the next {@link RoundStatus} in the sequence, or {@link #END} if already at the end
+     */
     public static RoundStatus stepRoundStatus(RoundStatus status) {
         if (status == END) {
             return END;

@@ -82,20 +82,33 @@ public class RoundLogEntry {
         this.entryDescription = player.getName() + " decided to " + action.getDescription();
     }
 
+    /**
+     * Returns the pot that was open when this log entry was recorded.
+     *
+     * @return the {@link Pot} at the time of the action, or {@code null} for entries without a pot context
+     */
     public Pot getCurrentPot() { return currentPot; }
 
+    /**
+     * Sets the pot context for this log entry (used when the pot is updated after entry creation).
+     *
+     * @param currentPot the {@link Pot} to associate with this entry
+     */
     public void setCurrentPot(Pot currentPot) { this.currentPot = currentPot; }
 
-    private void setEntryDescription() {
-        String str;
-         if (action == Action.RAISE) str = " by " + Integer.toString(betSize - toCall) + " dollars.";
-         else if (action == Action.CALL) str = " " + Integer.toString(toCall) + " dollars to play.";
-         else { str = "."; }
-        this.entryDescription = (String) player.getName() + " decided to " + action.getDescription() + str + " The current Pot is now at " + currentPot.getPotSize() + " dollars.";
-    }
-
+    /**
+     * Returns the human-readable description of this log entry.
+     *
+     * @return the entry description string
+     */
     public String getEntryDescription() { return this.entryDescription; }
 
+    /**
+     * Formats the log entry as a display string, including the player's action,
+     * amounts, and pot context (if available).
+     *
+     * @return a formatted string suitable for display in the game log UI
+     */
     public String displayGameLogEntry(){
         if (player == null || action == null) {
             return entryDescription;
@@ -108,6 +121,12 @@ public class RoundLogEntry {
         return (String) player.getName() + " decided to " + action.getDescription() + str + potDescription;
     }
 
+    /**
+     * Returns the name of the player associated with this entry,
+     * or {@code "SYSTEM"} for entries not tied to a specific player.
+     *
+     * @return the player name string
+     */
     public String getPlayerName() {
         if (player == null) {
             return "SYSTEM";
@@ -115,14 +134,29 @@ public class RoundLogEntry {
         return player.getName();
     }
 
+    /**
+     * Returns the chip amount wagered in this action.
+     *
+     * @return the bet size, or {@code 0} for non-betting actions (CHECK, FOLD, system entries)
+     */
     public int getBetSize() {
         return betSize;
     }
 
+    /**
+     * Returns the amount the player needed to call at the time of this action.
+     *
+     * @return the to-call amount, or {@code 0} for non-betting entries
+     */
     public int getToCall() {
         return toCall;
     }
 
+    /**
+     * Returns the action the player took for this log entry.
+     *
+     * @return the {@link Action}, or {@code null} for system or end-of-round entries
+     */
     public Action getAction() {
         return action;
     }

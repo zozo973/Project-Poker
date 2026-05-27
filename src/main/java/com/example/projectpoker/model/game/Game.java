@@ -87,30 +87,66 @@ public class Game {
         this(user, null, userBalance, numPlayers, initBlind, whenIncreaseBlinds, gameLength, difficulty);
     }
 
+    /**
+     * Registers a listener for all property change events fired by this game
+     * (e.g. gameStatus, blindSize, players, round).
+     *
+     * @param listener the {@link PropertyChangeListener} to add
+     */
     public void addPropertyChangeListener(PropertyChangeListener listener) {
         pcs.addPropertyChangeListener(listener);
     }
 
+    /**
+     * Removes a previously registered global property change listener.
+     *
+     * @param listener the {@link PropertyChangeListener} to remove
+     */
     public void removePropertyChangeListener(PropertyChangeListener listener) {
         pcs.removePropertyChangeListener(listener);
     }
 
+    /**
+     * Returns the log of all completed rounds, each captured as a {@link RoundLog}.
+     *
+     * @return the list of round logs accumulated during this game
+     */
     public ArrayList<RoundLog> getGameLog() { return GameLog; }
 
+    /**
+     * Returns the current status of the game (e.g. INITIALISED, RUNNING, ENDED).
+     *
+     * @return the current {@link GameStatus}
+     */
     public GameStatus getGameStatus() {
         return gameStatus;
     }
 
+    /**
+     * Sets the game status and fires a property change event to notify observers.
+     *
+     * @param gameStatus the new {@link GameStatus} to assign
+     */
     public void setGameStatus (GameStatus gameStatus) {
         var oldVal = this.gameStatus;
         this.gameStatus = gameStatus;
         pcs.firePropertyChange("state",oldVal,this.gameStatus);
     }
 
+    /**
+     * Returns all players currently in the game, including AI players.
+     *
+     * @return the mutable list of {@link Player} objects
+     */
     public ArrayList<Player> getPlayers() {
         return players;
     }
 
+    /**
+     * Replaces the player list, syncs property-change listeners, and fires a "players" event.
+     *
+     * @param players the new list of {@link Player} objects to use
+     */
     public void setPlayers(ArrayList<Player> players) {
         var oldVal = this.players;
         syncPlayerActionListeners(oldVal, players);
@@ -118,6 +154,10 @@ public class Game {
         pcs.firePropertyChange("players",oldVal,this.players);
     }
 
+    /**
+     * Prepares and fires a new {@link Round} for the next hand,
+     * applying the current blind size to all players.
+     */
     public void createNextRound() {
         for (Player p : this.players) p.setMinBet((int) Math.round (this.blindSize*0.5));
         Round round = new Round(players, blindSize, gameSessionId, handsPlayed + 1);
@@ -125,22 +165,50 @@ public class Game {
         setRound(round);
     }
 
+    /**
+     * Returns the number of rounds remaining before the game ends.
+     *
+     * @return rounds left as a non-negative integer
+     */
     public int getNumRoundsLeft() { return numRoundsLeft; }
 
+    /**
+     * Sets the number of rounds remaining.
+     *
+     * @param numRoundsLeft the new round count
+     */
     public void setNumRoundsLeft(int numRoundsLeft) { this.numRoundsLeft = numRoundsLeft; }
 
+    /**
+     * Returns the most recently created round, or {@code null} if no round has started yet.
+     *
+     * @return the current {@link Round}
+     */
     public Round getRound() { return this.round; }
 
-    private void setRound(Round round) { this.round = round; }
-
+    /**
+     * Returns the current blind size used to determine minimum bets.
+     *
+     * @return the blind size in chips
+     */
     public int getBlindSize() { return blindSize; }
 
+    /**
+     * Updates the blind size and fires a "blindSize" property change event.
+     *
+     * @param blindSize the new blind size in chips
+     */
     public void setBlindSize(int blindSize) {
         var oldVal = this.blindSize;
         this.blindSize = blindSize;
         pcs.firePropertyChange("blindSize",oldVal,this.blindSize);
     }
 
+    /**
+     * Returns a list containing only the AI-controlled players in the game.
+     *
+     * @return list of {@link AiPlayer} instances (may be empty if there are none)
+     */
     public ArrayList<AiPlayer> getAiPlayers() {
         ArrayList<AiPlayer> AiPlayers = new ArrayList<>();
         for (Player p : players) {
@@ -149,6 +217,11 @@ public class Game {
         return AiPlayers;
     }
 
+    /**
+     * Returns the index of the human (non-AI) player in the players list.
+     *
+     * @return zero-based index of the user player, or the list size if no user is found
+     */
     public int findUserIndex() {
         int i = 0;
         for (Player p : players) {
@@ -158,6 +231,12 @@ public class Game {
         return i;
     }
 
+    /**
+     * Returns the human (non-AI) player in the game.
+     *
+     * @return the user's {@link Player} object
+     * @throws IllegalStateException if no non-AI player exists in the players list
+     */
     public Player getUser() {
         for (Player p : players) {
             if (!(p instanceof AiPlayer)) return p;
@@ -165,6 +244,10 @@ public class Game {
         throw new IllegalStateException("There is no User in players, only Ai player");
     }
 
+    /**
+     * Initialises the game by creating AI players, assigning roles, and opening a database session.
+     * Also checks whether the blind should be increased before the first round.
+     */
     public void init() {
         tryIncreaseBlind();
         setPlayers(
@@ -180,6 +263,9 @@ public class Game {
         setGameStatus(GameStatus.INITIALISED);
     }
 
+    /**
+     * Sets the game status to RUNNING and starts the first round.
+     */
     public void start() {
         // Valid game before starting
         setGameStatus(GameStatus.RUNNING);
@@ -187,6 +273,11 @@ public class Game {
         startNextRound();
     }
 
+    /**
+     * Starts the next round if the game is running and the end conditions have not been met.
+     * Guards against concurrent round starts using a synchronized flag.
+     * End conditions include: user balance = 0, no rounds left, or only user remains.
+     */
     public void startNextRound() {
 
         synchronized (this) {
@@ -228,6 +319,10 @@ public class Game {
         }
     }
 
+    /**
+     * Called when the current round has finished.
+     * Logs the round, rotates roles, decrements the round counter, and begins the next round.
+     */
     public void onRoundEnded() {
 
         if (round == null || round.getRoundStatus() != RoundStatus.END) {
@@ -253,10 +348,17 @@ public class Game {
         }
     }
 
+    /**
+     * Ends the game by persisting the session to the database.
+     */
     public void end() {
         finishSession();
     }
 
+    /**
+     * Closes the game session safely from any thread (e.g. when the window is closed mid-game).
+     * Idempotent — calling this more than once has no additional effect.
+     */
     public synchronized void closeSession() {
         finishSession();
     }
@@ -309,12 +411,6 @@ public class Game {
         return players;
     }
 
-    public void tryIncreaseBlind() {
-        if (gameLength != numRoundsLeft && (gameLength - numRoundsLeft) % whenIncreaseBlinds == 0) {
-            setBlindSize(this.blindSize*2);
-        }
-    }
-
     private void syncPlayerActionListeners(ArrayList<Player> oldPlayers, ArrayList<Player> newPlayers) {
         if (oldPlayers != null) {
             for (Player player : oldPlayers) {
@@ -333,7 +429,10 @@ public class Game {
     }
 
 
-    // method to check if any players have lost all there money or left the game.
+    /**
+     * Checks for players whose action is FORFEIT and removes them from the active player list.
+     * Updates the total player count accordingly.
+     */
     public void checkForfeitedPlayers() {
         ArrayList<Player> activePlayers = new ArrayList<>();
         for (Player p : this.players) {
@@ -345,31 +444,76 @@ public class Game {
         }
     }
 
+    /**
+     * Returns the total number of hands (rounds) completed so far in this game.
+     *
+     * @return hands played count
+     */
     public int getHandsPlayed() {
         return handsPlayed;
     }
 
+    /**
+     * Returns the chip balance the user started the game with (their buy-in this session).
+     *
+     * @return the starting user balance in chips
+     */
     public int getStartingUserBalance() {
         return startingUserBalance;
     }
 
+    /**
+     * Returns the AI difficulty level for this game.
+     *
+     * @return the {@link Difficulty} enum value
+     */
     public Difficulty getDifficulty() {
         return difficulty;
     }
 
+    /**
+     * Returns the total number of players (human + AI) in the game.
+     *
+     * @return the player count
+     */
     public int getNumPlayers() {
         return numPlayers;
     }
 
+    /**
+     * Returns the chip amount the user bought in with at the start of this game.
+     *
+     * @return the user buy-in amount
+     */
     public int getUserBuyIn() {
         return userBuyIn;
     }
 
+    /**
+     * Returns the number of rounds that must pass before the blind size is doubled.
+     *
+     * @return the blind-increase interval in rounds
+     */
     public int getWhenIncreaseBlinds() {
         return whenIncreaseBlinds;
     }
 
+    /**
+     * Returns the total number of rounds this game is configured to run.
+     *
+     * @return the game length in rounds
+     */
     public int getGameLength() {
         return gameLength;
+    }
+
+    /**
+     * Doubles the blind size if the required number of rounds since the last increase have elapsed.
+     * Has no effect on the very first round or if the increase interval has not been reached.
+     */
+    public void tryIncreaseBlind() {
+        if (gameLength != numRoundsLeft && (gameLength - numRoundsLeft) % whenIncreaseBlinds == 0) {
+            setBlindSize(this.blindSize*2);
+        }
     }
 }

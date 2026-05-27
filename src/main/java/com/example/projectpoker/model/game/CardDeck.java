@@ -23,6 +23,12 @@ public class CardDeck {
         Collections.shuffle(this.cardDeck);
     }
 
+    /**
+     * Resets the deck to a full 52-card set and shuffles it.
+     * Any previously drawn cards are discarded and the deck is rebuilt
+     * from scratch using all {@link com.example.projectpoker.model.game.enums.Suit} and
+     * {@link com.example.projectpoker.model.game.enums.Rank} combinations.
+     */
     public void reset() {
         cardDeck.clear();
         for (Suit s : Suit.values()) {
@@ -55,9 +61,12 @@ public class CardDeck {
         return c;
     }
 
+    /**
+     * Removes the top card from the deck without returning it.
+     * Used between betting rounds in Texas Hold'em to burn a card before dealing community cards.
+     */
     public void burnCard() {
         cardDeck.removeFirst();
 
     }
 }
-

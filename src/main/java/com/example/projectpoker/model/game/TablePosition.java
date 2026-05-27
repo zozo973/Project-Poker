@@ -14,18 +14,63 @@ public class TablePosition {
     public double chipOffsetX;
     public double chipOffsetY;
 
+    /**
+     * Creates a table position with default vertical crop scale and no label/chip offsets.
+     *
+     * @param x x-coordinate for the first rendered card
+     * @param y y-coordinate for the first rendered card
+     * @param spacingX horizontal spacing between cards
+     * @param spacingY vertical spacing between cards
+     * @param rotation card rotation angle in degrees
+     */
     public TablePosition(double x, double y, double spacingX, double spacingY, double rotation) {
         this(x, y, spacingX, spacingY, rotation, 0.3, 0, 0, 0, 0);
     }
 
+    /**
+     * Creates a table position with an explicit vertical crop scale and no label/chip offsets.
+     *
+     * @param x x-coordinate for the first rendered card
+     * @param y y-coordinate for the first rendered card
+     * @param spacingX horizontal spacing between cards
+     * @param spacingY vertical spacing between cards
+     * @param rotation card rotation angle in degrees
+     * @param vScale visible vertical portion of each card image
+     */
     public TablePosition(double x, double y, double spacingX, double spacingY, double rotation, double vScale) {
         this(x, y, spacingX, spacingY, rotation, vScale, 0, 0, 0, 0);
     }
 
+    /**
+     * Creates a table position with explicit nameplate offsets and no chip offsets.
+     *
+     * @param x x-coordinate for the first rendered card
+     * @param y y-coordinate for the first rendered card
+     * @param spacingX horizontal spacing between cards
+     * @param spacingY vertical spacing between cards
+     * @param rotation card rotation angle in degrees
+     * @param vScale visible vertical portion of each card image
+     * @param nameplateOffsetX x-offset for the player's nameplate label
+     * @param nameplateOffsetY y-offset for the player's nameplate label
+     */
     public TablePosition(double x, double y, double spacingX, double spacingY, double rotation, double vScale, double nameplateOffsetX, double nameplateOffsetY) {
         this(x, y, spacingX, spacingY, rotation, vScale, nameplateOffsetX, nameplateOffsetY, 0, 0);
     }
 
+    /**
+     * Creates a fully configured table position for card, label, and chip rendering.
+     *
+     * @param x x-coordinate for the first rendered card
+     * @param y y-coordinate for the first rendered card
+     * @param spacingX horizontal spacing between cards
+     * @param spacingY vertical spacing between cards
+     * @param rotation card rotation angle in degrees
+     * @param vScale visible vertical portion of each card image
+     * @param nameplateOffsetX x-offset for the player's nameplate label
+     * @param nameplateOffsetY y-offset for the player's nameplate label
+     * @param chipOffsetX x-offset for the player's chip stack image
+     * @param chipOffsetY y-offset for the player's chip stack image
+     */
     public TablePosition(double x, double y, double spacingX, double spacingY, double rotation, double vScale, double nameplateOffsetX, double nameplateOffsetY, double chipOffsetX, double chipOffsetY) {
         this.x = x;
         this.y = y;

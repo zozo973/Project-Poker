@@ -14,6 +14,15 @@ import java.util.EnumMap;
 
 public class HandEvaluation {
 
+    /**
+     * Determines which player(s) hold the best hand given the shared community cards.
+     * Combines each player's hole cards with the board to evaluate the best 5-card hand,
+     * then returns all players who are tied for the best result.
+     *
+     * @param board   the community cards on the table (up to 5 cards shared by all players)
+     * @param players the list of {@link Player} objects still in the hand
+     * @return a list of {@link PlayerResult} objects for the winner(s); contains multiple entries on a tie
+     */
     public static ArrayList<PlayerResult> whoWins(ArrayList<Card> board, ArrayList<Player> players) {
 
         ArrayList<ArrayList<Card>> playerHands = new ArrayList<>();

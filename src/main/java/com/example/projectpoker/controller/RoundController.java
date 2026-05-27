@@ -81,6 +81,11 @@ public class RoundController {
     private final PropertyChangeListener roundListener = this::handleRoundEvent;
     private final PropertyChangeListener playerListener = this::handlePlayerEvent;
 
+    /**
+     * Injects the table rendering helper and binds it to this controller's table pane.
+     *
+     * @param pokerUI shared UI renderer used for cards, chips, and nameplates
+     */
     public void setUI(PokerGameUI pokerUI) {
         this.pokerUI = pokerUI;
         pokerUI.setTablePane(tablePane);
@@ -98,6 +103,11 @@ public class RoundController {
         }
     }
 
+    /**
+     * Applies an initial dark-mode preference before or after the scene is attached.
+     *
+     * @param enabled {@code true} to enable dark mode, {@code false} for normal theme
+     */
     public void setPreferredDarkMode(boolean enabled) {
         preferredDarkMode = enabled;
         if (darkModeToggle != null) {
@@ -106,6 +116,11 @@ public class RoundController {
         applyDarkMode(enabled);
     }
 
+    /**
+     * Sets the active game model and attaches listeners for game and player updates.
+     *
+     * @param game game instance backing this controller's UI
+     */
     public void setGame(Game game) {
         if (this.game != null) {
             this.game.removePropertyChangeListener(gameListener);
@@ -158,6 +173,12 @@ public class RoundController {
         renderChipStacksNow();
     }
 
+    /**
+     * Sets the currently displayed round and human player, then refreshes bound UI state.
+     *
+     * @param round round model to observe and render
+     * @param userPlayer human player represented by this UI session
+     */
     public void setRound(Round round, Player userPlayer) {
         if (this.round != null) {
             this.round.removePropertyChangeListener(roundListener);
@@ -844,7 +865,7 @@ public class RoundController {
             }
 
             if (round == null || round.getCommunityCards() == null) {
-                aiStatusLabel.setText("Advice unavailable: Please start the game 1st.");
+                aiStatusLabel.setText("Advice unavailable: Please start the game first.");
                 btnGenerate.setDisable(false);
                 return;
             }

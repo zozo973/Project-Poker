@@ -17,6 +17,9 @@ public class ProfileController {
     @FXML private Label balanceLabel;
     @FXML private Label messageLabel;
 
+    /**
+     * Populates the profile screen with the currently logged-in user's information.
+     */
     @FXML
     public void initialize() {
         User user = SessionManager.getCurrentUser();

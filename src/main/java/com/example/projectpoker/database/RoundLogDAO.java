@@ -13,11 +13,17 @@ public class RoundLogDAO {
     private final Connection connection;
 
     // Uses the shared SQLite connection for round log queries.
+    /**
+     * Creates a DAO instance backed by the shared SQLite connection.
+     */
     public RoundLogDAO() {
         this.connection = DatabaseConnection.getInstance();
     }
 
-    // Creates both tables needed to store a round and its player actions.
+    /**
+     * Creates both the {@code round_logs} and {@code round_actions} tables, plus the trigger
+     * that keeps the user's {@code totalHandsPlayed} count in sync.
+     */
     public void createTables() {
         createRoundTable();
         createActionTable();
@@ -91,7 +97,13 @@ public class RoundLogDAO {
         }
     }
 
-    // Inserts the round summary, then uses its generated id for the action rows.
+    /**
+     * Inserts a completed round into the {@code round_logs} table and saves all of its
+     * player actions as rows in the {@code round_actions} table.
+     *
+     * @param round         the completed {@link Round} whose data is to be persisted
+     * @param gameSessionId the session id that this round belongs to
+     */
     public void insertRound(Round round, int gameSessionId) {
         String roundSql = """
                 INSERT INTO round_logs (

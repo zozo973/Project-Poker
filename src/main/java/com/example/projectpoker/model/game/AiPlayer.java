@@ -30,18 +30,26 @@ public class AiPlayer extends Player {
         this.setBalance(generateAiPlayer(userBalance));
     }
 
+    /**
+     * Returns the last AI decision response received from the Gemini API for this player.
+     *
+     * @return the {@link AIActions.AiPlayerResponse} containing the action and amount, or {@code null} if not yet set
+     */
     public AIActions.AiPlayerResponse getResponse() { return response; }
 
+    /**
+     * Sets the AI decision response used to drive this player's next action.
+     *
+     * @param response the {@link AIActions.AiPlayerResponse} returned by the Gemini API
+     */
     public void setResponse(AIActions.AiPlayerResponse response) { this.response = response; }
 
-    private int generateAiPlayer(int playerBalance) {
-        int scale = (difficulty.ordinal() - 2);
-        SkewNormalSampler skewNormalSampler = new SkewNormalSampler();
-        int omega =  SkewNormalSampler.safeRoundToInt(0.1 * playerBalance)*abs(scale) + 1;
-        int alpha = SkewNormalSampler.safeRoundToInt(0.05 * scale * playerBalance);
-        return skewNormalSampler.sample(playerBalance, omega, alpha);
-    }
-
+    /**
+     * Executes this AI player's turn by interpreting the Gemini API response.
+     * Falls back to a random heuristic if the response is absent or contains an error.
+     *
+     * @param pots the current list of {@link Pot} objects used to compute the amount-to-call
+     */
     @Override
     public void play(ArrayList<Pot> pots) {
         // For Gemini use
@@ -179,6 +187,10 @@ public class AiPlayer extends Player {
         setActiveBet(betAmount);
     }
 
+    /**
+     * Marks this AI player as forfeited, setting the action directly to FORFEIT
+     * without the folding pre-condition check used by the base {@link Player} class.
+     */
     @Override
     public void forfeitGame() {
         setAction(Action.FORFEIT);

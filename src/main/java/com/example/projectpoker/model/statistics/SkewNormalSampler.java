@@ -44,6 +44,15 @@ public class SkewNormalSampler {
         return safeRoundToInt(xi + omega * z);
     }
 
+    /**
+     * Samples multiple values from a skew-normal distribution.
+     *
+     * @param n     number of samples to generate
+     * @param xi    location parameter
+     * @param omega scale parameter (must be > 0)
+     * @param alpha shape/skew parameter
+     * @return array of {@code n} random samples from SN(xi, omega, alpha)
+     */
     public int[] sampleMany(int n, double xi, double omega, double alpha) {
         int[] samples = new int[n];
         for (int i = 0; i < n; i++) {

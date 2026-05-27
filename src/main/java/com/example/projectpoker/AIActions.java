@@ -23,6 +23,13 @@ import java.util.List;
 
 public class AIActions {
 
+    // Gemini API configuration
+    private static final String GEMINI_API_KEY = "";
+    // gemini-3.1-flash-lite-preview / gemma-4-31b-it / gemini-2.5-flash
+    private static final String API_URL =
+            "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite-preview:generateContent?key="
+                    + GEMINI_API_KEY;
+
     // AI personality options
     public enum AiPersonality {
         ROBOT, PIRATE, WIZARD
@@ -35,6 +42,19 @@ public class AIActions {
         public String errormsg;
     }
 
+    /**
+     * Requests a single AI action decision for one player.
+     *
+     * @param handCards the player's private hole cards
+     * @param boardCards currently revealed community cards
+     * @param currentStatus current round phase
+     * @param toPlay table amount to call in this betting phase
+     * @param potSize current total pot size
+     * @param stackSize chips available to this AI player
+     * @param requiredToCall amount this player must contribute to call
+     * @param alreadyInvested amount this player has already put into the current pot
+     * @return an {@link AiPlayerResponse} containing the suggested action or an error message
+     */
     public AiPlayerResponse getChoice(
             Card[] handCards,
             Card[] boardCards,
@@ -78,13 +98,22 @@ public class AIActions {
         return responses.get(0);
     }
 
-    // Gemini API configuration
-    private static final String GEMINI_API_KEY = "";
-    // gemini-3.1-flash-lite-preview / gemma-4-31b-it / gemini-2.5-flash
-    private static final String API_URL =
-            "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite-preview:generateContent?key="
-                    + GEMINI_API_KEY;
 
+
+    /**
+     * Requests AI decisions for multiple players in a single prompt.
+     *
+     * @param handCardsPerPlayer each player's private hole cards
+     * @param boardCards currently revealed community cards
+     * @param currentStatus current round phase
+     * @param toPlay table amount to call in this betting phase
+     * @param potSize current total pot size
+     * @param stackSizes chip stacks for each AI player
+     * @param requiredToCallList amount each player must contribute to call
+     * @param alreadyInvestedList amount each player has already invested in the current pot
+     * @return a list of {@link AiPlayerResponse} results aligned by input player order
+     * @throws IllegalArgumentException if list sizes do not match player count
+     */
     public List<AiPlayerResponse> getAllChoices(List<Card[]> handCardsPerPlayer, Card[] boardCards, RoundStatus currentStatus, int toPlay, int potSize, List<Integer> stackSizes, List<Integer> requiredToCallList, List<Integer> alreadyInvestedList) {
         List<AiPlayerResponse> results = new ArrayList<>();
         int expectedCount = handCardsPerPlayer == null ? 0 : handCardsPerPlayer.size();

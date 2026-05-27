@@ -10,11 +10,17 @@ public class UserDAO {
     private Connection connection;
 
     // Uses the shared SQLite connection for all user queries.
+    /**
+     * Creates a DAO instance backed by the shared SQLite connection.
+     */
     public UserDAO() {
         connection = DatabaseConnection.getInstance();
     }
 
-    // Creates the users table and adds newer columns if an older database is opened.
+    /**
+     * Creates the {@code users} table if it does not already exist and adds any newer columns
+     * that may be missing from an older database schema.
+     */
     public void createTable() {
         try {
             Statement createTable = connection.createStatement();
@@ -36,7 +42,12 @@ public class UserDAO {
         }
     }
 
-    // Adds one missing column without deleting existing user data.
+    /**
+     * Adds one missing column without deleting existing user data.
+     *
+     * @param columnName the name of the column to add
+     * @param definition the data type and constraints for the column
+     */
     private void ensureColumnExists(String columnName, String definition) throws SQLException {
         DatabaseMetaData metadata = connection.getMetaData();
         // SQLite has no simple "ADD COLUMN IF NOT EXISTS", so metadata is checked first.
@@ -49,7 +60,12 @@ public class UserDAO {
         }
     }
 
-    // Inserts a new user and copies the generated database id back into the User object.
+    /**
+     * Inserts a new user row into the database and writes the generated primary key
+     * back into the {@link User} object.
+     *
+     * @param user the {@link User} to insert; its {@code id} field is updated on success
+     */
     public void insert(User user) {
         try {
             PreparedStatement insertUser = connection.prepareStatement(
@@ -74,7 +90,12 @@ public class UserDAO {
         }
     }
 
-    // Updates the stored profile values for an existing user.
+    /**
+     * Updates the stored profile values (username, password, hands played, wins, balance)
+     * for the user identified by their database id.
+     *
+     * @param user the {@link User} whose record should be updated
+     */
     public void update(User user) {
         try {
             PreparedStatement updateUser = connection.prepareStatement(
@@ -92,7 +113,14 @@ public class UserDAO {
         }
     }
 
-    // Updates only the balance so game progress cannot overwrite newer profile statistics.
+    /**
+     * Updates only the chip balance for the user with the given id.
+     * Prefer this over {@link #update(User)} when only the balance has changed,
+     * to avoid accidentally overwriting newer statistics.
+     *
+     * @param userId         the primary key of the user to update
+     * @param currentBalance the new balance value to store
+     */
     public void updateCurrentBalance(int userId, int currentBalance) {
         try {
             PreparedStatement updateUser = connection.prepareStatement(
@@ -106,7 +134,12 @@ public class UserDAO {
         }
     }
 
-    // Increments wins from the stored value so stale in-memory users do not lose wins.
+    /**
+     * Atomically increments the {@code totalWins} counter for the user with the given id
+     * directly in the database, avoiding stale in-memory state issues.
+     *
+     * @param userId the primary key of the user whose win count should be incremented
+     */
     public void incrementTotalWins(int userId) {
         try {
             PreparedStatement updateUser = connection.prepareStatement(
@@ -119,7 +152,11 @@ public class UserDAO {
         }
     }
 
-    // Deletes one user by their database id.
+    /**
+     * Deletes the user row with the given id from the database.
+     *
+     * @param id the primary key of the user to delete
+     */
     public void delete(int id) {
         try {
             PreparedStatement deleteUser = connection.prepareStatement(
@@ -132,7 +169,11 @@ public class UserDAO {
         }
     }
 
-    // Loads every user row and converts each row into a User object.
+    /**
+     * Retrieves every row from the {@code users} table as a list of {@link User} objects.
+     *
+     * @return a list of all users; empty if the table contains no rows
+     */
     public List<User> getAll() {
         List<User> users = new ArrayList<>();
         try {
@@ -157,7 +198,12 @@ public class UserDAO {
         return users;
     }
 
-    // Finds one user by id, or returns null if no row matches.
+    /**
+     * Retrieves a single user by their database id.
+     *
+     * @param id the primary key to search for
+     * @return the matching {@link User}, or {@code null} if no row with that id exists
+     */
     public User getById(int id) {
         try {
             PreparedStatement getUser = connection.prepareStatement(
@@ -182,7 +228,12 @@ public class UserDAO {
         return null;
     }
 
-    // Finds one user by username, or returns null if the username is not registered.
+    /**
+     * Retrieves a single user by their username.
+     *
+     * @param username the username to search for (case-sensitive)
+     * @return the matching {@link User}, or {@code null} if the username is not registered
+     */
     public User getByUsername(String username) {
         try {
             PreparedStatement getUser = connection.prepareStatement(
@@ -207,7 +258,15 @@ public class UserDAO {
         return null;
     }
 
-    // Reuses an existing account when possible, otherwise creates a basic user record.
+    /**
+     * Returns an existing account matching the given username, or creates and inserts a new
+     * minimal user record if none is found.
+     *
+     * @param username       the username to look up or create
+     * @param password       the password to assign to a newly created user (should be pre-hashed)
+     * @param defaultBalance the starting balance for a newly created user
+     * @return the existing or newly created {@link User}
+     */
     public User getOrCreate(String username, String password, int defaultBalance) {
         User existingUser = getByUsername(username);
         if (existingUser != null) {
@@ -221,7 +280,10 @@ public class UserDAO {
         return newUser;
     }
 
-    // Kept for DAO compatibility; the shared connection is closed through DatabaseConnection.
+    /**
+     * No-op method kept for DAO interface compatibility.
+     * The shared database connection is managed centrally by {@link DatabaseConnection}.
+     */
     public void close() {
         // Shared singleton connection is managed centrally.
     }

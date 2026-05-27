@@ -14,11 +14,17 @@ public class GameSessionDAO {
     private final Connection connection;
 
     // Uses the shared SQLite connection for game session queries.
+    /**
+     * Creates a DAO instance backed by the shared SQLite connection.
+     */
     public GameSessionDAO() {
         this.connection = DatabaseConnection.getInstance();
     }
 
-    // Creates the table that tracks each poker game from start to finish.
+    /**
+     * Creates the {@code game_sessions} table if it does not already exist.
+     * The table records configuration, status, and balance data for each poker game session.
+     */
     public void createTable() {
         String sql = """
                 CREATE TABLE IF NOT EXISTS game_sessions (
@@ -45,7 +51,14 @@ public class GameSessionDAO {
         }
     }
 
-    // Inserts a new game session and returns the generated session id.
+    /**
+     * Inserts a new game session row and returns the generated session id.
+     *
+     * @param user   the logged-in {@link User} starting the session
+     * @param game   the {@link Game} providing session configuration (difficulty, blind size, etc.)
+     * @param player the human {@link Player} whose starting balance is recorded
+     * @return the generated session id, or {@code -1} if the insert failed
+     */
     public int insert(User user, Game game, Player player) {
         String sql = """
                 INSERT INTO game_sessions (
@@ -78,7 +91,13 @@ public class GameSessionDAO {
         return -1;
     }
 
-    // Marks a session as finished and records the user's ending balance.
+    /**
+     * Updates an existing session row to mark it as finished with the user's final balance.
+     *
+     * @param sessionId      the primary key of the session to finalise
+     * @param endingBalance  the user's chip balance at the end of the game
+     * @param status         the final status string (e.g. {@code "ENDED"})
+     */
     public void finish(int sessionId, int endingBalance, String status) {
         String sql = """
                 UPDATE game_sessions

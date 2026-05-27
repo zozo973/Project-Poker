@@ -19,12 +19,32 @@ public class Bet {
         this.pot = pot;
     }
 
+    /**
+     * Returns the chip amount of this bet.
+     *
+     * @return the bet size in chips
+     */
     public int getBetSize() { return betSize; }
 
+    /**
+     * Sets the chip amount for this bet.
+     *
+     * @param betSize the new bet size in chips
+     */
     public void setBetSize(int betSize) { this.betSize = betSize; }
 
+    /**
+     * Returns the pot this bet was placed into.
+     *
+     * @return the associated {@link Pot}
+     */
     public Pot getPot() { return pot; }
 
+    /**
+     * Sets the pot associated with this bet.
+     *
+     * @param pot the {@link Pot} to associate with this bet
+     */
     public void setPot(Pot pot) { this.pot = pot; }
 
 }

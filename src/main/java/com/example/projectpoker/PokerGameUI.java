@@ -37,18 +37,33 @@ public class PokerGameUI {
     private String boardResourcePath = DEFAULT_BOARD_IMAGE;
     private String cardBackResourcePath = DEFAULT_CARD_BACK_IMAGE;
 
+    /**
+     * Sets the board image resource path used when rendering the poker table surface.
+     *
+     * @param boardResourcePath classpath resource path for the board image
+     */
     public void setBoardResourcePath(String boardResourcePath) {
         if (boardResourcePath != null && !boardResourcePath.isBlank()) {
             this.boardResourcePath = boardResourcePath;
         }
     }
 
+    /**
+     * Sets the card-back image resource path used for hidden cards and deck rendering.
+     *
+     * @param cardBackResourcePath classpath resource path for the card-back image
+     */
     public void setCardBackResourcePath(String cardBackResourcePath) {
         if (cardBackResourcePath != null && !cardBackResourcePath.isBlank()) {
             this.cardBackResourcePath = cardBackResourcePath;
         }
     }
 
+    /**
+     * Attaches the JavaFX pane used to render table visuals and initializes static table elements.
+     *
+     * @param tablePane target pane that hosts all card, chip, and label nodes
+     */
     public void setTablePane(Pane tablePane) {
         this.tablePane = tablePane;
         initialiseTable();
@@ -65,6 +80,9 @@ public class PokerGameUI {
         return new Image(resource.toExternalForm());
     }
 
+    /**
+     * Clears and re-renders the static table layout (board image and deck graphics).
+     */
     public void initialiseTable() {
 
         if (tablePane == null) return;
@@ -79,6 +97,9 @@ public class PokerGameUI {
         displayDeck(DeckPos);
     }
 
+    /**
+     * Removes all temporary chip images rendered during the current UI state.
+     */
     public void clearChips() {
         if (tablePane == null) return;
         for (ImageView chip : chipViews) {
@@ -87,6 +108,9 @@ public class PokerGameUI {
         chipViews.clear();
     }
 
+    /**
+     * Removes all per-player chip stack images from the table.
+     */
     public void clearPlayerChipStacks() {
         if (tablePane == null) return;
 
@@ -97,6 +121,9 @@ public class PokerGameUI {
         playerChipStacks.clear();
     }
 
+    /**
+     * Removes the currently displayed central pot chip stack image.
+     */
     public void clearPotChipStack() {
         if (tablePane == null) return;
         if (potChipStack != null) {
@@ -105,6 +132,12 @@ public class PokerGameUI {
         }
     }
 
+    /**
+     * Renders or updates a player's chip stack image at the given seat position.
+     *
+     * @param balance player's current chip balance
+     * @param position table seat position where the stack should be shown
+     */
     public void displayPlayerChipStack(int balance, TablePosition position) {
         if (tablePane == null || position == null) return;
 
@@ -130,6 +163,11 @@ public class PokerGameUI {
         playerChipStacks.put(position, view);
     }
 
+    /**
+     * Renders or updates the shared pot chip stack image at the pot position.
+     *
+     * @param potSize current total pot value
+     */
     public void displayPotChipStack(int potSize) {
         if (tablePane == null) return;
 
@@ -158,6 +196,9 @@ public class PokerGameUI {
         return "/com/example/projectpoker/Images/Chips4.png";
     }
 
+    /**
+     * Clears all rendered nameplates and stops active turn-highlight animations.
+     */
     public void clearNameplates() {
         if (tablePane == null) return;
 
@@ -172,6 +213,14 @@ public class PokerGameUI {
         nameplates.clear();
     }
 
+    /**
+     * Renders or updates a player's nameplate at a seat position.
+     *
+     * @param playerName display name to show for the player
+     * @param role table role badge to append (dealer/small blind/big blind)
+     * @param position table seat position for the label
+     * @param isActiveTurn whether this player is currently taking their turn
+     */
     public void displayNameplate(String playerName, Roles role, TablePosition position, boolean isActiveTurn) {
         if (tablePane == null || position == null) return;
 
@@ -275,6 +324,13 @@ public class PokerGameUI {
         tablePane.getChildren().add(cardBack);
     }
 
+    /**
+     * Displays a sequence of cards at the provided table position.
+     *
+     * @param cards cards to render in order
+     * @param position table position defining origin, spacing, and orientation
+     * @param revealed whether face images should be shown instead of card backs
+     */
     public void displayCards(List<Card> cards, TablePosition position, boolean revealed){
         if (tablePane == null) return;
 

@@ -13,6 +13,13 @@ public class GamePreferences {
     public static final String DEFAULT_BOARD_KEY = "classic1";
     public static final boolean DEFAULT_DARK_MODE = false;
 
+    /**
+     * Describes a selectable themed asset used by the options menu.
+     *
+     * @param key stable preference key stored in the database
+     * @param displayName user-facing label shown in the UI
+     * @param resourcePath classpath path to the image resource
+     */
     public record AssetOption(String key, String displayName, String resourcePath) {}
 
     public static final List<AssetOption> CARD_BACK_OPTIONS = List.of(
@@ -49,10 +56,27 @@ public class GamePreferences {
     private final String boardKey;
     private final boolean darkModeEnabled;
 
+    /**
+     * Creates game preferences without overriding dark mode.
+     *
+     * @param opponentCount number of AI opponents requested
+     * @param difficulty selected AI difficulty
+     * @param cardBackKey selected card-back asset key
+     * @param boardKey selected table-board asset key
+     */
     public GamePreferences(int opponentCount, Difficulty difficulty, String cardBackKey, String boardKey) {
         this(opponentCount, difficulty, cardBackKey, boardKey, DEFAULT_DARK_MODE);
     }
 
+    /**
+     * Creates game preferences with explicit dark-mode preference.
+     *
+     * @param opponentCount number of AI opponents requested
+     * @param difficulty selected AI difficulty
+     * @param cardBackKey selected card-back asset key
+     * @param boardKey selected table-board asset key
+     * @param darkModeEnabled whether dark mode should be enabled
+     */
     public GamePreferences(int opponentCount, Difficulty difficulty, String cardBackKey, String boardKey, boolean darkModeEnabled) {
         this.opponentCount = clampOpponents(opponentCount);
         this.difficulty = difficulty == null ? DEFAULT_DIFFICULTY : difficulty;
@@ -61,34 +85,74 @@ public class GamePreferences {
         this.darkModeEnabled = darkModeEnabled;
     }
 
+    /**
+     * Creates a {@link GamePreferences} instance populated with all default values.
+     *
+     * @return a new {@link GamePreferences} object using all application defaults
+     */
     public static GamePreferences defaults() {
         return new GamePreferences(DEFAULT_OPPONENTS, DEFAULT_DIFFICULTY, DEFAULT_CARD_BACK_KEY, DEFAULT_BOARD_KEY, DEFAULT_DARK_MODE);
     }
 
+    /**
+     * Returns the number of AI opponents configured for the game.
+     *
+     * @return the opponent count, clamped to [{@code MIN_OPPONENTS}, {@code MAX_OPPONENTS}]
+     */
     public int getOpponentCount() {
         return opponentCount;
     }
 
+    /**
+     * Returns the AI difficulty level configured for the game.
+     *
+     * @return the {@link Difficulty} enum value
+     */
     public Difficulty getDifficulty() {
         return difficulty;
     }
 
+    /**
+     * Returns the key identifying which card back design is selected.
+     *
+     * @return the card back key string (e.g. {@code "back1"})
+     */
     public String getCardBackKey() {
         return cardBackKey;
     }
 
+    /**
+     * Returns the key identifying which poker board design is selected.
+     *
+     * @return the board key string (e.g. {@code "classic1"})
+     */
     public String getBoardKey() {
         return boardKey;
     }
 
+    /**
+     * Returns whether dark mode is enabled for the game UI.
+     *
+     * @return {@code true} if dark mode is on, {@code false} otherwise
+     */
     public boolean isDarkModeEnabled() {
         return darkModeEnabled;
     }
 
+    /**
+     * Resolves the card back key to its full classpath resource path.
+     *
+     * @return the resource path string for the selected card back image
+     */
     public String getCardBackResourcePath() {
         return resourcePathForKey(CARD_BACK_OPTIONS, cardBackKey, DEFAULT_CARD_BACK_KEY);
     }
 
+    /**
+     * Resolves the board key to its full classpath resource path.
+     *
+     * @return the resource path string for the selected board image
+     */
     public String getBoardResourcePath() {
         return resourcePathForKey(BOARD_OPTIONS, boardKey, DEFAULT_BOARD_KEY);
     }

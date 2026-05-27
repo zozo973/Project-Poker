@@ -14,6 +14,11 @@ public enum Difficulty {
         this.description = description;
     }
 
+    /**
+     * Returns the flavour-text description of this difficulty level.
+     *
+     * @return the difficulty description string
+     */
     public String getDescription() {
         return description;
     }

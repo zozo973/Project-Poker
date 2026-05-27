@@ -6,6 +6,16 @@ import java.util.ArrayList;
 
 public final class RoleUtil {
 
+    /**
+     * Assigns DEALER, SMALLBLIND, and BIGBLIND roles to the players at the given indices.
+     * All other players are reset to the base PLAYER role.
+     * For a two-player game the roles are always SMALLBLIND and BIGBLIND regardless of the indices.
+     *
+     * @param players     the full list of {@link Player} objects in the game
+     * @param roleIndices a three-element array: index 0 = dealer seat, index 1 = small blind seat,
+     *                    index 2 = big blind seat
+     * @return the same player list with updated roles
+     */
     public static ArrayList<Player> delegateRoles(ArrayList<Player> players, int[] roleIndices) {
         for (Player p : players) {
             p.setRole(Roles.PLAYER);
@@ -23,6 +33,13 @@ public final class RoleUtil {
         return players;
     }
 
+    /**
+     * Scans the player list and returns the seat indices currently holding DEALER,
+     * SMALLBLIND, and BIGBLIND roles.
+     *
+     * @param players the full list of {@link Player} objects
+     * @return a three-element array: [dealerIndex, smallBlindIndex, bigBlindIndex]
+     */
     public static int[] findRoleIndices(ArrayList<Player> players) {
         int[] roleIndices = {0, 0, 0};
         for (int i = 0; i < players.size(); i++) {
@@ -37,6 +54,14 @@ public final class RoleUtil {
         return roleIndices;
     }
 
+    /**
+     * Advances the role indices by one seat so the next round starts with the
+     * correct rotation of dealer and blinds.
+     * Wraps around when indices reach the end of the player list.
+     *
+     * @param players the full list of {@link Player} objects (used to determine wrapping boundaries)
+     * @return a new three-element array with the rotated indices for the next round
+     */
     public static int[] stepRoleIndices(ArrayList<Player> players) {
         int[] roleIndices = findRoleIndices(players);
         if (roleIndices[0] == players.size() - 3) {

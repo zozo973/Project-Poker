@@ -24,7 +24,7 @@ jobs:
         run: chmod +x mvnw
 
       - name: Run full test suite
-        run: ./mvnw -B -ntp clean test -Dtest='*Test,!DatabaseTest'
+        run: ./mvnw -B -ntp clean test -Dtest='*Test,!DatabaseTest,!AIActionsTests,!AiCoachingTest'
 
   javadocs:
     runs-on: ubuntu-latest

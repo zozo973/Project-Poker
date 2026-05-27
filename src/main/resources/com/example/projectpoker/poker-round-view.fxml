@@ -41,7 +41,8 @@
                         text="Start Game"
                         styleClass="start-button"
                         StackPane.alignment="CENTER"
-                        prefWidth="120"
+                        prefHeight="60"
+                        prefWidth="200"
                         onAction="#onStartGameButton"/>
             </StackPane>
 

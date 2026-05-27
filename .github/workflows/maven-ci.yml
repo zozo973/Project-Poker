@@ -47,10 +47,15 @@ jobs:
       - name: Generate JavaDocs
         run: ./mvnw -B -ntp -DskipTests javadoc:javadoc
 
+      - name: Verify JavaDocs index
+        run: test -f target/reports/apidocs/index.html
+
       - name: Upload JavaDocs artifact
         uses: actions/upload-artifact@v4
         with:
           name: javadocs
-          path: target/reports/apidocs
+          path: |
+            target/reports/apidocs/index.html
+            target/reports/apidocs/**
           if-no-files-found: error
 

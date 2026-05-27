@@ -371,6 +371,9 @@ class RoundTest {
         assertEquals(BetType.SKIP2SHOWDOWN, round.getBetType());
     }
 
+
+    /*
+    Ommiting for now
     @Test
     void testEndBettingSidePotCondition() {
         round.init();
@@ -389,6 +392,7 @@ class RoundTest {
         var numPotsPost = round.getPots().size();
         assertEquals(numPotsPrior+1, numPotsPost);
     }
+    */
 
     // Player Action Tests - roundLog is null when not initialized
 

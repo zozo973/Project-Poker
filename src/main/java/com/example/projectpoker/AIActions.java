@@ -85,6 +85,7 @@ public class AIActions {
             "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite-preview:generateContent?key="
                     + GEMINI_API_KEY;
 
+    // Gets poker actions for one or more AI players by sending their game states to Gemini.
     public List<AiPlayerResponse> getAllChoices(List<Card[]> handCardsPerPlayer, Card[] boardCards, RoundStatus currentStatus, int toPlay, int potSize, List<Integer> stackSizes, List<Integer> requiredToCallList, List<Integer> alreadyInvestedList) {
         List<AiPlayerResponse> results = new ArrayList<>();
         int expectedCount = handCardsPerPlayer == null ? 0 : handCardsPerPlayer.size();

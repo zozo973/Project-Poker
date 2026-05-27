@@ -31,9 +31,11 @@ public class AiCoaching {
         public String errormsg;
     }
 
-    // Main Feature; Send (User's hand cards / BoardCards / RoundStatus(Stage) / Advice Mode) to Gemini
-    // Return (result.action / result.condifence / result.reason / result.errormsg)
-    //-----
+    /**
+       Gets AI poker advice based on the player's hand, board cards, round stage, and advice mode.
+       Send (User's hand cards / BoardCards / RoundStatus(Stage) / Advice Mode) to Gemini
+       Return (result.action / result.condifence / result.reason / result.errormsg)
+    */
     public AiAdvice getAdvice(Card[] handCards, Card[] boardCards, RoundStatus currentStatus, AiAdviceMode mode) {
 
         AiAdvice result = new AiAdvice();
@@ -102,6 +104,7 @@ public class AiCoaching {
         return result;
     }
 
+    // Gets the system prompt used to set the AI coach's role and response rules.
     public String getSystemPrompt() {
         return """
                 You are a world-class Texas Hold'em poker master and AI coach. Your task is to analyze the current poker game state and provide the best action recommendation.
@@ -117,6 +120,7 @@ public class AiCoaching {
                 """;
     }
 
+    // Gets the user prompt that describes the current poker game state for the AI.
     public String getUserPrompt(Card[] handCards, Card[] boardCards, RoundStatus currentStatus, AiAdviceMode mode) {
         String handStr = formatCards(handCards);
         String boardStr = formatCards(boardCards);

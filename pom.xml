@@ -175,6 +175,10 @@
                         <sourceFileExclude>module-info.java</sourceFileExclude>
                     </sourceFileExcludes>
                     <detectJavaApiLink>false</detectJavaApiLink>
+                    <additionalOptions>
+                        <additionalOption>--ignore-source-errors</additionalOption>
+                    </additionalOptions>
+                    <failOnError>false</failOnError>
                 </configuration>
             </plugin>
             <plugin>

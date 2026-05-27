@@ -47,31 +47,10 @@ jobs:
       - name: Generate JavaDocs
         run: ./mvnw -B -ntp -DskipTests javadoc:javadoc
 
-      - name: Inspect JavaDocs output
-        run: |
-          echo "Listing generated documentation folders:"
-          find target -maxdepth 3 -type d | sort
-
-      - name: Prepare JavaDocs artifact
-        run: |
-          set -e
-          rm -rf target/javadocs
-          if [ -f target/site/apidocs/index.html ]; then
-            echo "Copying Javadocs from target/site/apidocs"
-            cp -R target/site/apidocs target/javadocs
-          elif [ -f target/reports/apidocs/index.html ]; then
-            echo "Copying Javadocs from target/reports/apidocs"
-            cp -R target/reports/apidocs target/javadocs
-          else
-            echo "No index.html found in the generated Javadocs directories."
-            find target -maxdepth 4 -type f | sort
-            exit 1
-          fi
-
       - name: Upload JavaDocs artifact
         uses: actions/upload-artifact@v4
         with:
           name: javadocs
-          path: target/javadocs
+          path: target/reports/apidocs
           if-no-files-found: error
 

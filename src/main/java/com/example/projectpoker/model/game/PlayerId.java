@@ -20,7 +20,7 @@ public class PlayerId {
     /** Main constructor
      *      Used if a player object already has a unique identifier.
      * @param id: players unique identifier
-     * @throws IOException: Input Output exception thrown from validateId if id is invalid.
+     * @throws IOException Input/output exception thrown from {@link #validateId(String)} if the id is invalid.
      */
 
     public PlayerId(String id) throws IOException {

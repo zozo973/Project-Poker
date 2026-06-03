@@ -366,7 +366,7 @@ public class Player {
     public int placeBet(int betSize, Pot pot) {
         int b = getBalance();
 
-        if (betSize < 0 || (betSize == 0 && !this.action.equals(Action.CALL))) {
+        if (betSize < 0 || (betSize == 0 && (!this.action.equals(Action.CALL) && !this.action.equals(Action.CHECK)) )) {
             this.action = Action.FOLD;
             return 0;
         }

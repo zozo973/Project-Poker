@@ -272,14 +272,33 @@ class PlayerTest {
     }
 
     @Test
-    void testPlaceBetZeroThrows() {
-        assertThrows(IllegalArgumentException.class, () -> player.placeBet(0, new Pot()));
+    void testPlaceBetZeroNotCheck() {
+        player.setAction(Action.RAISE);
+        player.placeBet(0, new Pot());
+        assertEquals(Action.FOLD, player.getAction());
     }
 
     @Test
-    void testPlaceBetNegativeThrows() {
-        assertThrows(IllegalArgumentException.class, () -> player.placeBet(-50, new Pot()));
+    void testPlaceBetZeroCheck() {
+        player.setAction(Action.CHECK);
+        player.placeBet(0, new Pot());
+        assertEquals(Action.CHECK, player.getAction());
     }
+
+    @Test
+    void testPlaceBetZeroCall() {
+        player.setAction(Action.CALL);
+        player.placeBet(0, new Pot());
+        assertEquals(Action.CALL, player.getAction());
+    }
+
+    @Test
+    void testPlaceBetNegative() {
+        player.setAction(Action.CHECK);
+        player.placeBet(-50, new Pot());
+        assertEquals(Action.FOLD, player.getAction());
+    }
+
 
     @Test
     void testPlaceBetExceedsBalanceThrows() {

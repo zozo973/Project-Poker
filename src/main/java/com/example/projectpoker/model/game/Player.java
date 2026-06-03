@@ -360,18 +360,21 @@ public class Player {
      *
      * @param betSize the number of chips to bet; must be &gt; 0 (or 0 only for CALL actions)
      * @param pot     the {@link Pot} the chips are placed into
-     * @return the actual number of chips placed (may be capped at balance for all-in)
+     * @return the actual number of chips placed (maybe capped at balance for all-in)
      * @throws IllegalArgumentException if betSize is negative or exceeds balance without an ALLIN action
      */
     public int placeBet(int betSize, Pot pot) {
         int b = getBalance();
 
         if (betSize < 0 || (betSize == 0 && !this.action.equals(Action.CALL))) {
-            throw new IllegalArgumentException("Bet must be positive.");
+            this.action = Action.FOLD;
+            return 0;
         }
 
         if (betSize > this.balance) {
-            if (!this.action.equals(Action.ALLIN)) throw new IllegalArgumentException(
+            if (this.action.equals(Action.CALL)) {
+                betSize = this.balance;
+            } else if (!this.action.equals(Action.ALLIN)) throw new IllegalArgumentException(
                     "Bet must be <= balance | betSize=" + betSize +
                             " balance=" + this.balance +
                             " action=" + this.action +

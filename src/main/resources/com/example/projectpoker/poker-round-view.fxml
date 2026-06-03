@@ -64,27 +64,32 @@
                         text="Start Round"
                         styleClass="start-button"
                         prefWidth="110"
+                        prefHeight="35"
                         disable="true"
                         onAction="#onStartRoundButton"/>
                 <Button fx:id="toCallButton"
                         text="Check / Call"
                         styleClass="menu-button"
                         prefWidth="110"
+                        prefHeight="35"
                         onAction="#handleCall"/>
                 <Button fx:id="betButton"
                         text="Raise"
                         styleClass="menu-button"
                         prefWidth="110"
+                        prefHeight="35"
                         onAction="#handleRaise"/>
                 <Button fx:id="foldButton"
                         text="Fold"
                         styleClass="menu-button danger-button"
                         prefWidth="110"
+                        prefHeight="35"
                         onAction="#handleFold"/>
                 <Button fx:id="allInButton"
                         text="All In"
                         styleClass="menu-button warning-button"
                         prefWidth="110"
+                        prefHeight="35"
                         onAction="#handleAllIn"/>
             </HBox>
 

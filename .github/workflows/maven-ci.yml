@@ -24,6 +24,7 @@ jobs:
         run: chmod +x mvnw
 
       - name: Run full test suite
+        #Exclude tests that require API keys, or database access, or are otherwise not suitable for CI environments
         run: ./mvnw -B -ntp clean test -Dtest='*Test,!DatabaseTest,!AIActionsTests,!AiCoachingTest'
 
   javadocs:

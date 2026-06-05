@@ -2,244 +2,341 @@ Git Commit History
 
 git shortlog --summary --numbered --all --no-merges
 
-    56  Gattfo (Jacob)
-    37  Basilis Karalouka
-    35  Hugo Powe
-    13  Mitchel
-    12  Dylan Friend
+    95  Gattfo (Jacob Gatt)
+    49  Hugo Powe
+    44  Basilis Karalouka
+    17  Dylan Friend
+    13  Mitchel (Townsend)
+    12  Ho Yui Wong (Bobby)
      9  Ben Sheppard
      7  Ho Yui WONG (Bobby)
-     6  Ho Yui Wong
+     6  shepboy22 (Ben)
      5  Dylan
+     2  Ho Yui WONG (Bobby)
+     2  MJET11 
 
 Summary (including merges)
-    67  Gattfo
-    45  Basilis Karalouka
-    42  Hugo Powe
-    19  Dylan Friend
-    13  Mitchel
+git shortlog --summary --numbered --all            
+
+   111  Gattfo (Jacob Gatt)
+    63  Hugo Powe
+    55  Basilis Karalouka
+    20  Dylan Friend
+    17  Ho Yui Wong (Bobby)
+    13  Mitchel (Townsend)
     11  Ben Sheppard
      9  Ho Yui WONG (Bobby)
-     7  Ho Yui Wong
+     6  shepboy22 (Ben Sheppard)
      5  Dylan
+     3  Ho Yui WONG
+     2  MJET11
 
 
+Full Commit History
+git log --pretty=format:'%h was %an (%ae), %at, %ar, message: %s'
 
-Project-Poker> git log --pretty=format:'%h was %an (%ae), %at, %ar, message: %s'
-
-b71c0bc was Gattfo (gattfo@hotmail.com), 1777605180, 23 hours ago, message: Quick patch to fix Dylans merge error. Will probably be rolled back.
-4c234eb was Dylan Friend (dylan.m.friend@gmail.com), 1777554149, 2 days ago, message: Merge remote-tracking branch 'origin/master'
-68663e1 was Dylan Friend (dylan.m.friend@gmail.com), 1777553772, 2 days ago, message: Merge branch 'UI_Menus'
-1b2b392 was Basilis Karalouka (basi.loukas1@gmail.com), 1777540099, 2 days ago, message: fixed register resizing
-915257a was Basilis Karalouka (basi.loukas1@gmail.com), 1777539813, 2 days ago, message: Merge remote-tracking branch 'origin/master'
-6f43c0d was Basilis Karalouka (basi.loukas1@gmail.com), 1777539751, 2 days ago, message: Screen now doesn't resize and is full screen from the start
-dbce31b was Basilis Karalouka (basi.loukas1@gmail.com), 1777539367, 2 days ago, message: fixed errors
-f8efe49 was Basilis Karalouka (basi.loukas1@gmail.com), 1777538752, 2 days ago, message: Screen now doesn't resize and is full screen from the start
-7adb121 was Ben Sheppard (your-email@example.com), 1777537746, 2 days ago, message: DatabaseTest now uses separate DB file for testing
-:...skipping...
-b71c0bc was Gattfo (gattfo@hotmail.com), 1777605180, 23 hours ago, message: Quick patch to fix Dylans merge error. Will probably be rolled back.
-4c234eb was Dylan Friend (dylan.m.friend@gmail.com), 1777554149, 2 days ago, message: Merge remote-tracking branch 'origin/master'
-68663e1 was Dylan Friend (dylan.m.friend@gmail.com), 1777553772, 2 days ago, message: Merge branch 'UI_Menus'
-1b2b392 was Basilis Karalouka (basi.loukas1@gmail.com), 1777540099, 2 days ago, message: fixed register resizing
-915257a was Basilis Karalouka (basi.loukas1@gmail.com), 1777539813, 2 days ago, message: Merge remote-tracking branch 'origin/master'
-6f43c0d was Basilis Karalouka (basi.loukas1@gmail.com), 1777539751, 2 days ago, message: Screen now doesn't resize and is full screen from the start
-dbce31b was Basilis Karalouka (basi.loukas1@gmail.com), 1777539367, 2 days ago, message: fixed errors
-f8efe49 was Basilis Karalouka (basi.loukas1@gmail.com), 1777538752, 2 days ago, message: Screen now doesn't resize and is full screen from the start
-7adb121 was Ben Sheppard (your-email@example.com), 1777537746, 2 days ago, message: DatabaseTest now uses separate DB file for testing
-b7eca41 was Ben Sheppard (your-email@example.com), 1777537451, 2 days ago, message: DatabaseTest now uses seperate DB file for testing
-8808750 was Ben Sheppard (your-email@example.com), 1777536347, 2 days ago, message: Fix: persisted user balance after rounds and on window close
-7f49098 was Ben Sheppard (your-email@example.com), 1777536025, 2 days ago, message: Added persistence tests using isolated SQLite DB
-1bd8424 was Ben Sheppard (your-email@example.com), 1777535856, 2 days ago, message: Merge remote-tracking branch 'origin/master'
-8c81092 was Ben Sheppard (your-email@example.com), 1777535594, 2 days ago, message: Added persistence tests using isolated SQLite DB
-9eef944 was Basilis Karalouka (basi.loukas1@gmail.com), 1777534017, 2 days ago, message: Fixed Coupling with handleLogin() LoginController.java
-62a6027 was Basilis Karalouka (basi.loukas1@gmail.com), 1777533223, 2 days ago, message: Fixing the tight coupling with the handleRegister method in RegisterController.java
-2fc8dd6 was Gattfo (gattfo@hotmail.com), 1777516636, 2 days ago, message: Added toString() method for cards
-239b5b9 was Dylan Friend (dylan.m.friend@gmail.com), 1777479183, 2 days ago, message: Added back button to profile so logout wasn't the only option
-dc69c62 was Dylan Friend (dylan.m.friend@gmail.com), 1777478905, 2 days ago, message: Removed unused import
-262146a was Dylan Friend (dylan.m.friend@gmail.com), 1777478776, 2 days ago, message: Cleared unused attributes
-8c9bde8 was Dylan Friend (dylan.m.friend@gmail.com), 1777478738, 2 days ago, message: Cleared unused imports
-dd9b4ab was Dylan Friend (dylan.m.friend@gmail.com), 1777478306, 2 days ago, message: Basic Menu recreated to work with currently code base.
-eb86b0f was Gattfo (gattfo@hotmail.com), 1777465829, 3 days ago, message: Fixed bug where folded player could still win the round.
-7ebe1a9 was Gattfo (gattfo@hotmail.com), 1777431296, 3 days ago, message: Updated Meeting minutes
-da4fec0 was Gattfo (gattfo@hotmail.com), 1777425361, 3 days ago, message: Merge remote-tracking branch 'origin/master'
-a0ccfee was Gattfo (gattfo@hotmail.com), 1777425317, 3 days ago, message: Changed Var types to actual types
-cdfb33e was Dylan Friend (dylan.m.friend@gmail.com), 1777371312, 4 days ago, message: Recreation of MainMenuController.java.
-5eb1988 was Dylan Friend (dylan.m.friend@gmail.com), 1777369060, 4 days ago, message: Test commit
-5ae18ed was Gattfo (gattfo@hotmail.com), 1777368355, 4 days ago, message: Ammended GameTest after removing alternate Start() method. Made fields in PlayerResult final.
-cf98dc5 was Gattfo (gattfo@hotmail.com), 1777347255, 4 days ago, message: Started removing unused test methods from Game. Hugo is going to do the rest.
-713c175 was Gattfo (gattfo@hotmail.com), 1777346713, 4 days ago, message: Removed unused methods and imports from Game and RoundController. Also removed RoundViewUpdater as controller doesnt need it.
-6b078f5 was Basilis Karalouka (basi.loukas1@gmail.com), 1777288567, 5 days ago, message: Further updates to the meeting journal
-e5d8ded was Basilis Karalouka (basi.loukas1@gmail.com), 1777287465, 5 days ago, message: Simple update to the meeting journal for last friday meeting
-913cf99 was Gattfo (gattfo@hotmail.com), 1777282930, 5 days ago, message: Added chipstack images for all players and the pot.
-4cf5296 was Gattfo (gattfo@hotmail.com), 1777273386, 5 days ago, message: Added Chip assets to game and methods in PokerGameUI to render them on screen. Removed unused method onRoundStart
-7d37d9b was Gattfo (gattfo@hotmail.com), 1777216667, 5 days ago, message: Added Role indicators and a pulsing effect to active players name badge
-4ef9ea2 was Gattfo (gattfo@hotmail.com), 1777209719, 6 days ago, message: Merge remote-tracking branch 'origin/master'
-c675d78 was Gattfo (gattfo@hotmail.com), 1777209693, 6 days ago, message: Added nameplates to UI and cleaned up some unused functions. Added HandEval Tests
-49231cb was Basilis Karalouka (basi.loukas1@gmail.com), 1777205284, 6 days ago, message: Adding Register and Login Test Cases
-5f9814b was Gattfo (gattfo@hotmail.com), 1777197428, 6 days ago, message: Removed unused classes and added HandEvalTests
-f864ec7 was Dylan (165541755+IliadanX13@users.noreply.github.com), 1777192324, 6 days ago, message: Create Test file
-67a9bbe was Gattfo (gattfo@hotmail.com), 1777191124, 6 days ago, message: Updated Meetings journal
-17518dd was Gattfo (gattfo@hotmail.com), 1777189673, 6 days ago, message: Merge remote-tracking branch 'origin/master'
-c747375 was Gattfo (gattfo@hotmail.com), 1777189530, 6 days ago, message: Login Controller no longer opens seperate game window.
-3058bb6 was Basilis Karalouka (basi.loukas1@gmail.com), 1777187065, 6 days ago, message: Added username, email and password criteria when registering
-a6f46b9 was Basilis Karalouka (basi.loukas1@gmail.com), 1777186960, 6 days ago, message: Adding additional if statements to make it clear for the user what they are doing wrong when registering
-0a0f7d7 was Ho Yui Wong (hoyuiwong@gmail.com), 1777184584, 6 days ago, message: Connect the AI Coaching to the game
-7a7944a was Ho Yui Wong (hoyuiwong@gmail.com), 1777181851, 6 days ago, message: Updated the UI for AI Coaching
-d8f59ce was Gattfo (gattfo@hotmail.com), 1777172052, 6 days ago, message: Made the To call text update with the call amount
-3751405 was Basilis Karalouka (basi.loukas1@gmail.com), 1777128210, 7 days ago, message: Added criteria for username, email and password. Fixed the registercontroller initializing the database everytime and also added checking for Existing Users in case someone tries to input a username that's already existing in the database
-a276dc6 was Basilis Karalouka (basi.loukas1@gmail.com), 1777121975, 7 days ago, message: Fixing merging errors with the removal of handlers
-5962994 was Basilis Karalouka (basi.loukas1@gmail.com), 1777117735, 7 days ago, message: Merge remote-tracking branch 'origin/master'
-f986a9b was Gattfo (gattfo@hotmail.com), 1777109666, 7 days ago, message: Fixed some IDE warnings
-894011e was Gattfo (gattfo@hotmail.com), 1777108291, 7 days ago, message: Removed Change handlers from project due to conflicting updates. Implemented relevant behaviour in Round, RoundController and Game instead. Fixed some bugs causing the game to crash and added start round button to UI.
-68e4b6d was Basilis Karalouka (basi.loukas1@gmail.com), 1777028359, 8 days ago, message: Completed and Tested Version for Login and Regisration
-b64b16f was Basilis Karalouka (basi.loukas1@gmail.com), 1777027646, 8 days ago, message: merged with ben's branch to fix errors with missing methods
-886d690 was Basilis Karalouka (basi.loukas1@gmail.com), 1777019219, 8 days ago, message: Merge branch 'master' to 'authentication' branch
-7f9f49a was Hugo Powe (11580178@qut.edu.au), 1777005003, 8 days ago, message: Merge remote-tracking branch 'origin/master'
-e23f839 was Hugo Powe (11580178@qut.edu.au), 1777004939, 8 days ago, message: implemented start game button
-89472e0 was Ho Yui WONG (Bobby) (hoyuiwong@gmail.com), 1777004067, 8 days ago, message: Fix some bugs
-8c8f661 was Basilis Karalouka (basi.loukas1@gmail.com), 1777001550, 8 days ago, message: Merge branch 'PokerGameDatabase-ben' of https://github.com/zozo973/Project-Poker into authentication
-a2aa49d was Hugo Powe (11580178@qut.edu.au), 1777001239, 8 days ago, message: start method in Round had been altered, fixed method
-dee468d was Ho Yui WONG (Bobby) (hoyuiwong@gmail.com), 1777000620, 8 days ago, message: Merge remote-tracking branch 'origin/master'
-c093d0a was Basilis Karalouka (basi.loukas1@gmail.com), 1777000595, 8 days ago, message: fixing some hardcoded implementation in PokerApplication.java
-10875ea was Ho Yui WONG (Bobby) (hoyuiwong@gmail.com), 1777000112, 8 days ago, message: feat: update AiCoaching UI and logic
-d5c382d was Hugo Powe (11580178@qut.edu.au), 1776999555, 8 days ago, message: updated poker-round-view file
-1d91419 was Hugo Powe (11580178@qut.edu.au), 1776997441, 8 days ago, message: saving remote master changes
-ca71557 was Hugo Powe (11580178@qut.edu.au), 1776997165, 8 days ago, message: getting master up to date
-3dcd882 was Ben Sheppard (your-email@example.com), 1776996030, 8 days ago, message: Changes made for DB persistence: - Passed the logged-in User from PokerApplication into Game so game sessions can be tied to the correct user. -Added Game session fields and constructor support for persistence data such as buy-in, starting balance, hands played, and user profile. -Incremented handsPlayed each round so stored session stats stay accurate. -Added round metadata to Round so completed rounds can be saved with the correct game session and hand number. - Updated RoundLogDAO to save RoundLogEntry data correctly.  - Added getters to RoundLogEntry so DAO code can read player/action/bet values. -Ensured roundLog is initialized before actions are recorded so round logs can always be persisted. Cleanup / safety: - Made RoundLogEntry.toString() safe when no current pot is present. - Added helper methods on Round for DB-friendly string formatting of community cards and remaining players.
-885a6dc was Gattfo (gattfo@hotmail.com), 1776969177, 8 days ago, message: Added onClick methods for buttons in the UI. This uncovered some more bugs to fix,this time related to Player.getActiveBet returning a null value. Also removed some unnecessary methods from round that I put there for testing and forgot about.
-0acc8f2 was Gattfo (gattfo@hotmail.com), 1776965968, 8 days ago, message: Fixed Issue where players cards were rendering in the wrong table position
-e5f794a was Gattfo (gattfo@hotmail.com), 1776955953, 8 days ago, message: Merge remote-tracking branch 'origin/master'
-5257d91 was Gattfo (gattfo@hotmail.com), 1776955783, 9 days ago, message: Fixed the issue where the cards were not rendering. Was caused by UI being initialised twice. Cleaned up warnings that I've been ignoring too.
-f33830c was Gattfo (gattfo@hotmail.com), 1776955783, 9 days ago, message: Fixed the infinite loop that was causing the game to crash. Added break statements to switch cases. Still have an issue where the cards are not rendering this is probably due to Round status not flowing correctly.
-4978a06 was Gattfo (gattfo@hotmail.com), 1776950210, 9 days ago, message: Fixed the infinite loop that was causing the game to crash. Added break statements to switch cases. Still have an issue where the cards are not rendering this is probably due to Round status not flowing correctly.
-a6a24a4 was Gattfo (gattfo@hotmail.com), 1776950054, 9 days ago, message: Fixed imports for cards but not the incorrect handling of RoundStatus. Im currently fixing other errors and dont have time for this. Bobby please fix the area Ive commented out.
-cf39047 was Gattfo (gattfo@hotmail.com), 1776924091, 9 days ago, message: Added new fxml file for game window. Fixed some logic causing game to not start properly. Now it starts and renders cards but causes an infinite loop. Sharing for help in diagnosing problem.
-fc76814 was Gattfo (gattfo@hotmail.com), 1776923961, 9 days ago, message: Merge remote-tracking branch 'origin/master'
-8431d89 was Gattfo (gattfo@hotmail.com), 1776923921, 9 days ago, message: Deleted default Application and fxml files.
-a0b722c was Ho Yui WONG (Bobby) (hoyuiwong@gmail.com), 1776915067, 9 days ago, message: Merge branch 'AI-Coaching-Advice'
-7896d5f was Ho Yui WONG (Bobby) (hoyuiwong@gmail.com), 1776914652, 9 days ago, message: feat: integrate Gemini API for AI Coaching engine
-ade3055 was Hugo Powe (11580178@qut.edu.au), 1776838806, 10 days ago, message: Merge remote-tracking branch 'origin/master'
-55b06a6 was Hugo Powe (11580178@qut.edu.au), 1776838020, 10 days ago, message: Added new unitTest classes for pot and potUtil classes
-67a0ab3 was Basilis Karalouka (basi.loukas1@gmail.com), 1776764258, 11 days ago, message: Final small changes
-03522cb was Basilis Karalouka (basi.loukas1@gmail.com), 1776762812, 11 days ago, message: Integrating register and login with main game
-a1d2038 was Basilis Karalouka (basi.loukas1@gmail.com), 1776761965, 11 days ago, message: Integrating register and login with main game
-2ac6f99 was Hugo Powe (11580178@qut.edu.au), 1776761625, 11 days ago, message: Debugging of round, continued resolution of how sidePots can be created
-57e8e44 was Basilis Karalouka (basi.loukas1@gmail.com), 1776758047, 11 days ago, message: Merge branch 'master' of https://github.com/zozo973/Project-Poker into authentication
-5814e6c was Basilis Karalouka (basi.loukas1@gmail.com), 1776745554, 11 days ago, message: editted user class
-b7bc492 was Hugo Powe (11580178@qut.edu.au), 1776660998, 12 days ago, message: fixing RoundLogEntry, Pot and round class from testing
-82c52fd was Gattfo (gattfo@hotmail.com), 1776437233, 2 weeks ago, message: Merge remote-tracking branch 'origin/master'
-c96f0d5 was Gattfo (gattfo@hotmail.com), 1776435390, 2 weeks ago, message: Changed dummy methods in RoundController to call actual UI methods. Added a static list of TablePositions to be indexed to.
-f6c4e2b was Hugo Powe (11580178@qut.edu.au), 1776397695, 2 weeks ago, message: fixed problems from debugging in game class
-9d08e9a was Hugo Powe (11580178@qut.edu.au), 1776392388, 2 weeks ago, message: added some test cases to gameTest class, for the start command
-e7c8e20 was Hugo Powe (11580178@qut.edu.au), 1776321713, 2 weeks ago, message: Added Test classes for Game, Round and Player classes
-55b8fb5 was Gattfo (gattfo@hotmail.com), 1776240539, 2 weeks ago, message: Bug fix in testing
-a7027a0 was Gattfo (gattfo@hotmail.com), 1776215582, 2 weeks ago, message: Merge branch 'UI_and_Animation'
-b3850d9 was Gattfo (gattfo@hotmail.com), 1776215354, 2 weeks ago, message: Changed launcher method during testing
-f4349b3 was Gattfo (gattfo@hotmail.com), 1776215312, 2 weeks ago, message: Fixed type error.
-69f28a0 was Gattfo (gattfo@hotmail.com), 1776215140, 2 weeks ago, message: Fixed Null pointer exception bug caused by player Hand not having a constructor.
-990db2f was Gattfo (gattfo@hotmail.com), 1776210703, 2 weeks ago, message: Commiting changes before merging into master
-e3bbee9 was Hugo Powe (11580178@qut.edu.au), 1776060508, 3 weeks ago, message: Commiting changes made on feature propertyChangeSupport branch to remote origin
-9b15d4d was Hugo Powe (11580178@qut.edu.au), 1776060364, 3 weeks ago, message: Implemented real or dummy methods for all events in the round controller class from the handlers of the property change events in the player,round and game classes
-03a2e3b was Gattfo (gattfo@hotmail.com), 1776056819, 3 weeks ago, message: Fixed bug that was causing the getCardImagePath to return null filepaths.
-a910080 was Hugo Powe (11580178@qut.edu.au), 1776052675, 3 weeks ago, message: commiting syntax changes to push into and update feature/propertyChangeSupport branch
-55bcb6c was Gattfo (gattfo@hotmail.com), 1776048940, 3 weeks ago, message: Created TablePosition class to hold data of where cards should be rendered. PokerGameUI handles the actual rendering of assets.
-444a4a8 was Gattfo (gattfo@hotmail.com), 1776048726, 3 weeks ago, message: Fixed code smell in image path method, card previously needed itself as an argument. Dont code tired.
-e1733c8 was Basilis Karalouka (basi.loukas1@gmail.com), 1775993345, 3 weeks ago, message: fully implemented ProfileController.java and profile.fxml
-99b5b3a was Basilis Karalouka (basi.loukas1@gmail.com), 1775991553, 3 weeks ago, message: Completed login controller and login fxml
-37c2696 was Gattfo (gattfo@hotmail.com), 1775983271, 3 weeks ago, message: Merge remote-tracking branch 'origin/master'
-161d1dc was Gattfo (gattfo@hotmail.com), 1775983248, 3 weeks ago, message: Updated meetings journal with todays notes
-e0a9687 was Basilis Karalouka (basi.loukas1@gmail.com), 1775971836, 3 weeks ago, message: fully implemented RegisterController.java
-3e6c3a9 was Basilis Karalouka (basi.loukas1@gmail.com), 1775969917, 3 weeks ago, message: added further hashed password functionality and created user object.
-c57b144 was Basilis Karalouka (basi.loukas1@gmail.com), 1775905426, 3 weeks ago, message: added functionality to handle register method
-0e0eab7 was Basilis Karalouka (basi.loukas1@gmail.com), 1775903280, 3 weeks ago, message: added fxml register code and started on RegisterController.java
-ce75f61 was Basilis Karalouka (basi.loukas1@gmail.com), 1775893298, 3 weeks ago, message: Merged with Ben and implemented new User.java class. Added email to database and fixed up some errors with UserDAO.java. Implemented password hasher class
-f7fed89 was Hugo Powe (11580178@qut.edu.au), 1775798680, 3 weeks ago, message: improved some of the game logic and tweaked hand eval so a winner can be found and paided.
-7208b17 was Ben Sheppard (your-email@example.com), 1775718516, 3 weeks ago, message: Added SQLite connection and DAO for users, game sessions, and round logs:
-15c7de9 was Ben Sheppard (your-email@example.com), 1775715550, 3 weeks ago, message: Merge remote-tracking branch 'origin/master' into PokerGameDatabase-ben
-19b6bc9 was Basilis Karalouka (basi.loukas1@gmail.com), 1775712734, 3 weeks ago, message: further fixing up bugs SessionManager.java and User.java
-4b500e0 was Basilis Karalouka (basi.loukas1@gmail.com), 1775712384, 3 weeks ago, message: fixing up bugs & changing away from boolean in SessionManager.java and User.java
-6bfd72f was Gattfo (gattfo@hotmail.com), 1775709120, 3 weeks ago, message: Added PokerGame as a UI manager for the poker game.
-2c3625a was Gattfo (gattfo@hotmail.com), 1775708998, 3 weeks ago, message: Added Method to call image file path for cards. Added static card objects for use in testing temporarily.
-c379145 was Gattfo (gattfo@hotmail.com), 1775708851, 3 weeks ago, message: Renamed and edited files to fit methods better
-f290672 was Basilis Karalouka (basi.loukas1@gmail.com), 1775654580, 3 weeks ago, message: Further editing and fixing up bugs in SessionManager.java
-cf23068 was Basilis Karalouka (basi.loukas1@gmail.com), 1775654157, 3 weeks ago, message: editting and fixing up bugs in SessionManager.java
-b99e594 was Basilis Karalouka (basi.loukas1@gmail.com), 1775653821, 3 weeks ago, message: adding fields, constructors, getting and setting methods to SessionManager.java
-6802e64 was Basilis Karalouka (basi.loukas1@gmail.com), 1775652240, 3 weeks ago, message: fixing some spelling mistakes
-f3cefbe was Basilis Karalouka (basi.loukas1@gmail.com), 1775652141, 3 weeks ago, message: added getter and setter methods to access private fields
-1140504 was Hugo Powe (11580178@qut.edu.au), 1775651177, 3 weeks ago, message: merged propertyChangeSupport feature and am Commiting master to push to remote rempo
-43b0863 was Hugo Powe (11580178@qut.edu.au), 1775651003, 3 weeks ago, message: Merge branch 'feature/propertyChangeSupport'
-80c36e9 was Basilis Karalouka (basi.loukas1@gmail.com), 1775650862, 3 weeks ago, message: adding constructor to user class
-e798ec8 was Hugo Powe (11580178@qut.edu.au), 1775650113, 3 weeks ago, message: Added dummy method in PokerApplication for starting a game, the view and controller for this need to be improved to fit in with the rest of the ui's
-22ad241 was Hugo Powe (11580178@qut.edu.au), 1775642453, 3 weeks ago, message: added test package containing test classes to make sure game runs smoothly, added BettingController for the buttons and sliders in the betting ui, implemented propertyChangeSupport into player, round and game class to implement obersver pattern
-0253cc4 was Gattfo (gattfo@hotmail.com), 1775624666, 3 weeks ago, message: Added new assets for board, deck and chips
-1f2ae11 was Gattfo (gattfo@hotmail.com), 1775624615, 3 weeks ago, message: Added new assets for board, deck and chips
-eeb9ecf was Gattfo (gattfo@hotmail.com), 1775607147, 3 weeks ago, message: Added card images to project
-5569a74 was Gattfo (gattfo@hotmail.com), 1775607101, 3 weeks ago, message: Added prototype sketch to Master
-7b1627d was Gattfo (gattfo@hotmail.com), 1775536349, 4 weeks ago, message: Updated Meetings Journal with weeks meetings
-bf3c0c9 was Ho Yui WONG (Bobby) (hoyuiwong@gmail.com), 1775454048, 4 weeks ago, message: Added situations for testing; Ensure AiCoaching is work.
-7456d72 was Ho Yui WONG (Bobby) (hoyuiwong@gmail.com), 1775276702, 4 weeks ago, message: // Add httpclient, reqest and process the data that recieved.
-f813ce4 was Ho Yui WONG (Bobby) (hoyuiwong@gmail.com), 1775188955, 4 weeks ago, message: Added Gson dependency in pom.xml; Implemented request body formatting using Gson to safely handle prompt strings in AiCoaching.java.
-c715e2f was Gattfo (gattfo@hotmail.com), 1775107415, 4 weeks ago, message: Commiting changes for merge into master so Hugo can continue on game logic with hand evaluation.
-f04f5e4 was Gattfo (gattfo@hotmail.com), 1775105703, 4 weeks ago, message: Merge branch 'Game-Logic'
-935dbd8 was Gattfo (gattfo@hotmail.com), 1775105463, 4 weeks ago, message: Commiting changes for merge into master. Added Method to find winner between hands.
-bc509fb was Gattfo (gattfo@hotmail.com), 1775105254, 4 weeks ago, message: Commiting changes for merge into master. Added Method to find winner between hands.
-8197cc9 was Hugo Powe (11580178@qut.edu.au), 1775103595, 4 weeks ago, message: refactored all enum classes into enums package for readablity of program
-9b3fbb8 was Hugo Powe (11580178@qut.edu.au), 1775101846, 4 weeks ago, message: commit of master to merge StateMachine-PokerGame branch into local and then remote origin
-fed802a was Hugo Powe (11580178@qut.edu.au), 1775101326, 4 weeks ago, message: commit to merge this branch with master
-7942101 was Gattfo (gattfo@hotmail.com), 1775100054, 4 weeks ago, message: Fixed some bugs in evaluateHand method and HandResult ToString method. Added PlayerResult class and whoWins method to determine hand winners.
-da7a3de was Hugo Powe (11580178@qut.edu.au), 1775083789, 4 weeks ago, message: implemented Init, Start and end commands into game and round. Implementations require connection to GUI and database.
-1699c22 was Ho Yui WONG (Bobby) (hoyuiwong@gmail.com), 1775024258, 4 weeks ago, message: Added enum(AiAdviceModel) for prompt; Added input prompt(getSystemPrompt & getUserPrompt);
-cb4d620 was Gattfo (gattfo@hotmail.com), 1774998617, 4 weeks ago, message: Fixed ToString() output bugs. Renamed Suit and Rank enums to lower case.
-4579aeb was Gattfo (gattfo@hotmail.com), 1774961324, 5 weeks ago, message: Finished Hand evaluation logic and Hand result classes. Renamed Rank names to lower case for better output readability.
-ffb6fa4 was Gattfo (gattfo@hotmail.com), 1774961162, 5 weeks ago, message: Finished Hand evaluation logic and Hand result classes. Renamed Rank names to lower case for better output readability.
-713e276 was Hugo Powe (11580178@qut.edu.au), 1774936006, 5 weeks ago, message: saving work on implementing observer and statemachine design patterns into Round and Game classes
-396b7aa was Hugo Powe (11580178@qut.edu.au), 1774922936, 5 weeks ago, message: implementing State Machine and observer desgin patterns into game logic
-4308af8 was Dylan (165541755+IliadanX13@users.noreply.github.com), 1774671850, 5 weeks ago, message: Update Meetings Journal
-e39a6b8 was Ben Sheppard (your-email@example.com), 1774592627, 5 weeks ago, message: Implemented a local SQLite database connection using JDBC following the Activity 4 structure.
-fd6bc6b was Basilis Karalouka (basi.loukas1@gmail.com), 1774585694, 5 weeks ago, message: Adding Fields in User Class
-67db7ea was Hugo Powe (11580178@qut.edu.au), 1774584067, 5 weeks ago, message: implemented pathway to send roundLog to database through newRound method in PokerGame
-a392f80 was Hugo Powe (11580178@qut.edu.au), 1774582112, 5 weeks ago, message: updated PokerRound class to have instance of Pot class
-964f78d was Basilis Karalouka (basi.loukas1@gmail.com), 1774576798, 5 weeks ago, message: Setting up files, folders & dependencies for Account & Profile Features
-fb560d1 was Basilis Karalouka (basi.loukas1@gmail.com), 1774573302, 5 weeks ago, message: Simple Spelling Errors
-25208f1 was Gattfo (gattfo@hotmail.com), 1774492785, 5 weeks ago, message: Merge remote-tracking branch 'origin/Game-Logic' into Game-Logic
-d6eed3b was Gattfo (gattfo@hotmail.com), 1774492717, 5 weeks ago, message: Methods for determining different kinds of hands
-bab8045 was Basilis Karalouka (basi.loukas1@gmail.com), 1774480943, 5 weeks ago, message: Merge branch 'master' of https://github.com/zozo973/Project-Poker
-642aa3d was Hugo Powe (11580178@qut.edu.au), 1774427475, 5 weeks ago, message: implemented game logs, which will be sent to a  database
-06daac0 was Dylan (165541755+IliadanX13@users.noreply.github.com), 1774410500, 5 weeks ago, message: Update Meetings Journal
-370154d was Dylan (165541755+IliadanX13@users.noreply.github.com), 1774410352, 5 weeks ago, message: Update Meetings Journal
-037bc39 was Dylan (165541755+IliadanX13@users.noreply.github.com), 1774410216, 5 weeks ago, message: Update Meetings Journal
-d164735 was Ben Sheppard (your-email@example.com), 1774409782, 5 weeks ago, message: Added rough list of requirements
-7014036 was Hugo Powe (11580178@qut.edu.au), 1774409108, 5 weeks ago, message: Merge remote-tracking branch 'origin/master'
-d6babac was Hugo Powe (11580178@qut.edu.au), 1774408723, 5 weeks ago, message:  merge commit
-5d2382d was Hugo Powe (11580178@qut.edu.au), 1774408601, 5 weeks ago, message: committing for merge of Game_logic and master'
-d0371e0 was Hugo Powe (11580178@qut.edu.au), 1774408198, 5 weeks ago, message: commiting code for meeting demonstraightion
-e1292c3 was Basilis Karalouka (basi.loukas1@gmail.com), 1774400147, 5 weeks ago, message: Editing and Adding User Stories
-eb20c05 was Hugo Powe (11580178@qut.edu.au), 1774267907, 6 weeks ago, message: Implemented some initialisation methods for PokerGame and AiPlayer classes
-1eb1926 was Hugo Powe (11580178@qut.edu.au), 1774259017, 6 weeks ago, message: improved readability by making into seperate class enums
-a9c75a4 was Hugo Powe (11580178@qut.edu.au), 1774257375, 6 weeks ago, message: commiting to origin to merge branches
-e7bc3ab was Gattfo (gattfo@hotmail.com), 1774246525, 6 weeks ago, message: Added User stories and meeting minutes to Main Repo
-74a12f2 was Gattfo (gattfo@hotmail.com), 1774246265, 6 weeks ago, message: Added User stories and meeting minutes to Main Repo
-d0e9743 was Hugo Powe (11580178@qut.edu.au), 1774245255, 6 weeks ago, message: Removed Random class instances from CardDeck class opting to use the Collections Shuffle method instead.
-439903f was Hugo Powe (11580178@qut.edu.au), 1774244986, 6 weeks ago, message: Added CardDeck and PokerHand classes into GameLogic, classes are currently not implemented
-4ef5f2b was Hugo Powe (11580178@qut.edu.au), 1774239053, 6 weeks ago, message: Initial commit
-(END)
-d6eed3b was Gattfo (gattfo@hotmail.com), 1774492717, 5 weeks ago, message: Methods for determining different kinds of hands
-bab8045 was Basilis Karalouka (basi.loukas1@gmail.com), 1774480943, 5 weeks ago, message: Merge branch 'master' of https://github.com/zozo973/Project-Poker
-642aa3d was Hugo Powe (11580178@qut.edu.au), 1774427475, 5 weeks ago, message: implemented game logs, which will be sent to a  database
-06daac0 was Dylan (165541755+IliadanX13@users.noreply.github.com), 1774410500, 5 weeks ago, message: Update Meetings Journal
-370154d was Dylan (165541755+IliadanX13@users.noreply.github.com), 1774410352, 5 weeks ago, message: Update Meetings Journal
-037bc39 was Dylan (165541755+IliadanX13@users.noreply.github.com), 1774410216, 5 weeks ago, message: Update Meetings Journal
-d164735 was Ben Sheppard (your-email@example.com), 1774409782, 5 weeks ago, message: Added rough list of requirements
-7014036 was Hugo Powe (11580178@qut.edu.au), 1774409108, 5 weeks ago, message: Merge remote-tracking branch 'origin/master'
-d6babac was Hugo Powe (11580178@qut.edu.au), 1774408723, 5 weeks ago, message:  merge commit
-5d2382d was Hugo Powe (11580178@qut.edu.au), 1774408601, 5 weeks ago, message: committing for merge of Game_logic and master'
-d0371e0 was Hugo Powe (11580178@qut.edu.au), 1774408198, 5 weeks ago, message: commiting code for meeting demonstraightion
-e1292c3 was Basilis Karalouka (basi.loukas1@gmail.com), 1774400147, 5 weeks ago, message: Editing and Adding User Stories
-eb20c05 was Hugo Powe (11580178@qut.edu.au), 1774267907, 6 weeks ago, message: Implemented some initialisation methods for PokerGame and AiPlayer classes
-1eb1926 was Hugo Powe (11580178@qut.edu.au), 1774259017, 6 weeks ago, message: improved readability by making into seperate class enums
-a9c75a4 was Hugo Powe (11580178@qut.edu.au), 1774257375, 6 weeks ago, message: commiting to origin to merge branches
-e7bc3ab was Gattfo (gattfo@hotmail.com), 1774246525, 6 weeks ago, message: Added User stories and meeting minutes to Main Repo
-74a12f2 was Gattfo (gattfo@hotmail.com), 1774246265, 6 weeks ago, message: Added User stories and meeting minutes to Main Repo
-d0e9743 was Hugo Powe (11580178@qut.edu.au), 1774245255, 6 weeks ago, message: Removed Random class instances from CardDeck class opting to use the Collections Shuffle method instead.
-439903f was Hugo Powe (11580178@qut.edu.au), 1774244986, 6 weeks ago, message: Added CardDeck and PokerHand classes into GameLogic, classes are currently not implemented
-4ef5f2b was Hugo Powe (11580178@qut.edu.au), 1774239053, 6 weeks ago, message: Initial commit
+68421d8 was Hugo Powe (11580178@qut.edu.au), 1780465251, 2 days ago, message: Fixed player unit tests
+c38c770 was Hugo Powe (11580178@qut.edu.au), 1780463681, 2 days ago, message: improved on feedback from user testing that pointed out the action buttons were not all the same size, by seting their prefered size in poker-round-view fxml file
+4b9b6f9 was Gattfo (gattfo@hotmail.com), 1779875054, 9 days ago, message: Reinstated missing files removed for Javadocs trial.
+b738f46 was Gattfo (gattfo@hotmail.com), 1779872445, 9 days ago, message: Merge remote-tracking branch 'origin/master'
+fed3440 was Gattfo (gattfo@hotmail.com), 1779871978, 9 days ago, message: Added Documentation for Javadocs
+a50ba8d was Ho Yui WONG (hoyuiwong@gmail.com), 1779867317, 9 days ago, message: Added some comments for public method
+e535337 was Gattfo (gattfo@hotmail.com), 1779866273, 9 days ago, message: Javadoc still not generating remotely
+647ea1a was Gattfo (gattfo@hotmail.com), 1779865976, 9 days ago, message: Javadoc still not generating remotely
+43acf50 was Gattfo (gattfo@hotmail.com), 1779865675, 9 days ago, message: Javadoc still not generating remotely
+7112923 was Gattfo (gattfo@hotmail.com), 1779865334, 9 days ago, message: Fixed incorrect Javadoc formatting in PlayerID
+95fa76f was Gattfo (gattfo@hotmail.com), 1779864922, 9 days ago, message: Troubleshooting Javadocs creation
+e84d6d7 was Gattfo (gattfo@hotmail.com), 1779864260, 9 days ago, message: Troubleshooting Javadocs creation
+8dce581 was Gattfo (gattfo@hotmail.com), 1779863838, 9 days ago, message: Updated Pom.xml to ignore non fatal errors and source errors.
+260ba30 was Gattfo (gattfo@hotmail.com), 1779863422, 9 days ago, message: Updated Pom.xml to exclude module info from doc generation.
+2c63d63 was Gattfo (gattfo@hotmail.com), 1779862182, 9 days ago, message: Removed Failing tests.
+e776b2a was Gattfo (gattfo@hotmail.com), 1779861499, 9 days ago, message: Fixed lag
+483f841 was Gattfo (gattfo@hotmail.com), 1779860290, 9 days ago, message: Ommiting tests that are causing CI to fail.
+c7effd3 was Gattfo (gattfo@hotmail.com), 1779856565, 9 days ago, message: Database and AI related tests excluded from github workflows
+b172485 was Gattfo (gattfo@hotmail.com), 1779830053, 10 days ago, message: Merge remote-tracking branch 'origin/master'
+959c40d was Gattfo (gattfo@hotmail.com), 1779830008, 10 days ago, message: Retrying continuous integration
+e8334c3 was shepboy22 (shepboy2202@gmail.com), 1779779057, 10 days ago, message: Update meetings journal
+2e1776e was shepboy22 (shepboy2202@gmail.com), 1779771164, 10 days ago, message: Fix round log persistence bug
+7c6ff1f was Hugo Powe (11580178@qut.edu.au), 1779436862, 2 weeks ago, message: Merge remote-tracking branch 'origin/master'
+2e570ac was Hugo Powe (11580178@qut.edu.au), 1779436831, 2 weeks ago, message: fixed bug with sidePot creation hitting an exception, sidePots should be properly initialised
+6b58efd was Gattfo (gattfo@hotmail.com), 1779359437, 2 weeks ago, message: Reinstate AIActionsTests
+124539c was Gattfo (gattfo@hotmail.com), 1779359293, 2 weeks ago, message: Merge remote-tracking branch 'origin/master'
+e63ad10 was Gattfo (gattfo@hotmail.com), 1779359252, 2 weeks ago, message: Testing continuous integration. Had to comment out AIActionsTests. Leaving that for Bobby to look at.
+459da0d was Ho Yui WONG (hoyuiwong@gmail.com), 1779359042, 2 weeks ago, message: Merge remote-tracking branch 'origin/master'
+2400c83 was Ho Yui WONG (hoyuiwong@gmail.com), 1779359006, 2 weeks ago, message: Updated the test
+b406109 was Gattfo (gattfo@hotmail.com), 1779358262, 2 weeks ago, message: Merge remote-tracking branch 'origin/master'
+9992f70 was Gattfo (gattfo@hotmail.com), 1779358219, 2 weeks ago, message: Testing continuous integration
+44a05b2 was Hugo Powe (11580178@qut.edu.au), 1779341240, 2 weeks ago, message: Merge remote-tracking branch 'origin/master'
+6a0d33b was Hugo Powe (11580178@qut.edu.au), 1779341197, 2 weeks ago, message: Added Documentation of constructors in model.game files
+080e364 was Gattfo (gattfo@hotmail.com), 1779337144, 2 weeks ago, message: Merge remote-tracking branch 'origin/master'
+224459c was Gattfo (gattfo@hotmail.com), 1779337083, 2 weeks ago, message: Setting up continuous integration
+210d10b was Ho Yui Wong (hoyuiwong@gmail.com), 1779262182, 2 weeks ago, message: Fixed bugs
+3f831ab was Ho Yui Wong (hoyuiwong@gmail.com), 1779261989, 2 weeks ago, message: Merge remote-tracking branch 'origin/master'
+88a610c was Ho Yui Wong (hoyuiwong@gmail.com), 1779261371, 2 weeks ago, message: Merge branch 'AI-Player-Personalities'
+8e0d2c8 was Gattfo (gattfo@hotmail.com), 1779254219, 2 weeks ago, message: Merge remote-tracking branch 'origin/master'
+4e78ab5 was Hugo Powe (11580178@qut.edu.au), 1779254208, 2 weeks ago, message: Fixed starting poker game with 2 players and round database action null pointer error
+1c65bbf was Gattfo (gattfo@hotmail.com), 1779254177, 2 weeks ago, message: Changed TablePosition nameplate coordinate so long plates cant render over cards.
+454ff8f was Hugo Powe (11580178@qut.edu.au), 1779252262, 2 weeks ago, message: fixed merge in round class
+d8798e8 was Hugo Powe (11580178@qut.edu.au), 1779243567, 2 weeks ago, message: Merge remote-tracking branch 'origin/master'
+29fc13e was Gattfo (gattfo@hotmail.com), 1779097016, 3 weeks ago, message: Changed the test suite to accomodate the new difficulty names.
+ce321e8 was Gattfo (gattfo@hotmail.com), 1779096558, 3 weeks ago, message: Enforced a buyin limit. Fixed AI buttons so selecting one deselects the others. Fixed a test file.
+162124d was Gattfo (gattfo@hotmail.com), 1779093801, 3 weeks ago, message: Finished tutorial and edited coaching prompt to align with user feedback
+bec5852 was Gattfo (gattfo@hotmail.com), 1779072848, 3 weeks ago, message: Applied style sheet to game screen
+93f5c91 was Basilis Karalouka (basi.loukas1@gmail.com), 1778908760, 3 weeks ago, message: adding tutorial functionality to main menu and updating everything accordingly
+3b53e9a was Basilis Karalouka (basi.loukas1@gmail.com), 1778903013, 3 weeks ago, message: fixing bugs with options menu message label and adding fading to Preferences Saved Message Label
+6bcbc69 was Basilis Karalouka (basi.loukas1@gmail.com), 1778837169, 3 weeks ago, message: fixed CSS and FXML for all of the Menu UI
+79e91c0 was Basilis Karalouka (basi.loukas1@gmail.com), 1778821877, 3 weeks ago, message: pull from master
+4ebd0f4 was Basilis Karalouka (basi.loukas1@gmail.com), 1778821476, 3 weeks ago, message: minor tweaks
+b6463ed was Basilis Karalouka (basi.loukas1@gmail.com), 1778820917, 3 weeks ago, message: Finish login, register and main menu CSS UI
+e050472 was Ho Yui Wong (hoyuiwong@gmail.com), 1778818879, 3 weeks ago, message: Merged Master(Main) into AI-Player-Personalities and Fixed some bugs
+8fc6eb3 was shepboy22 (shepboy2202@gmail.com), 1778818076, 3 weeks ago, message: Fix total hands played persistance
+80e4ca7 was Ho Yui Wong (hoyuiwong@gmail.com), 1778813865, 3 weeks ago, message: Merge branch 'refs/heads/master' into AI-Player-Personalities
+492ed84 was Gattfo (gattfo@hotmail.com), 1778759193, 3 weeks ago, message: Fixed the line alignment on some of the poker boards.
+c26cc01 was Gattfo (gattfo@hotmail.com), 1778757175, 3 weeks ago, message: Made the players cards a little larger following user feedback. Also added test case and fix for the AI players bet inflation bug. Moved Hand clearing to the start of the next round so user can see enemy cards on showdown.
+c5572ef was Ho Yui Wong (hoyuiwong@gmail.com), 1778742624, 3 weeks ago, message: AiAction changed from request at once to request independently
+12fff29 was Basilis Karalouka (basi.loukas1@gmail.com), 1778742604, 3 weeks ago, message: Pulling from master from github
+7ec6be0 was Basilis Karalouka (basi.loukas1@gmail.com), 1778742091, 3 weeks ago, message: just simple testing (only changed projectpoker.db) as a result
+531de1e was Hugo Powe (11580178@qut.edu.au), 1778724170, 3 weeks ago, message: Added method to roundTest to test this to prevent infinite betting loop
+68a7fa6 was Hugo Powe (11580178@qut.edu.au), 1778723537, 3 weeks ago, message: Changed logic in EndBetting and Betting methods to fix infinite loop
+b58947e was Gattfo (gattfo@hotmail.com), 1778697597, 3 weeks ago, message: Changed the poker round view fxml file to cut down a bit of the white space
+519c63a was Gattfo (gattfo@hotmail.com), 1778681151, 3 weeks ago, message: Changed difficulty names/ descriptions and added a pokemon card back
+23655d1 was Gattfo (gattfo@hotmail.com), 1778678908, 3 weeks ago, message: Fixed infinite betting loop glitch and moved Label text to a more relevant location
+73dbb28 was Gattfo (gattfo@hotmail.com), 1778642794, 3 weeks ago, message: Removed unused imports
+83e0c40 was Gattfo (gattfo@hotmail.com), 1778642550, 3 weeks ago, message: Added darkmode and full screen options. Also corrected a bug causing AI players to submit illegal bet sizes. Fixed Smallest chip image to render it smaller. Also added a buy in button so user can add balance without making a new account.
+1224307 was shepboy22 (shepboy2202@gmail.com), 1778503646, 4 weeks ago, message: Added SQLite persistence for user preferences and tests in database test
+9024db5 was Hugo Powe (11580178@qut.edu.au), 1778478145, 4 weeks ago, message: removed used import statements
+6bfbc1d was Hugo Powe (11580178@qut.edu.au), 1778477910, 4 weeks ago, message: Fixed logic in aiPlayer play method, should prevent infinite loop during betting due to Ai player raising but betting less then amount to call
+cb133d5 was Hugo Powe (11580178@qut.edu.au), 1778477780, 4 weeks ago, message: Fixed logic in aiPlayer play method, should prevent infinite loop during betting due to Ai player raising but betting less then amount to call
+1ce5e5f was Ho Yui Wong (hoyuiwong@gmail.com), 1778403638, 4 weeks ago, message: Added more functions to check the formal that Gemini return; Fixed bugs
+1f6f2ce was Ho Yui Wong (hoyuiwong@gmail.com), 1778388117, 4 weeks ago, message: Merge remote-tracking branch 'origin/AI-Player-Personalities' into AI-Player-Personalities
+48bdaa5 was Gattfo (gattfo@hotmail.com), 1778384429, 4 weeks ago, message: Updated meeting notes
+1878305 was Gattfo (gattfo@hotmail.com), 1778344954, 4 weeks ago, message: Added options to options menu for boards, card backs, difficulty and number of opponents
+114c177 was Gattfo (gattfo@hotmail.com), 1778344935, 4 weeks ago, message: Added options to options menu for boards, card backs, difficulty and number of opponents
+f0b19ca was Gattfo (gattfo@hotmail.com), 1778344691, 4 weeks ago, message: Added Game preferences class to store user preferences for card backs, difficulty and opponent numbers
+202be87 was Gattfo (gattfo@hotmail.com), 1778344558, 4 weeks ago, message: Added Get description method to Difficulty
+45fefed was Gattfo (gattfo@hotmail.com), 1778344449, 4 weeks ago, message: Added new image assets
+e5cd4ab was Hugo Powe (11580178@qut.edu.au), 1778146603, 4 weeks ago, message: Merged Ai player personalities with up to date game-model
+c6f785b was Hugo Powe (11580178@qut.edu.au), 1778143948, 4 weeks ago, message: Merge branch 'master' into game-model/Ai-Player-Personalities-implementation
+4011972 was Hugo Powe (11580178@qut.edu.au), 1778142925, 4 weeks ago, message: Debugged all game.model tests, fixed Round, Game and player classes
+f3a392b was Hugo Powe (11580178@qut.edu.au), 1777780025, 5 weeks ago, message: Merge remote-tracking branch 'origin/master'
+3213195 was Hugo Powe (11580178@qut.edu.au), 1777779936, 5 weeks ago, message: Merge branch 'game-model/implementation'
+664e2f8 was Hugo Powe (11580178@qut.edu.au), 1777779867, 5 weeks ago, message: Debugging using tests
+4a44c43 was Gattfo (gattfo@hotmail.com), 1777779200, 5 weeks ago, message: Added a README
+308eb0f was Gattfo (gattfo@hotmail.com), 1777778887, 5 weeks ago, message: Documents for submission
+4e445d2 was Hugo Powe (11580178@qut.edu.au), 1777776973, 5 weeks ago, message: Saving progress for video
+32dcb63 was shepboy22 (shepboy2202@gmail.com), 1777722201, 5 weeks ago, message: Fix: Persist completed round logs during game flow, small line was missing preventing round logs from actually being saved
+80c83a7 was Basilis Karalouka (basi.loukas1@gmail.com), 1777702798, 5 weeks ago, message: Merge of Ben's latest commit
+db6e98e was Basilis Karalouka (basi.loukas1@gmail.com), 1777701813, 5 weeks ago, message: Final implementation of login and register & implementing all the unit tests accordingly for authentication, addition fixing resizing and centring issues
+43f5912 was shepboy22 (shepboy2202@gmail.com), 1777701466, 5 weeks ago, message: Finalised Database Tests, confirmed user balance bug is still fixed.
+bffa76e was Ho Yui Wong (hoyuiwong@gmail.com), 1777699419, 5 weeks ago, message: fixed some bugs
+114d6e8 was Ho Yui Wong (hoyuiwong@gmail.com), 1777697883, 5 weeks ago, message: fixed many error
+c212add was Dylan Friend (dylan.m.friend@gmail.com), 1777678966, 5 weeks ago, message: Adding updated user stories
+62ea38f was Dylan Friend (dylan.m.friend@gmail.com), 1777678913, 5 weeks ago, message: Removing test commit file
+6c10935 was Dylan Friend (dylan.m.friend@gmail.com), 1777678745, 5 weeks ago, message: Adding UI design Docs
+4fe0a18 was Mitchel (n11507471@qut.edu.aui), 1777634826, 5 weeks ago, message: Added a Few tests for the basic Actions and a few use cases.
+1e66054 was Mitchel (n11507471@qut.edu.aui), 1777634619, 5 weeks ago, message: Added a Few tests for the basic Actions and a few use cases.
+9e9553d was Ho Yui Wong (hoyuiwong@gmail.com), 1777633838, 5 weeks ago, message: Move the AiCoaching test from AiCoaching.java to AiCoachingTest.java
+7bb9fe6 was Mitchel (n11507471@qut.edu.aui), 1777628366, 5 weeks ago, message: Added back Missing dependancies now runs as expected.
+252e03d was Hugo Powe (11580178@qut.edu.au), 1777621372, 5 weeks ago, message: implemented more streamlined round class, and implemented more detailed round and game logs, contains issue with model connection to view
+761937a was Ho Yui Wong (hoyuiwong@gmail.com), 1777620552, 5 weeks ago, message: Merge remote-tracking branch 'origin/AI-Player-Personalities' into AI-Player-Personalities
+d7945b9 was Ho Yui Wong (hoyuiwong@gmail.com), 1777620441, 5 weeks ago, message: ..
+871a6ae was Ho Yui Wong (hoyuiwong@gmail.com), 1777620148, 5 weeks ago, message: Updated the code that check the HTTP status for debug
+595e9ad was Ho Yui Wong (hoyuiwong@gmail.com), 1777619970, 5 weeks ago, message: Try to rewrite the AIActions
+fd3ceea was MJET11 (n11507471@qut.edu.au), 1777604955, 5 weeks ago, message: Version of AIActions that builds doesn't get respond.
+176dab9 was Mitchel (n11507471@qut.edu.aui), 1777504375, 5 weeks ago, message: "Basic Code skeleton, Including the basic infrastructure for testing an AIplayer response.
+046409a was Mitchel (n11507471@qut.edu.aui), 1777463158, 5 weeks ago, message: "Basic Code skeleton, Including the basic infrastructure for AI controlled player responces"
+41182af was Mitchel (n11507471@qut.edu.aui), 1777454341, 5 weeks ago, message: "Nothing Works"
+4b98c5a was Mitchel (n11507471@qut.edu.aui), 1776381961, 7 weeks ago, message: "Nothing Works"
+a60a732 was Mitchel (n11507471@qut.edu.aui), 1776327006, 7 weeks ago, message: "Nothing Works"
+102a8cb was Hugo Powe (11580178@qut.edu.au), 1777606942, 5 weeks ago, message: implemented updating toPlay methods in potUtil for round and all pots
+b71c0bc was Gattfo (gattfo@hotmail.com), 1777605180, 5 weeks ago, message: Quick patch to fix Dylans merge error. Will probably be rolled back.
+82d1b56 was MJET11 (n11507471@qut.edu.au), 1777604955, 5 weeks ago, message: Version of AIActions that builds doesn't get respond.
+4c234eb was Dylan Friend (dylan.m.friend@gmail.com), 1777554149, 5 weeks ago, message: Merge remote-tracking branch 'origin/master'
+68663e1 was Dylan Friend (dylan.m.friend@gmail.com), 1777553772, 5 weeks ago, message: Merge branch 'UI_Menus'
+1b2b392 was Basilis Karalouka (basi.loukas1@gmail.com), 1777540099, 5 weeks ago, message: fixed register resizing
+915257a was Basilis Karalouka (basi.loukas1@gmail.com), 1777539813, 5 weeks ago, message: Merge remote-tracking branch 'origin/master'
+6f43c0d was Basilis Karalouka (basi.loukas1@gmail.com), 1777539751, 5 weeks ago, message: Screen now doesn't resize and is full screen from the start
+dbce31b was Basilis Karalouka (basi.loukas1@gmail.com), 1777539367, 5 weeks ago, message: fixed errors
+f8efe49 was Basilis Karalouka (basi.loukas1@gmail.com), 1777538752, 5 weeks ago, message: Screen now doesn't resize and is full screen from the start
+7adb121 was Ben Sheppard (your-email@example.com), 1777537746, 5 weeks ago, message: DatabaseTest now uses separate DB file for testing
+b7eca41 was Ben Sheppard (your-email@example.com), 1777537451, 5 weeks ago, message: DatabaseTest now uses seperate DB file for testing
+8808750 was Ben Sheppard (your-email@example.com), 1777536347, 5 weeks ago, message: Fix: persisted user balance after rounds and on window close
+7f49098 was Ben Sheppard (your-email@example.com), 1777536025, 5 weeks ago, message: Added persistence tests using isolated SQLite DB
+1bd8424 was Ben Sheppard (your-email@example.com), 1777535856, 5 weeks ago, message: Merge remote-tracking branch 'origin/master'
+8c81092 was Ben Sheppard (your-email@example.com), 1777535594, 5 weeks ago, message: Added persistence tests using isolated SQLite DB
+9eef944 was Basilis Karalouka (basi.loukas1@gmail.com), 1777534017, 5 weeks ago, message: Fixed Coupling with handleLogin() LoginController.java
+62a6027 was Basilis Karalouka (basi.loukas1@gmail.com), 1777533223, 5 weeks ago, message: Fixing the tight coupling with the handleRegister method in RegisterController.java
+2fc8dd6 was Gattfo (gattfo@hotmail.com), 1777516636, 5 weeks ago, message: Added toString() method for cards
+b24761f was Mitchel (n11507471@qut.edu.aui), 1777504375, 5 weeks ago, message: "Basic Code skeleton, Including the basic infrastructure for testing an AIplayer response.
+239b5b9 was Dylan Friend (dylan.m.friend@gmail.com), 1777479183, 5 weeks ago, message: Added back button to profile so logout wasn't the only option
+dc69c62 was Dylan Friend (dylan.m.friend@gmail.com), 1777478905, 5 weeks ago, message: Removed unused import
+262146a was Dylan Friend (dylan.m.friend@gmail.com), 1777478776, 5 weeks ago, message: Cleared unused attributes
+8c9bde8 was Dylan Friend (dylan.m.friend@gmail.com), 1777478738, 5 weeks ago, message: Cleared unused imports
+dd9b4ab was Dylan Friend (dylan.m.friend@gmail.com), 1777478306, 5 weeks ago, message: Basic Menu recreated to work with currently code base.
+eb86b0f was Gattfo (gattfo@hotmail.com), 1777465829, 5 weeks ago, message: Fixed bug where folded player could still win the round.
+d261039 was Mitchel (n11507471@qut.edu.aui), 1777463158, 5 weeks ago, message: "Basic Code skeleton, Including the basic infrastructure for AI controlled player responces"
+140a132 was Mitchel (n11507471@qut.edu.aui), 1777454341, 5 weeks ago, message: "Nothing Works"
+7ebe1a9 was Gattfo (gattfo@hotmail.com), 1777431296, 5 weeks ago, message: Updated Meeting minutes
+da4fec0 was Gattfo (gattfo@hotmail.com), 1777425361, 5 weeks ago, message: Merge remote-tracking branch 'origin/master'
+a0ccfee was Gattfo (gattfo@hotmail.com), 1777425317, 5 weeks ago, message: Changed Var types to actual types
+cdfb33e was Dylan Friend (dylan.m.friend@gmail.com), 1777371312, 5 weeks ago, message: Recreation of MainMenuController.java.
+5eb1988 was Dylan Friend (dylan.m.friend@gmail.com), 1777369060, 5 weeks ago, message: Test commit
+5ae18ed was Gattfo (gattfo@hotmail.com), 1777368355, 5 weeks ago, message: Ammended GameTest after removing alternate Start() method. Made fields in PlayerResult final.
+cf98dc5 was Gattfo (gattfo@hotmail.com), 1777347255, 5 weeks ago, message: Started removing unused test methods from Game. Hugo is going to do the rest.
+713c175 was Gattfo (gattfo@hotmail.com), 1777346713, 5 weeks ago, message: Removed unused methods and imports from Game and RoundController. Also removed RoundViewUpdater as controller doesnt need it.
+6b078f5 was Basilis Karalouka (basi.loukas1@gmail.com), 1777288567, 6 weeks ago, message: Further updates to the meeting journal
+e5d8ded was Basilis Karalouka (basi.loukas1@gmail.com), 1777287465, 6 weeks ago, message: Simple update to the meeting journal for last friday meeting
+913cf99 was Gattfo (gattfo@hotmail.com), 1777282930, 6 weeks ago, message: Added chipstack images for all players and the pot.
+4cf5296 was Gattfo (gattfo@hotmail.com), 1777273386, 6 weeks ago, message: Added Chip assets to game and methods in PokerGameUI to render them on screen. Removed unused method onRoundStart
+7d37d9b was Gattfo (gattfo@hotmail.com), 1777216667, 6 weeks ago, message: Added Role indicators and a pulsing effect to active players name badge
+4ef9ea2 was Gattfo (gattfo@hotmail.com), 1777209719, 6 weeks ago, message: Merge remote-tracking branch 'origin/master'
+c675d78 was Gattfo (gattfo@hotmail.com), 1777209693, 6 weeks ago, message: Added nameplates to UI and cleaned up some unused functions. Added HandEval Tests
+49231cb was Basilis Karalouka (basi.loukas1@gmail.com), 1777205284, 6 weeks ago, message: Adding Register and Login Test Cases
+5f9814b was Gattfo (gattfo@hotmail.com), 1777197428, 6 weeks ago, message: Removed unused classes and added HandEvalTests
+f864ec7 was Dylan (165541755+IliadanX13@users.noreply.github.com), 1777192324, 6 weeks ago, message: Create Test file
+67a9bbe was Gattfo (gattfo@hotmail.com), 1777191124, 6 weeks ago, message: Updated Meetings journal
+17518dd was Gattfo (gattfo@hotmail.com), 1777189673, 6 weeks ago, message: Merge remote-tracking branch 'origin/master'
+c747375 was Gattfo (gattfo@hotmail.com), 1777189530, 6 weeks ago, message: Login Controller no longer opens seperate game window.
+3058bb6 was Basilis Karalouka (basi.loukas1@gmail.com), 1777187065, 6 weeks ago, message: Added username, email and password criteria when registering
+a6f46b9 was Basilis Karalouka (basi.loukas1@gmail.com), 1777186960, 6 weeks ago, message: Adding additional if statements to make it clear for the user what they are doing wrong when registering
+0a0f7d7 was Ho Yui Wong (hoyuiwong@gmail.com), 1777184584, 6 weeks ago, message: Connect the AI Coaching to the game
+7a7944a was Ho Yui Wong (hoyuiwong@gmail.com), 1777181851, 6 weeks ago, message: Updated the UI for AI Coaching
+d8f59ce was Gattfo (gattfo@hotmail.com), 1777172052, 6 weeks ago, message: Made the To call text update with the call amount
+3751405 was Basilis Karalouka (basi.loukas1@gmail.com), 1777128210, 6 weeks ago, message: Added criteria for username, email and password. Fixed the registercontroller initializing the database everytime and also added checking for Existing Users in case someone tries to input a username that's already existing in the database
+a276dc6 was Basilis Karalouka (basi.loukas1@gmail.com), 1777121975, 6 weeks ago, message: Fixing merging errors with the removal of handlers
+5962994 was Basilis Karalouka (basi.loukas1@gmail.com), 1777117735, 6 weeks ago, message: Merge remote-tracking branch 'origin/master'
+f986a9b was Gattfo (gattfo@hotmail.com), 1777109666, 6 weeks ago, message: Fixed some IDE warnings
+894011e was Gattfo (gattfo@hotmail.com), 1777108291, 6 weeks ago, message: Removed Change handlers from project due to conflicting updates. Implemented relevant behaviour in Round, RoundController and Game instead. Fixed some bugs causing the game to crash and added start round button to UI.
+68e4b6d was Basilis Karalouka (basi.loukas1@gmail.com), 1777028359, 6 weeks ago, message: Completed and Tested Version for Login and Regisration
+b64b16f was Basilis Karalouka (basi.loukas1@gmail.com), 1777027646, 6 weeks ago, message: merged with ben's branch to fix errors with missing methods
+886d690 was Basilis Karalouka (basi.loukas1@gmail.com), 1777019219, 6 weeks ago, message: Merge branch 'master' to 'authentication' branch
+7f9f49a was Hugo Powe (11580178@qut.edu.au), 1777005003, 6 weeks ago, message: Merge remote-tracking branch 'origin/master'
+e23f839 was Hugo Powe (11580178@qut.edu.au), 1777004939, 6 weeks ago, message: implemented start game button
+89472e0 was Ho Yui WONG (Bobby) (hoyuiwong@gmail.com), 1777004067, 6 weeks ago, message: Fix some bugs
+8c8f661 was Basilis Karalouka (basi.loukas1@gmail.com), 1777001550, 6 weeks ago, message: Merge branch 'PokerGameDatabase-ben' of https://github.com/zozo973/Project-Poker into authentication
+a2aa49d was Hugo Powe (11580178@qut.edu.au), 1777001239, 6 weeks ago, message: start method in Round had been altered, fixed method
+dee468d was Ho Yui WONG (Bobby) (hoyuiwong@gmail.com), 1777000620, 6 weeks ago, message: Merge remote-tracking branch 'origin/master'
+c093d0a was Basilis Karalouka (basi.loukas1@gmail.com), 1777000595, 6 weeks ago, message: fixing some hardcoded implementation in PokerApplication.java
+10875ea was Ho Yui WONG (Bobby) (hoyuiwong@gmail.com), 1777000112, 6 weeks ago, message: feat: update AiCoaching UI and logic
+d5c382d was Hugo Powe (11580178@qut.edu.au), 1776999555, 6 weeks ago, message: updated poker-round-view file
+1d91419 was Hugo Powe (11580178@qut.edu.au), 1776997441, 6 weeks ago, message: saving remote master changes
+ca71557 was Hugo Powe (11580178@qut.edu.au), 1776997165, 6 weeks ago, message: getting master up to date
+3dcd882 was Ben Sheppard (your-email@example.com), 1776996030, 6 weeks ago, message: Changes made for DB persistence: - Passed the logged-in User from PokerApplication into Game so game sessions can be tied to the correct user. -Added Game session fields and constructor support for persistence data such as buy-in, starting balance, hands played, and user profile. -Incremented handsPlayed each round so stored session stats stay accurate. -Added round metadata to Round so completed rounds can be saved with the correct game session and hand number. - Updated RoundLogDAO to save RoundLogEntry data correctly.  - Added getters to RoundLogEntry so DAO code can read player/action/bet values. -Ensured roundLog is initialized before actions are recorded so round logs can always be persisted. Cleanup / safety: - Made RoundLogEntry.toString() safe when no current pot is present. - Added helper methods on Round for DB-friendly string formatting of community cards and remaining players.
+885a6dc was Gattfo (gattfo@hotmail.com), 1776969177, 6 weeks ago, message: Added onClick methods for buttons in the UI. This uncovered some more bugs to fix,this time related to Player.getActiveBet returning a null value. Also removed some unnecessary methods from round that I put there for testing and forgot about.
+0acc8f2 was Gattfo (gattfo@hotmail.com), 1776965968, 6 weeks ago, message: Fixed Issue where players cards were rendering in the wrong table position
+e5f794a was Gattfo (gattfo@hotmail.com), 1776955953, 6 weeks ago, message: Merge remote-tracking branch 'origin/master'
+5257d91 was Gattfo (gattfo@hotmail.com), 1776955783, 6 weeks ago, message: Fixed the issue where the cards were not rendering. Was caused by UI being initialised twice. Cleaned up warnings that I've been ignoring too.
+f33830c was Gattfo (gattfo@hotmail.com), 1776955783, 6 weeks ago, message: Fixed the infinite loop that was causing the game to crash. Added break statements to switch cases. Still have an issue where the cards are not rendering this is probably due to Round status not flowing correctly.
+4978a06 was Gattfo (gattfo@hotmail.com), 1776950210, 6 weeks ago, message: Fixed the infinite loop that was causing the game to crash. Added break statements to switch cases. Still have an issue where the cards are not rendering this is probably due to Round status not flowing correctly.
+a6a24a4 was Gattfo (gattfo@hotmail.com), 1776950054, 6 weeks ago, message: Fixed imports for cards but not the incorrect handling of RoundStatus. Im currently fixing other errors and dont have time for this. Bobby please fix the area Ive commented out.
+cf39047 was Gattfo (gattfo@hotmail.com), 1776924091, 6 weeks ago, message: Added new fxml file for game window. Fixed some logic causing game to not start properly. Now it starts and renders cards but causes an infinite loop. Sharing for help in diagnosing problem.
+fc76814 was Gattfo (gattfo@hotmail.com), 1776923961, 6 weeks ago, message: Merge remote-tracking branch 'origin/master'
+8431d89 was Gattfo (gattfo@hotmail.com), 1776923921, 6 weeks ago, message: Deleted default Application and fxml files.
+a0b722c was Ho Yui WONG (Bobby) (hoyuiwong@gmail.com), 1776915067, 6 weeks ago, message: Merge branch 'AI-Coaching-Advice'
+7896d5f was Ho Yui WONG (Bobby) (hoyuiwong@gmail.com), 1776914652, 6 weeks ago, message: feat: integrate Gemini API for AI Coaching engine
+ade3055 was Hugo Powe (11580178@qut.edu.au), 1776838806, 6 weeks ago, message: Merge remote-tracking branch 'origin/master'
+55b06a6 was Hugo Powe (11580178@qut.edu.au), 1776838020, 6 weeks ago, message: Added new unitTest classes for pot and potUtil classes
+67a0ab3 was Basilis Karalouka (basi.loukas1@gmail.com), 1776764258, 6 weeks ago, message: Final small changes
+03522cb was Basilis Karalouka (basi.loukas1@gmail.com), 1776762812, 6 weeks ago, message: Integrating register and login with main game
+a1d2038 was Basilis Karalouka (basi.loukas1@gmail.com), 1776761965, 6 weeks ago, message: Integrating register and login with main game
+2ac6f99 was Hugo Powe (11580178@qut.edu.au), 1776761625, 6 weeks ago, message: Debugging of round, continued resolution of how sidePots can be created
+57e8e44 was Basilis Karalouka (basi.loukas1@gmail.com), 1776758047, 6 weeks ago, message: Merge branch 'master' of https://github.com/zozo973/Project-Poker into authentication
+5814e6c was Basilis Karalouka (basi.loukas1@gmail.com), 1776745554, 6 weeks ago, message: editted user class
+b7bc492 was Hugo Powe (11580178@qut.edu.au), 1776660998, 7 weeks ago, message: fixing RoundLogEntry, Pot and round class from testing
+82c52fd was Gattfo (gattfo@hotmail.com), 1776437233, 7 weeks ago, message: Merge remote-tracking branch 'origin/master'
+c96f0d5 was Gattfo (gattfo@hotmail.com), 1776435390, 7 weeks ago, message: Changed dummy methods in RoundController to call actual UI methods. Added a static list of TablePositions to be indexed to.
+f6c4e2b was Hugo Powe (11580178@qut.edu.au), 1776397695, 7 weeks ago, message: fixed problems from debugging in game class
+9d08e9a was Hugo Powe (11580178@qut.edu.au), 1776392388, 7 weeks ago, message: added some test cases to gameTest class, for the start command
+3ee290d was Mitchel (n11507471@qut.edu.aui), 1776381961, 7 weeks ago, message: "Nothing Works"
+58e8634 was Mitchel (n11507471@qut.edu.aui), 1776327006, 7 weeks ago, message: "Nothing Works"
+e7c8e20 was Hugo Powe (11580178@qut.edu.au), 1776321713, 7 weeks ago, message: Added Test classes for Game, Round and Player classes
+55b8fb5 was Gattfo (gattfo@hotmail.com), 1776240539, 7 weeks ago, message: Bug fix in testing
+a7027a0 was Gattfo (gattfo@hotmail.com), 1776215582, 7 weeks ago, message: Merge branch 'UI_and_Animation'
+b3850d9 was Gattfo (gattfo@hotmail.com), 1776215354, 7 weeks ago, message: Changed launcher method during testing
+f4349b3 was Gattfo (gattfo@hotmail.com), 1776215312, 7 weeks ago, message: Fixed type error.
+69f28a0 was Gattfo (gattfo@hotmail.com), 1776215140, 7 weeks ago, message: Fixed Null pointer exception bug caused by player Hand not having a constructor.
+990db2f was Gattfo (gattfo@hotmail.com), 1776210703, 7 weeks ago, message: Commiting changes before merging into master
+e3bbee9 was Hugo Powe (11580178@qut.edu.au), 1776060508, 8 weeks ago, message: Commiting changes made on feature propertyChangeSupport branch to remote origin
+9b15d4d was Hugo Powe (11580178@qut.edu.au), 1776060364, 8 weeks ago, message: Implemented real or dummy methods for all events in the round controller class from the handlers of the property change events in the player,round and game classes
+03a2e3b was Gattfo (gattfo@hotmail.com), 1776056819, 8 weeks ago, message: Fixed bug that was causing the getCardImagePath to return null filepaths.
+a910080 was Hugo Powe (11580178@qut.edu.au), 1776052675, 8 weeks ago, message: commiting syntax changes to push into and update feature/propertyChangeSupport branch
+55bcb6c was Gattfo (gattfo@hotmail.com), 1776048940, 8 weeks ago, message: Created TablePosition class to hold data of where cards should be rendered. PokerGameUI handles the actual rendering of assets.
+444a4a8 was Gattfo (gattfo@hotmail.com), 1776048726, 8 weeks ago, message: Fixed code smell in image path method, card previously needed itself as an argument. Dont code tired.
+e1733c8 was Basilis Karalouka (basi.loukas1@gmail.com), 1775993345, 8 weeks ago, message: fully implemented ProfileController.java and profile.fxml
+99b5b3a was Basilis Karalouka (basi.loukas1@gmail.com), 1775991553, 8 weeks ago, message: Completed login controller and login fxml
+37c2696 was Gattfo (gattfo@hotmail.com), 1775983271, 8 weeks ago, message: Merge remote-tracking branch 'origin/master'
+161d1dc was Gattfo (gattfo@hotmail.com), 1775983248, 8 weeks ago, message: Updated meetings journal with todays notes
+e0a9687 was Basilis Karalouka (basi.loukas1@gmail.com), 1775971836, 8 weeks ago, message: fully implemented RegisterController.java
+3e6c3a9 was Basilis Karalouka (basi.loukas1@gmail.com), 1775969917, 8 weeks ago, message: added further hashed password functionality and created user object.
+c57b144 was Basilis Karalouka (basi.loukas1@gmail.com), 1775905426, 8 weeks ago, message: added functionality to handle register method
+0e0eab7 was Basilis Karalouka (basi.loukas1@gmail.com), 1775903280, 8 weeks ago, message: added fxml register code and started on RegisterController.java
+ce75f61 was Basilis Karalouka (basi.loukas1@gmail.com), 1775893298, 8 weeks ago, message: Merged with Ben and implemented new User.java class. Added email to database and fixed up some errors with UserDAO.java. Implemented password hasher class
+f7fed89 was Hugo Powe (11580178@qut.edu.au), 1775798680, 8 weeks ago, message: improved some of the game logic and tweaked hand eval so a winner can be found and paided.
+7208b17 was Ben Sheppard (your-email@example.com), 1775718516, 8 weeks ago, message: Added SQLite connection and DAO for users, game sessions, and round logs:
+15c7de9 was Ben Sheppard (your-email@example.com), 1775715550, 8 weeks ago, message: Merge remote-tracking branch 'origin/master' into PokerGameDatabase-ben
+19b6bc9 was Basilis Karalouka (basi.loukas1@gmail.com), 1775712734, 8 weeks ago, message: further fixing up bugs SessionManager.java and User.java
+4b500e0 was Basilis Karalouka (basi.loukas1@gmail.com), 1775712384, 8 weeks ago, message: fixing up bugs & changing away from boolean in SessionManager.java and User.java
+6bfd72f was Gattfo (gattfo@hotmail.com), 1775709120, 8 weeks ago, message: Added PokerGame as a UI manager for the poker game.
+2c3625a was Gattfo (gattfo@hotmail.com), 1775708998, 8 weeks ago, message: Added Method to call image file path for cards. Added static card objects for use in testing temporarily.
+c379145 was Gattfo (gattfo@hotmail.com), 1775708851, 8 weeks ago, message: Renamed and edited files to fit methods better
+f290672 was Basilis Karalouka (basi.loukas1@gmail.com), 1775654580, 8 weeks ago, message: Further editing and fixing up bugs in SessionManager.java
+cf23068 was Basilis Karalouka (basi.loukas1@gmail.com), 1775654157, 8 weeks ago, message: editting and fixing up bugs in SessionManager.java
+b99e594 was Basilis Karalouka (basi.loukas1@gmail.com), 1775653821, 8 weeks ago, message: adding fields, constructors, getting and setting methods to SessionManager.java
+6802e64 was Basilis Karalouka (basi.loukas1@gmail.com), 1775652240, 8 weeks ago, message: fixing some spelling mistakes
+f3cefbe was Basilis Karalouka (basi.loukas1@gmail.com), 1775652141, 8 weeks ago, message: added getter and setter methods to access private fields
+1140504 was Hugo Powe (11580178@qut.edu.au), 1775651177, 8 weeks ago, message: merged propertyChangeSupport feature and am Commiting master to push to remote rempo
+43b0863 was Hugo Powe (11580178@qut.edu.au), 1775651003, 8 weeks ago, message: Merge branch 'feature/propertyChangeSupport'
+80c36e9 was Basilis Karalouka (basi.loukas1@gmail.com), 1775650862, 8 weeks ago, message: adding constructor to user class
+e798ec8 was Hugo Powe (11580178@qut.edu.au), 1775650113, 8 weeks ago, message: Added dummy method in PokerApplication for starting a game, the view and controller for this need to be improved to fit in with the rest of the ui's
+22ad241 was Hugo Powe (11580178@qut.edu.au), 1775642453, 8 weeks ago, message: added test package containing test classes to make sure game runs smoothly, added BettingController for the buttons and sliders in the betting ui, implemented propertyChangeSupport into player, round and game class to implement obersver pattern
+0253cc4 was Gattfo (gattfo@hotmail.com), 1775624666, 8 weeks ago, message: Added new assets for board, deck and chips
+1f2ae11 was Gattfo (gattfo@hotmail.com), 1775624615, 8 weeks ago, message: Added new assets for board, deck and chips
+eeb9ecf was Gattfo (gattfo@hotmail.com), 1775607147, 8 weeks ago, message: Added card images to project
+5569a74 was Gattfo (gattfo@hotmail.com), 1775607101, 8 weeks ago, message: Added prototype sketch to Master
+7b1627d was Gattfo (gattfo@hotmail.com), 1775536349, 8 weeks ago, message: Updated Meetings Journal with weeks meetings
+bf3c0c9 was Ho Yui WONG (Bobby) (hoyuiwong@gmail.com), 1775454048, 9 weeks ago, message: Added situations for testing; Ensure AiCoaching is work.
+7456d72 was Ho Yui WONG (Bobby) (hoyuiwong@gmail.com), 1775276702, 9 weeks ago, message: // Add httpclient, reqest and process the data that recieved.
+f813ce4 was Ho Yui WONG (Bobby) (hoyuiwong@gmail.com), 1775188955, 9 weeks ago, message: Added Gson dependency in pom.xml; Implemented request body formatting using Gson to safely handle prompt strings in AiCoaching.java.
+c715e2f was Gattfo (gattfo@hotmail.com), 1775107415, 9 weeks ago, message: Commiting changes for merge into master so Hugo can continue on game logic with hand evaluation.
+f04f5e4 was Gattfo (gattfo@hotmail.com), 1775105703, 9 weeks ago, message: Merge branch 'Game-Logic'
+935dbd8 was Gattfo (gattfo@hotmail.com), 1775105463, 9 weeks ago, message: Commiting changes for merge into master. Added Method to find winner between hands.
+bc509fb was Gattfo (gattfo@hotmail.com), 1775105254, 9 weeks ago, message: Commiting changes for merge into master. Added Method to find winner between hands.
+8197cc9 was Hugo Powe (11580178@qut.edu.au), 1775103595, 9 weeks ago, message: refactored all enum classes into enums package for readablity of program
+9b3fbb8 was Hugo Powe (11580178@qut.edu.au), 1775101846, 9 weeks ago, message: commit of master to merge StateMachine-PokerGame branch into local and then remote origin
+fed802a was Hugo Powe (11580178@qut.edu.au), 1775101326, 9 weeks ago, message: commit to merge this branch with master
+7942101 was Gattfo (gattfo@hotmail.com), 1775100054, 9 weeks ago, message: Fixed some bugs in evaluateHand method and HandResult ToString method. Added PlayerResult class and whoWins method to determine hand winners.
+da7a3de was Hugo Powe (11580178@qut.edu.au), 1775083789, 9 weeks ago, message: implemented Init, Start and end commands into game and round. Implementations require connection to GUI and database.
+1699c22 was Ho Yui WONG (Bobby) (hoyuiwong@gmail.com), 1775024258, 9 weeks ago, message: Added enum(AiAdviceModel) for prompt; Added input prompt(getSystemPrompt & getUserPrompt);
+cb4d620 was Gattfo (gattfo@hotmail.com), 1774998617, 9 weeks ago, message: Fixed ToString() output bugs. Renamed Suit and Rank enums to lower case.
+4579aeb was Gattfo (gattfo@hotmail.com), 1774961324, 9 weeks ago, message: Finished Hand evaluation logic and Hand result classes. Renamed Rank names to lower case for better output readability.
+ffb6fa4 was Gattfo (gattfo@hotmail.com), 1774961162, 9 weeks ago, message: Finished Hand evaluation logic and Hand result classes. Renamed Rank names to lower case for better output readability.
+713e276 was Hugo Powe (11580178@qut.edu.au), 1774936006, 9 weeks ago, message: saving work on implementing observer and statemachine design patterns into Round and Game classes
+396b7aa was Hugo Powe (11580178@qut.edu.au), 1774922936, 10 weeks ago, message: implementing State Machine and observer desgin patterns into game logic
+4308af8 was Dylan (165541755+IliadanX13@users.noreply.github.com), 1774671850, 10 weeks ago, message: Update Meetings Journal
+e39a6b8 was Ben Sheppard (your-email@example.com), 1774592627, 2 months ago, message: Implemented a local SQLite database connection using JDBC following the Activity 4 structure.
+fd6bc6b was Basilis Karalouka (basi.loukas1@gmail.com), 1774585694, 2 months ago, message: Adding Fields in User Class
+67db7ea was Hugo Powe (11580178@qut.edu.au), 1774584067, 2 months ago, message: implemented pathway to send roundLog to database through newRound method in PokerGame
+a392f80 was Hugo Powe (11580178@qut.edu.au), 1774582112, 2 months ago, message: updated PokerRound class to have instance of Pot class
+964f78d was Basilis Karalouka (basi.loukas1@gmail.com), 1774576798, 2 months ago, message: Setting up files, folders & dependencies for Account & Profile Features
+fb560d1 was Basilis Karalouka (basi.loukas1@gmail.com), 1774573302, 2 months ago, message: Simple Spelling Errors
+25208f1 was Gattfo (gattfo@hotmail.com), 1774492785, 2 months ago, message: Merge remote-tracking branch 'origin/Game-Logic' into Game-Logic
+d6eed3b was Gattfo (gattfo@hotmail.com), 1774492717, 2 months ago, message: Methods for determining different kinds of hands
+bab8045 was Basilis Karalouka (basi.loukas1@gmail.com), 1774480943, 2 months ago, message: Merge branch 'master' of https://github.com/zozo973/Project-Poker
+642aa3d was Hugo Powe (11580178@qut.edu.au), 1774427475, 2 months ago, message: implemented game logs, which will be sent to a  database
+06daac0 was Dylan (165541755+IliadanX13@users.noreply.github.com), 1774410500, 2 months ago, message: Update Meetings Journal
+370154d was Dylan (165541755+IliadanX13@users.noreply.github.com), 1774410352, 2 months ago, message: Update Meetings Journal
+037bc39 was Dylan (165541755+IliadanX13@users.noreply.github.com), 1774410216, 2 months ago, message: Update Meetings Journal
+d164735 was Ben Sheppard (your-email@example.com), 1774409782, 2 months ago, message: Added rough list of requirements
+7014036 was Hugo Powe (11580178@qut.edu.au), 1774409108, 2 months ago, message: Merge remote-tracking branch 'origin/master'
+d6babac was Hugo Powe (11580178@qut.edu.au), 1774408723, 2 months ago, message:  merge commit
+5d2382d was Hugo Powe (11580178@qut.edu.au), 1774408601, 2 months ago, message: committing for merge of Game_logic and master'
+d0371e0 was Hugo Powe (11580178@qut.edu.au), 1774408198, 2 months ago, message: commiting code for meeting demonstraightion
+e1292c3 was Basilis Karalouka (basi.loukas1@gmail.com), 1774400147, 2 months ago, message: Editing and Adding User Stories
+eb20c05 was Hugo Powe (11580178@qut.edu.au), 1774267907, 2 months ago, message: Implemented some initialisation methods for PokerGame and AiPlayer classes
+1eb1926 was Hugo Powe (11580178@qut.edu.au), 1774259017, 2 months ago, message: improved readability by making into seperate class enums
+a9c75a4 was Hugo Powe (11580178@qut.edu.au), 1774257375, 2 months ago, message: commiting to origin to merge branches
+e7bc3ab was Gattfo (gattfo@hotmail.com), 1774246525, 2 months ago, message: Added User stories and meeting minutes to Main Repo
+74a12f2 was Gattfo (gattfo@hotmail.com), 1774246265, 2 months ago, message: Added User stories and meeting minutes to Main Repo
+d0e9743 was Hugo Powe (11580178@qut.edu.au), 1774245255, 2 months ago, message: Removed Random class instances from CardDeck class opting to use the Collections Shuffle method instead.
+439903f was Hugo Powe (11580178@qut.edu.au), 1774244986, 2 months ago, message: Added CardDeck and PokerHand classes into GameLogic, classes are currently not implemented
+4ef5f2b was Hugo Powe (11580178@qut.edu.au), 1774239053, 2 months ago, message: Initial commit

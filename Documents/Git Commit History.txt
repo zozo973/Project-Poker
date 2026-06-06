@@ -9,11 +9,11 @@ git shortlog --summary --numbered --all --no-merges
     13	Mitchel
     12	Ho Yui Wong
     10	Ben Sheppard
+    10	shepboy22
      7	Ho Yui WONG (Bobby)
-     7	shepboy22 (Ben Sheppard)
      5	Dylan
      2	Ho Yui WONG
-     2	MJET11 (Mitchel)
+     2	MJET11
 
 Summary (including merges)
 git shortlog --summary --numbered --all
@@ -25,18 +25,21 @@ git shortlog --summary --numbered --all
     17	Ho Yui Wong
     13	Ben Sheppard
     13	Mitchel
+    10	shepboy22
      9	Ho Yui WONG (Bobby)
-     7	shepboy22 (Ben Sheppard)
      5	Dylan
      3	Ho Yui WONG
-     2	MJET11 (Mitchel)
+     2	MJET11
 
 Full Commit History
 git log --pretty=format:'%h was %an (%ae), %at, %ar, message: %s'
 
-9efbe8e was shepboy22 (shepboy2202@gmail.com), 1780718266, 6 minutes ago, message: Add retrospective and coverage reporting evidence, updated meeting notes
-169afdf was Gattfo (gattfo@hotmail.com), 1780671366, 13 hours ago, message: Added Notion Exports to project
-2c9543f was Gattfo (gattfo@hotmail.com), 1780670683, 13 hours ago, message: Updated CI and documentation for User stories and User feedback files
+705d905 was shepboy22 (shepboy2202@gmail.com), 1780741756, 6 minutes ago, message: Remove feedback-driven change log document
+a8ed529 was shepboy22 (shepboy2202@gmail.com), 1780725924, 5 hours ago, message: Added sprint retrospective (final version) and concise change log
+12a5955 was shepboy22 (shepboy2202@gmail.com), 1780718738, 7 hours ago, message: Update commit history evidence
+9efbe8e was shepboy22 (shepboy2202@gmail.com), 1780718266, 7 hours ago, message: Add retrospective and coverage reporting evidence, updated meeting notes
+169afdf was Gattfo (gattfo@hotmail.com), 1780671366, 20 hours ago, message: Added Notion Exports to project
+2c9543f was Gattfo (gattfo@hotmail.com), 1780670683, 20 hours ago, message: Updated CI and documentation for User stories and User feedback files
 68421d8 was Hugo Powe (11580178@qut.edu.au), 1780465251, 3 days ago, message: Fixed player unit tests
 c38c770 was Hugo Powe (11580178@qut.edu.au), 1780463681, 3 days ago, message: improved on feedback from user testing that pointed out the action buttons were not all the same size, by seting their prefered size in poker-round-view fxml file
 4b9b6f9 was Gattfo (gattfo@hotmail.com), 1779875054, 10 days ago, message: Reinstated missing files removed for Javadocs trial.
@@ -55,8 +58,8 @@ e84d6d7 was Gattfo (gattfo@hotmail.com), 1779864260, 10 days ago, message: Troub
 e776b2a was Gattfo (gattfo@hotmail.com), 1779861499, 10 days ago, message: Fixed lag
 483f841 was Gattfo (gattfo@hotmail.com), 1779860290, 10 days ago, message: Ommiting tests that are causing CI to fail.
 c7effd3 was Gattfo (gattfo@hotmail.com), 1779856565, 10 days ago, message: Database and AI related tests excluded from github workflows
-b172485 was Gattfo (gattfo@hotmail.com), 1779830053, 10 days ago, message: Merge remote-tracking branch 'origin/master'
-959c40d was Gattfo (gattfo@hotmail.com), 1779830008, 10 days ago, message: Retrying continuous integration
+b172485 was Gattfo (gattfo@hotmail.com), 1779830053, 11 days ago, message: Merge remote-tracking branch 'origin/master'
+959c40d was Gattfo (gattfo@hotmail.com), 1779830008, 11 days ago, message: Retrying continuous integration
 e8334c3 was shepboy22 (shepboy2202@gmail.com), 1779779057, 11 days ago, message: Update meetings journal
 2e1776e was shepboy22 (shepboy2202@gmail.com), 1779771164, 11 days ago, message: Fix round log persistence bug
 7c6ff1f was Hugo Powe (11580178@qut.edu.au), 1779436862, 2 weeks ago, message: Merge remote-tracking branch 'origin/master'

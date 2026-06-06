@@ -9,7 +9,7 @@ git shortlog --summary --numbered --all --no-merges
     13	Mitchel
     12	Ho Yui Wong
     10	Ben Sheppard
-    10	shepboy22
+    10	shepboy22 (Ben Sheppard)
      7	Ho Yui WONG (Bobby)
      5	Dylan
      2	Ho Yui WONG
@@ -25,7 +25,7 @@ git shortlog --summary --numbered --all
     17	Ho Yui Wong
     13	Ben Sheppard
     13	Mitchel
-    10	shepboy22
+    10	shepboy22 (Ben Sheppard)
      9	Ho Yui WONG (Bobby)
      5	Dylan
      3	Ho Yui WONG

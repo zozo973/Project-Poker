@@ -7,8 +7,11 @@ import com.example.projectpoker.model.game.Game;
 import com.example.projectpoker.model.game.Player;
 import com.example.projectpoker.model.game.RoleUtil;
 import com.example.projectpoker.model.game.Round;
+import com.example.projectpoker.model.game.RoundLogEntry;
 import com.example.projectpoker.model.game.enums.Action;
 import com.example.projectpoker.model.game.enums.Difficulty;
+import com.example.projectpoker.model.game.enums.GameStatus;
+import com.example.projectpoker.model.game.enums.RoundStatus;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -56,8 +59,8 @@ class DatabaseTest {
         // the required tables are actually created. That verifies the schema setup for users,
         // game_sessions, round_logs, and round_actions.
     void initializeDatabaseCreatesAllRequiredTables() throws SQLException {
-        try (Connection connection = DatabaseConnection.getInstance();
-             Statement statement = connection.createStatement()) {
+        Connection connection = DatabaseConnection.getInstance();
+        try (Statement statement = connection.createStatement()) {
             // This verifies the persistence layer creates the schema the application depends on.
             ResultSet resultSet = statement.executeQuery(
                     "SELECT name FROM sqlite_master WHERE type = 'table' AND name IN "
@@ -114,6 +117,40 @@ class DatabaseTest {
     }
 
     @Test
+    void finalizeGameSessionIncrementsStoredWinsWithoutOverwritingOtherStats() throws SQLException {
+        UserDAO userDAO = new UserDAO();
+        User user = new User(DEMO_USERNAME, "hashed-password", DEMO_EMAIL);
+        user.setTotalHandsPlayed(2);
+        user.setTotalWins(3);
+        userDAO.insert(user);
+
+        TestPlayer userPlayer = new TestPlayer(user.getUsername(), 1000);
+        Game game = new Game(userPlayer, user, 1000, 3, 50, 5, 10, Difficulty.Baby);
+        game.setGameStatus(GameStatus.ENDED);
+        int gameSessionId = DatabaseManager.createGameSession(user, game, userPlayer);
+
+        Connection connection = DatabaseConnection.getInstance();
+        try (Statement statement = connection.createStatement()) {
+            statement.executeUpdate(
+                    "UPDATE users SET totalHandsPlayed = 7, totalWins = 4 WHERE id = " + user.getId()
+            );
+        }
+
+        userPlayer.forceBalance(1250);
+        DatabaseManager.finalizeGameSession(gameSessionId, user, game, userPlayer);
+
+        User loadedUser = userDAO.getByUsername(DEMO_USERNAME);
+
+        assertNotNull(loadedUser);
+        assertEquals(7, loadedUser.getTotalHandsPlayed());
+        assertEquals(5, loadedUser.getTotalWins());
+        assertEquals(1250, loadedUser.getCurrentBalance());
+        assertEquals(7, user.getTotalHandsPlayed());
+        assertEquals(5, user.getTotalWins());
+        assertEquals(1250, user.getCurrentBalance());
+    }
+
+    @Test
     void saveAndLoadUserPreferencesPersistsOptions() {
         UserDAO userDAO = new UserDAO();
         User user = new User(DEMO_USERNAME, "hashed-password", DEMO_EMAIL);
@@ -148,7 +185,7 @@ class DatabaseTest {
 
     @Test
     // forth test checks that a completed round writes both a round log row and action rows to the database.
-    void recordRoundPersistsRoundLogsAndActions() throws SQLException {
+    void recordRoundPersistsRoundLogsAndActions() throws Exception {
         UserDAO userDAO = new UserDAO();
         User user = new User(DEMO_USERNAME, "hashed-password", DEMO_EMAIL);
         userDAO.insert(user);
@@ -168,7 +205,7 @@ class DatabaseTest {
         Round round = new Round(players, 50, gameSessionId, 1);
         round.init();
         round.setCommunityCards(new ArrayList<>(java.util.List.of(Card.CA, Card.DK, Card.HQ)));
-        round.setRoundStatus(com.example.projectpoker.model.game.enums.RoundStatus.FLOP);
+        setRoundStatusForPersistenceTest(round, RoundStatus.FLOP);
 
         userPlayer.setAction(Action.CHECK);
         round.recordPlayerAction(userPlayer);
@@ -177,8 +214,8 @@ class DatabaseTest {
 
         DatabaseManager.recordRound(gameSessionId, round);
 
-        try (Connection connection = DatabaseConnection.getInstance();
-             Statement statement = connection.createStatement()) {
+        Connection connection = DatabaseConnection.getInstance();
+        try (Statement statement = connection.createStatement()) {
             try (ResultSet roundLogResult = statement.executeQuery(
                     "SELECT game_session_id, round_number, round_status, community_cards FROM round_logs WHERE game_session_id = " + gameSessionId
             )) {
@@ -196,6 +233,49 @@ class DatabaseTest {
                 assertEquals(2, actionCountResult.getInt("action_count"));
             }
         }
+    }
+
+    @Test
+    void recordRoundPersistsSystemRoundLogEntries() throws Exception {
+        UserDAO userDAO = new UserDAO();
+        User user = new User(DEMO_USERNAME, "hashed-password", DEMO_EMAIL);
+        userDAO.insert(user);
+
+        TestPlayer userPlayer = new TestPlayer(user.getUsername(), 1000);
+        TestPlayer aiOne = new TestPlayer("ai_one", 1000);
+        TestPlayer aiTwo = new TestPlayer("ai_two", 1000);
+        ArrayList<Player> players = new ArrayList<>();
+        players.add(userPlayer);
+        players.add(aiOne);
+        players.add(aiTwo);
+        RoleUtil.delegateRoles(players, new int[]{0, 1, 2});
+
+        Game game = new Game(userPlayer, user, 1000, 3, 50, 5, 10, Difficulty.Baby);
+        int gameSessionId = DatabaseManager.createGameSession(user, game, userPlayer);
+
+        Round round = new Round(players, 50, gameSessionId, 1);
+        round.init();
+        setRoundStatusForPersistenceTest(round, RoundStatus.FLOP);
+        round.getRoundLog().add(new RoundLogEntry("FLOP round has ended."));
+
+        DatabaseManager.recordRound(gameSessionId, round);
+
+        Connection connection = DatabaseConnection.getInstance();
+        try (Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(
+                     "SELECT player_name, action, description FROM round_actions WHERE player_name = 'SYSTEM'"
+             )) {
+            assertTrue(resultSet.next());
+            assertEquals("SYSTEM", resultSet.getString("player_name"));
+            assertEquals("SYSTEM", resultSet.getString("action"));
+            assertTrue(resultSet.getString("description").contains("round has ended."));
+        }
+    }
+
+    private void setRoundStatusForPersistenceTest(Round round, RoundStatus roundStatus) throws Exception {
+        java.lang.reflect.Field roundStatusField = Round.class.getDeclaredField("roundStatus");
+        roundStatusField.setAccessible(true);
+        roundStatusField.set(round, roundStatus);
     }
 
     private static class TestPlayer extends Player {

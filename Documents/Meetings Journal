@@ -153,3 +153,46 @@ implement final features
 prepare final submission (last priority)
 fix all in bug (Pot.java)
 fix game loop bug
+
+Meeting 04/06
+Discussed roles for final submission and video presentation recording.
+Roles were split as such:
+Brief overview these were marked in week 9, and we will not mark them again but a refresher is needed to give the marker some context (~1 minute) @Basilis
+
+Brief refresher of the project purpose, benefits, and main requirements
+Brief refresher of user stories and planning documents
+Brief refresher (e.g. screenshots) from the preliminary prototype UIs
+
+Demo the final project in action (~1 minute) @Mitchel
+
+go very fast on what you already presented in week 9 (if you did have a demo then)
+give more emphasis on what was implemented after the week 9 submission
+use your feedback from week 9 to clarify, add detail, highlight improvements
+
+Walk through relevant Java code (~3 minutes) @Hugo
+
+show and discuss your adoption of OO design patterns
+show evidence of refactorings, e.g in repository commits, or comparing different versions of a class
+justify your technical/process choices
+
+Discuss your Continuous Integration/Automated Build Workflow (~2 minutes) @Jacob
+
+show and run your GitHub actions scripts
+show and run your test suits
+show your use of javadoc comments and javadoc pages
+show evidence of sustained use
+
+give evidence of Feedback‑Driven Improvement (~3 minutes) @Ben Sheppard
+
+From whom did the team seek feedback, and how was it discussed and implemented?
+Show evidence of code quality assessment (e.g. test coverage)
+Show evidence of UI quality assessment (e.g. Usability assessment)
+Show evidence of reflective team practices (e.g. sprint retrospective)
+Show how all of these is reflected in iterative improvement in your process, product, and teamwork.
+
+
+@Bobby
+job is to edit the video together
+
+@Jacob
+final submission submitting

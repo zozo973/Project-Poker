@@ -13,10 +13,7 @@ public class DatabaseManager {
     private DatabaseManager() {
     }
 
-    /**
-     * Creates every database table required by the application if they do not already exist.
-     * Should be called once before any database reads or writes.
-     */
+    // Creates every database table the app needs before any reads or writes run.
     public static void initializeDatabase() {
         UserDAO userDAO = new UserDAO();
         userDAO.createTable();
@@ -27,30 +24,14 @@ public class DatabaseManager {
         new RoundLogDAO().createTables();
     }
 
-    /**
-     * Returns an existing user matching the given username, or inserts a new one with the
-     * specified default balance if none is found.
-     *
-     * @param username       the username to look up
-     * @param password       the password to assign if a new user is created
-     * @param defaultBalance the starting chip balance for a newly created user
-     * @return the existing or newly created {@link User}
-     */
+    // Loads an existing user, or creates one with the starting balance if none exists.
     public static User getOrCreateUser(String username, String password, int defaultBalance) {
         initializeDatabase();
         UserDAO userDAO = new UserDAO();
         return userDAO.getOrCreate(username, password, defaultBalance);
     }
 
-    /**
-     * Inserts a new game session record for the given user and returns its generated session id.
-     * Returns {@code -1} if {@code user} is {@code null}.
-     *
-     * @param user   the logged-in {@link User} starting the game
-     * @param game   the {@link Game} instance containing session configuration
-     * @param player the human {@link Player} whose starting balance is recorded
-     * @return the generated session id, or {@code -1} if the insert was skipped
-     */
+    // Starts a database record for a poker game and returns its session id.
     public static int createGameSession(User user, Game game, Player player) {
         if (user == null) {
             return -1;
@@ -59,13 +40,7 @@ public class DatabaseManager {
         return new GameSessionDAO().insert(user, game, player);
     }
 
-    /**
-     * Saves a completed round's log to the database, linked to the given session.
-     * Does nothing if {@code gameSessionId} is non-positive.
-     *
-     * @param gameSessionId the session id that the round belongs to
-     * @param round         the completed {@link Round} whose data should be persisted
-     */
+    // Saves one completed round and links it to the current game session.
     public static void recordRound(int gameSessionId, Round round) {
         if (gameSessionId <= 0) {
             return;
@@ -74,13 +49,7 @@ public class DatabaseManager {
         new RoundLogDAO().insertRound(round, gameSessionId);
     }
 
-    /**
-     * Updates the user's balance in the database mid-game so partial progress is not lost
-     * if the application exits unexpectedly.
-     *
-     * @param user   the {@link User} whose balance should be updated; ignored if {@code null}
-     * @param player the {@link Player} whose current balance will be saved to the user record
-     */
+    // Updates the user's saved balance while a game is still in progress.
     public static void saveUserProgress(User user, Player player) {
         if (user == null || player == null) {
             return;
@@ -92,16 +61,7 @@ public class DatabaseManager {
         new UserDAO().update(user);
     }
 
-    /**
-     * Finalises the game session in the database: updates the user's balance, increments wins if
-     * the user's ending balance exceeds their starting balance, and marks the session as finished.
-     * Does nothing if {@code user} is {@code null}.
-     *
-     * @param gameSessionId the session id to finalise; a non-positive id skips the session update
-     * @param user          the {@link User} whose profile stats are updated
-     * @param game          the {@link Game} holding the starting balance reference
-     * @param player        the {@link Player} whose final balance is written back to the user record
-     */
+    // Writes the final game result, including balance, wins, and session status.
     public static void finalizeGameSession(int gameSessionId, User user, Game game, Player player) {
         if (user == null) {
             return;
@@ -109,25 +69,31 @@ public class DatabaseManager {
 
         initializeDatabase();
 
-        boolean wonGame = player.getBalance() > game.getStartingUserBalance();
-        user.setCurrentBalance(player.getBalance());
-        if (wonGame) {
-            user.setTotalWins(user.getTotalWins() + 1);
+        UserDAO userDAO = new UserDAO();
+        User storedUser = userDAO.getById(user.getId());
+        if (storedUser == null) {
+            storedUser = user;
         }
 
-        UserDAO userDAO = new UserDAO();
-        userDAO.update(user);
+        boolean wonGame = player.getBalance() > game.getStartingUserBalance();
+        userDAO.updateCurrentBalance(storedUser.getId(), player.getBalance());
+        if (wonGame) {
+            userDAO.incrementTotalWins(storedUser.getId());
+        }
+
+        User updatedUser = userDAO.getById(storedUser.getId());
+        if (updatedUser != null) {
+            user.setCurrentBalance(updatedUser.getCurrentBalance());
+            user.setTotalHandsPlayed(updatedUser.getTotalHandsPlayed());
+            user.setTotalWins(updatedUser.getTotalWins());
+        }
 
         if (gameSessionId > 0) {
             new GameSessionDAO().finish(gameSessionId, player.getBalance(), game.getGameStatus().name());
         }
     }
 
-    /**
-     * Returns every user profile stored in the database.
-     *
-     * @return a list of all {@link User} objects, or an empty list if the table is empty
-     */
+    // Returns every user profile stored in the database.
     public static List<User> getAllUsers() {
         initializeDatabase();
         return new UserDAO().getAll();

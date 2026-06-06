@@ -34,15 +34,6 @@ public class AiCoaching {
     // Main Feature; Send (User's hand cards / BoardCards / RoundStatus(Stage) / Advice Mode) to Gemini
     // Return (result.action / result.condifence / result.reason / result.errormsg)
     //-----
-    /**
-     * Requests coaching advice for the human player based on the current game state.
-     *
-     * @param handCards the player's hole cards
-     * @param boardCards currently visible community cards
-     * @param currentStatus current round phase
-     * @param mode requested coaching style (safe, normal, or risky)
-     * @return an {@link AiAdvice} containing an action recommendation, confidence, and rationale
-     */
     public AiAdvice getAdvice(Card[] handCards, Card[] boardCards, RoundStatus currentStatus, AiAdviceMode mode) {
 
         AiAdvice result = new AiAdvice();
@@ -50,6 +41,7 @@ public class AiCoaching {
         try {
             if (handCards == null || boardCards == null) {
                 AiAdvice ErrorAdvice = new AiAdvice();
+                ErrorAdvice.errormsg = "Missing cards for AI advice.";
                 return ErrorAdvice;
             }
             //prompt contact
@@ -111,11 +103,6 @@ public class AiCoaching {
         return result;
     }
 
-    /**
-     * Builds the system-level instructions that constrain the model output format.
-     *
-     * @return system prompt text used for the Gemini request
-     */
     public String getSystemPrompt() {
         return """
                 You are a world-class Texas Hold'em poker master and AI coach. Your task is to analyze the current poker game state and provide the best action recommendation.
@@ -131,15 +118,6 @@ public class AiCoaching {
                 """;
     }
 
-    /**
-     * Builds the user prompt containing the current poker state and requested advice style.
-     *
-     * @param handCards the player's hole cards
-     * @param boardCards currently visible community cards
-     * @param currentStatus current round phase
-     * @param mode requested coaching style
-     * @return user prompt text sent to the model
-     */
     public String getUserPrompt(Card[] handCards, Card[] boardCards, RoundStatus currentStatus, AiAdviceMode mode) {
         String handStr = formatCards(handCards);
         String boardStr = formatCards(boardCards);
@@ -218,4 +196,3 @@ public class AiCoaching {
 
 
 }
-

@@ -1,0 +1,9 @@
+module:com.example.projectpoker
+com.example.projectpoker
+com.example.projectpoker.controller
+com.example.projectpoker.database
+com.example.projectpoker.model
+com.example.projectpoker.model.game
+com.example.projectpoker.model.game.enums
+com.example.projectpoker.model.statistics
+com.example.projectpoker.service
